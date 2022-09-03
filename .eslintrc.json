@@ -1,0 +1,6 @@
+{
+    "extends": [
+        "@gergoszaszvaradi/eslint-config",
+        "@gergoszaszvaradi/eslint-config-solid"
+    ]
+}
