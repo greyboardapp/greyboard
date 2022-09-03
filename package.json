@@ -9,8 +9,8 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@gergoszaszvaradi/eslint-config": "^1.1.0",
-    "@gergoszaszvaradi/eslint-config-solid": "^1.1.0",
+    "@gergoszaszvaradi/eslint-config": "^1.1.2",
+    "@gergoszaszvaradi/eslint-config-solid": "^1.1.2",
     "@gergoszaszvaradi/stylelint-config": "^1.2.1",
     "@gergoszaszvaradi/vite-env": "^1.0.2",
     "sass": "^1.54.8",
@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.4.2",
+    "nanoid": "^4.0.0",
+    "reflect-metadata": "^0.1.13",
     "solid-js": "^1.4.7"
   }
 }

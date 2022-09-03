@@ -2,5 +2,8 @@
     "extends": [
         "@gergoszaszvaradi/eslint-config",
         "@gergoszaszvaradi/eslint-config-solid"
-    ]
+    ],
+    "rules": {
+        "no-extend-native": "off"
+    }
 }
