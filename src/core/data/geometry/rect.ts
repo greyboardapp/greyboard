@@ -7,6 +7,10 @@ export default class Rect {
         return new Point(this.x + this.w / 2, this.y + this.h / 2);
     }
 
+    get area() : number {
+        return Math.abs(this.w * this.h);
+    }
+
     get x2() : number {
         return this.x + this.w;
     }
@@ -33,10 +37,6 @@ export default class Rect {
 
     static fromTwoPoints(a : Point, b : Point) : Rect {
         return new Rect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y));
-    }
-
-    area() : number {
-        return Math.abs(this.w * this.h);
     }
 }
 

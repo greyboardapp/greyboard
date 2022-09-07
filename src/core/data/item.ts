@@ -1,5 +1,5 @@
 import { generateId } from "../../utils/system/id";
-import Graphics from "../graphics";
+import Graphics from "../services/renderer/graphics";
 import Rect, { MinMaxRect } from "./geometry/rect";
 
 export enum BoardItemType {

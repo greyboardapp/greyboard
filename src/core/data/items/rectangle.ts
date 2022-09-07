@@ -1,4 +1,4 @@
-import Graphics from "../../graphics";
+import Graphics from "../../services/renderer/graphics";
 import Rect from "../geometry/rect";
 import { BoardItem } from "../item";
 

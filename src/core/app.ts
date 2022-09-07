@@ -1,34 +1,23 @@
-import { Container } from "../utils/system/di";
+import { startServices, stopServices } from "../utils/system/service";
+
+import "./services/viewport";
+import "./services/toolbox";
+
 import Rect from "./data/geometry/rect";
 import Rectangle from "./data/items/rectangle";
-import Board from "./services/board";
+import { board } from "./services/board";
 
 class Application {
-    constructor(
-        private readonly board : Board,
-    ) {}
+    constructor() {}
 
     start() : void {
-        Container.start();
-
-        const rect = new Rectangle(new Rect(100, 100, 300, 200), 0xFF000070, 0, true);
-        this.board.add([
-            rect,
-        ]);
-
-        this.board.add([
-            new Rectangle(new Rect(150, 120, 300, 200), 0xFF000070, 0, true),
-        ]);
-
-        this.board.remove([rect.id]);
+        startServices();
     }
 
     stop() : void {
-        Container.stop();
+        stopServices();
     }
 }
 
-const app = new Application(
-    Container.get(Board),
-);
+const app = new Application();
 export default app;

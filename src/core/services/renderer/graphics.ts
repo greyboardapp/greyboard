@@ -1,15 +1,22 @@
-import Color from "../utils/system/color";
-import Rect from "./data/geometry/rect";
+import Color from "../../../utils/system/color";
+import Rect from "../../data/geometry/rect";
 
 export default class Graphics {
     private readonly ctx : CanvasRenderingContext2D;
-    constructor(private readonly canvas : HTMLCanvasElement) {
-        this.ctx = canvas.getContext("2d", { alpha: false });
+    constructor(private readonly canvas : HTMLCanvasElement, alpha = false) {
+        const ctx = canvas.getContext("2d", { alpha });
+        if (!ctx)
+            throw new Error("no context");
+        this.ctx = ctx;
     }
 
-    clear() : void {
-        this.ctx.fillStyle = "#000000";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    clear(color ?: string) : void {
+        if (color) {
+            this.ctx.fillStyle = "#000000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
     }
 
     scissor(x : number, y : number, w : number, h : number, render : () => void) : void {

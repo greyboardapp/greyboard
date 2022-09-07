@@ -1,31 +1,38 @@
-import { Injectable, Lifetime, Service } from "../../utils/system/di";
+import { createService, Service } from "../../utils/system/service";
 import Point from "../data/geometry/point";
 import { MinMaxRect } from "../data/geometry/rect";
 import { BoardItem } from "../data/item";
-import { StaticRenderer } from "./graphics/renderer";
+import { StaticRenderer } from "./renderer";
 
-@Injectable(Lifetime.Singleton)
-export default class Board extends Service {
+interface BoardState {
+    name : string;
+    isPublic : boolean;
+}
+
+export class Board extends Service<BoardState> {
     public static readonly cellSize = 100;
 
-    public items = new Map<number, BoardItem>();
+    public readonly items = new Map<number, BoardItem>();
     public readonly cells = new Map<string, Set<BoardItem>>();
 
-    private renderer : StaticRenderer;
+    public renderer ?: StaticRenderer;
 
     constructor() {
-        super();
+        super({
+            name: "New Board",
+            isPublic: false,
+        });
     }
 
     start() : void {
-        this.renderer = new StaticRenderer(this);
+        this.renderer = new StaticRenderer();
     }
 
     add(items : Iterable<BoardItem>) : void {
         for (const item of items)
             this.items.set(item.id, item);
         this.addToGrid(items);
-        this.renderer.add(items);
+        this.renderer?.add(items);
     }
 
     remove(ids : Iterable<number>) : void {
@@ -40,7 +47,7 @@ export default class Board extends Service {
             }
         }
         this.removeFromGrid(items);
-        this.renderer.updateRegion(region);
+        this.renderer?.updateRegion(region);
     }
 
     getItemsFromRegion(region : MinMaxRect) : Set<BoardItem> {
@@ -96,3 +103,5 @@ export default class Board extends Service {
         return `${x}_${y}`;
     }
 }
+
+export const board = createService<BoardState, Board>(Board);
