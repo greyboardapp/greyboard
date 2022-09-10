@@ -6,7 +6,11 @@ const IndexPage : Component = () => {
     onMount(() => app.start());
     onCleanup(() => app.stop());
 
-    return <Canvas />;
+    return (
+        <>
+            <Canvas />
+        </>
+    );
 };
 
 export default IndexPage;

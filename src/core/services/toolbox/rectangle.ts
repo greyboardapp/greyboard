@@ -1,7 +1,6 @@
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
 import { CreatorTool, ToolCategory } from "./tool";
-import { board } from "../board";
 import { PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
 
@@ -33,6 +32,6 @@ export class RectangleTool extends CreatorTool<Rectangle> {
         if (this.item.rect.area < 1)
             return;
 
-        board.add([this.item]);
+        this.create();
     }
 }

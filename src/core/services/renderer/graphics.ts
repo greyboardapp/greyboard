@@ -19,6 +19,10 @@ export default class Graphics {
         }
     }
 
+    origin(x : number, y : number) : void {
+        this.ctx.translate(-x, -y);
+    }
+
     scissor(x : number, y : number, w : number, h : number, render : () => void) : void {
         this.ctx.save();
         this.ctx.beginPath();
@@ -33,5 +37,10 @@ export default class Graphics {
     rect(rect : Rect, color : number) : void {
         this.ctx.fillStyle = Color.UIntToHex(color);
         this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    }
+
+    path(path : Path2D, color : number) : void {
+        this.ctx.fillStyle = Color.UIntToHex(color);
+        this.ctx.fill(path);
     }
 }

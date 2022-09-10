@@ -2,6 +2,7 @@
 declare global {
     interface ArrayConstructor {
         repeat<T>(x : T, n : number) : Array<T>;
+        repeat<T>(fn : (i : number) => T, n : number) : Array<T>;
     }
 
     interface Array<T> {
@@ -75,6 +76,10 @@ Array.prototype.groupBy = function<T, K extends T[keyof T]> (this : T[], key : (
 
 Array.repeat = function<T> (x : T, n : number) : Array<T> {
     return new Array<T>(n).fill(x);
+};
+
+Array.repeat = function<T> (fn : (i : number) => T, n : number) : Array<T> {
+    return new Array<T>(n).map((_value, i) => fn(i));
 };
 
 export {};

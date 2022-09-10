@@ -1,17 +1,19 @@
+import tweenjs from "@tweenjs/tween.js";
 import { startServices, stopServices } from "../utils/system/service";
+import { dynamicRenderer } from "./services/renderer";
+
+import "../utils/system/array";
 
 import "./services/viewport";
 import "./services/toolbox";
-
-import Rect from "./data/geometry/rect";
-import Rectangle from "./data/items/rectangle";
-import { board } from "./services/board";
 
 class Application {
     constructor() {}
 
     start() : void {
         startServices();
+
+        dynamicRenderer.onRender.add((graphics, dt) => tweenjs.update(dt));
     }
 
     stop() : void {

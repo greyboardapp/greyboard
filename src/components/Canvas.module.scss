@@ -1,10 +1,23 @@
-.canvasContainer {
+.canvasLayerRoot {
     position: relative;
+}
+
+.staticCanvasContainer {
+    position: fixed;
+}
+
+canvas {
+    position: absolute;
+}
+
+.canvasOverlayContainer {
+    pointer-events: none;
+    overflow: hidden;
     width: 100vw;
     height: 100vh;
 
     > canvas {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100vw;

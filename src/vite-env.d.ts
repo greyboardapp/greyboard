@@ -12,5 +12,6 @@ declare module "*.scss" {
 declare interface ImportMeta {
     env : {
         BASE_URL : string;
+        DEBUG ?: string;
     }
 }

@@ -38,6 +38,10 @@ export default class Rect {
     static fromTwoPoints(a : Point, b : Point) : Rect {
         return new Rect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y));
     }
+
+    intersects(other : Rect) : boolean {
+        return (!(other.x > this.x2 || other.x2 < this.x || other.y > this.y2 || other.y2 < this.y));
+    }
 }
 
 export class MinMaxRect {

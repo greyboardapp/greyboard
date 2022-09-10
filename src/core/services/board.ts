@@ -1,8 +1,7 @@
 import { createService, Service } from "../../utils/system/service";
 import Point from "../data/geometry/point";
-import { MinMaxRect } from "../data/geometry/rect";
 import { BoardItem } from "../data/item";
-import { StaticRenderer } from "./renderer";
+import { Chunk } from "./board/chunk";
 
 interface BoardState {
     name : string;
@@ -10,12 +9,8 @@ interface BoardState {
 }
 
 export class Board extends Service<BoardState> {
-    public static readonly cellSize = 100;
-
     public readonly items = new Map<number, BoardItem>();
-    public readonly cells = new Map<string, Set<BoardItem>>();
-
-    public renderer ?: StaticRenderer;
+    public readonly chunks = new Map<string, Chunk>();
 
     constructor() {
         super({
@@ -24,79 +19,59 @@ export class Board extends Service<BoardState> {
         });
     }
 
-    start() : void {
-        this.renderer = new StaticRenderer();
-    }
+    start() : void {}
 
     add(items : Iterable<BoardItem>) : void {
         for (const item of items)
             this.items.set(item.id, item);
-        this.addToGrid(items);
-        this.renderer?.add(items);
+        this.addToChunk(items);
     }
 
-    remove(ids : Iterable<number>) : void {
-        const items : BoardItem[] = [];
-        const region = new MinMaxRect();
-        for (const id of ids) {
-            const item = this.items.get(id);
-            if (item) {
-                items.push(item);
-                region.append(item.cell);
-                this.items.delete(id);
-            }
-        }
-        this.removeFromGrid(items);
-        this.renderer?.updateRegion(region);
-    }
-
-    getItemsFromRegion(region : MinMaxRect) : Set<BoardItem> {
-        const items = new Set<BoardItem>();
-        for (let { x } = region.min; x <= region.max.x; ++x)
-            for (let { y } = region.min; y <= region.max.y; ++y) {
-                const key = this.hash(x, y);
-                const cell = this.cells.get(key);
-                if (cell)
-                    for (const item of cell.values())
-                        items.add(item);
-            }
-        return items;
-    }
-
-    private addToGrid(items : Iterable<BoardItem>) : void {
+    private addToChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const min = this.getCellIndex(item.rect.x, item.rect.y);
-            const max = this.getCellIndex(item.rect.x + item.rect.w, item.rect.y + item.rect.h);
+            const min = this.getChunkIndex(item.rect.x, item.rect.y);
+            const max = this.getChunkIndex(item.rect.x2, item.rect.y2);
             for (let { x } = min; x <= max.x; ++x)
                 for (let { y } = min; y <= max.y; ++y) {
                     const key = this.hash(x, y);
-                    let cell = this.cells.get(key);
-                    if (!cell) {
-                        cell = new Set();
-                        this.cells.set(key, cell);
+                    let chunk = this.chunks.get(key);
+                    if (!chunk) {
+                        chunk = new Chunk(x, y);
+                        this.chunks.set(key, chunk);
                     }
-                    cell.add(item);
+                    chunk.add(item);
                 }
-            item.cell.min = min;
-            item.cell.max = max;
         }
     }
 
-    private removeFromGrid(items : Iterable<BoardItem>) : void {
+    private removeFromChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
             const { min, max } = item.cell;
             for (let { x } = min; x <= max.x; ++x)
                 for (let { y } = min; y <= max.y; ++y) {
                     const key = this.hash(x, y);
-                    const cell = this.cells.get(key);
-                    if (cell)
-                        cell.delete(item);
+                    const chunk = this.chunks.get(key);
+                    if (chunk)
+                        chunk.remove(item);
                 }
         }
     }
 
-    private getCellIndex(x : number, y : number) : Point {
-        return new Point(Math.floor(x / Board.cellSize), Math.floor(y / Board.cellSize));
+    // getItemsFromRegion(region : MinMaxRect) : Set<BoardItem> {
+    //     const items = new Set<BoardItem>();
+    //     for (let { x } = region.min; x <= region.max.x; ++x)
+    //         for (let { y } = region.min; y <= region.max.y; ++y) {
+    //             const key = this.hash(x, y);
+    //             const cell = this.cells.get(key);
+    //             if (cell)
+    //                 for (const item of cell.values())
+    //                     items.add(item);
+    //         }
+    //     return items;
+    // }
+
+    private getChunkIndex(x : number, y : number) : Point {
+        return new Point(Math.floor(x / Chunk.maxChunkSize), Math.floor(y / Chunk.maxChunkSize));
     }
 
     private hash(x : number, y : number) : string {

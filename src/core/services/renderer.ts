@@ -1,38 +1,6 @@
-import { MinMaxRect } from "../data/geometry/rect";
-import { BoardItem } from "../data/item";
-import { Board, board } from "./board";
 import Graphics from "./renderer/graphics";
 import { createStatelessService, Service } from "../../utils/system/service";
 import createDelegate from "../../utils/system/delegate";
-
-export class StaticRenderer {
-    private readonly graphics : Graphics;
-
-    constructor() {
-        const canvas = document.getElementById("staticCanvas") as HTMLCanvasElement;
-        this.graphics = new Graphics(canvas);
-    }
-
-    render() : void {
-        this.graphics.clear("#000000");
-        for (const item of board.items.values())
-            item.render(this.graphics);
-    }
-
-    add(items : Iterable<BoardItem>) : void {
-        for (const item of items)
-            item.render(this.graphics);
-    }
-
-    updateRegion(region : MinMaxRect) : void {
-        const w = region.max.x - region.min.x;
-        const h = region.max.y - region.min.y;
-        this.graphics.scissor(region.min.x * Board.cellSize, region.min.y * Board.cellSize, w * Board.cellSize, h * Board.cellSize, () => {
-            for (const item of board.getItemsFromRegion(region))
-                item.render(this.graphics);
-        });
-    }
-}
 
 export class DynamicRenderer extends Service {
     public onRender = createDelegate<[graphics : Graphics, dt : number]>();
@@ -77,3 +45,42 @@ export class DynamicRenderer extends Service {
 }
 
 export const dynamicRenderer = createStatelessService(DynamicRenderer);
+
+// interface CanvasChunk {
+//     canvas : HTMLCanvasElement;
+//     ctx :
+// }
+
+// export class StaticRenderer {
+//     private static readonly maxCanvasSize = 16384;
+
+//     private readonly graphics : Graphics;
+//     // private readonly chunks : Map<string,
+
+//     constructor() {
+//         const canvas = document.getElementById("staticCanvas") as HTMLCanvasElement;
+//         this.graphics = new Graphics(canvas);
+
+//         dynamicRenderer.onResize.add(() => this.render());
+//     }
+
+//     render() : void {
+//         this.graphics.clear("#000000");
+//         for (const item of board.items.values())
+//             item.render(this.graphics);
+//     }
+
+//     add(items : Iterable<BoardItem>) : void {
+//         for (const item of items)
+//             item.render(this.graphics);
+//     }
+
+//     updateRegion(region : MinMaxRect) : void {
+//         const w = region.max.x - region.min.x;
+//         const h = region.max.y - region.min.y;
+//         this.graphics.scissor(region.min.x * Board.cellSize, region.min.y * Board.cellSize, w * Board.cellSize, h * Board.cellSize, () => {
+//             for (const item of board.getItemsFromRegion(region))
+//                 item.render(this.graphics);
+//         });
+//     }
+// }
