@@ -2,7 +2,6 @@ import Color from "../../utils/system/color";
 import { createService, Service } from "../../utils/system/service";
 import { Tool } from "./toolbox/tool";
 import Graphics from "./renderer/graphics";
-import { dynamicRenderer } from "./renderer";
 import { input, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
@@ -51,7 +50,6 @@ export class Toolbox extends Service<ToolboxState> {
         input.onPointerDown.add(this.pointerDownEvent);
         input.onPointerMove.add(this.pointerMoveEvent);
         input.onPointerUp.add(this.pointerUpEvent);
-        dynamicRenderer.onRender.add(this.renderEvent);
     }
 
     selectTool(tool : Tool) : void {

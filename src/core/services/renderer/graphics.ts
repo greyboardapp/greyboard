@@ -11,6 +11,7 @@ export default class Graphics {
     }
 
     clear(color ?: string) : void {
+        this.reset();
         if (color) {
             this.ctx.fillStyle = "#000000";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -19,8 +20,16 @@ export default class Graphics {
         }
     }
 
+    reset() : void {
+        this.ctx.resetTransform();
+    }
+
     origin(x : number, y : number) : void {
         this.ctx.translate(-x, -y);
+    }
+
+    zoom(scale : number) : void {
+        this.ctx.scale(scale, scale);
     }
 
     scissor(x : number, y : number, w : number, h : number, render : () => void) : void {
@@ -34,9 +43,21 @@ export default class Graphics {
         this.ctx.restore();
     }
 
-    rect(rect : Rect, color : number) : void {
-        this.ctx.fillStyle = Color.UIntToHex(color);
-        this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    rect(rect : Rect, color : number, filled = false) : void {
+        this.rectangle(rect.x, rect.y, rect.w, rect.h, color, filled);
+    }
+
+    rectangle(x : number, y : number, w : number, h : number, color : number, filled = false) : void {
+        if (filled) {
+            this.ctx.fillStyle = Color.UIntToHex(color);
+            this.ctx.fillRect(x, y, w, h);
+        } else {
+            this.ctx.strokeStyle = Color.UIntToHex(color);
+            this.ctx.beginPath();
+            this.ctx.rect(x, y, w, h);
+            this.ctx.stroke();
+            this.ctx.closePath();
+        }
     }
 
     path(path : Path2D, color : number) : void {

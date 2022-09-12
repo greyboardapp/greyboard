@@ -3,6 +3,7 @@ import { generateId } from "../../../utils/system/id";
 import Rect from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
 import Graphics from "../renderer/graphics";
+import { viewport } from "../viewport";
 
 export type QuadTreeSubdivisions = [QuadTree, QuadTree, QuadTree, QuadTree] | [];
 
@@ -16,7 +17,7 @@ export class QuadTree {
     constructor(public boundary : Rect, private readonly depth = 0) {}
 
     insert(item : BoardItem) : void {
-        if (!item.rect.intersects(this.boundary))
+        if (!item.transform.intersects(this.boundary))
             return;
 
         if (this.items.size < QuadTree.maxCapacity || this.depth >= QuadTree.maxDepth) {
@@ -30,7 +31,7 @@ export class QuadTree {
     }
 
     delete(item : BoardItem) : void {
-        if (!item.rect.intersects(this.boundary))
+        if (!item.transform.intersects(this.boundary))
             return;
 
         for (const i of this.items)
@@ -41,6 +42,12 @@ export class QuadTree {
 
         for (const child of this.children)
             child.delete(item);
+    }
+
+    deleteAll() : void {
+        this.items.clear();
+        for (const child of this.children)
+            child.deleteAll();
     }
 
     get(region : Rect, result ?: Set<BoardItem>) : Set<BoardItem> {
@@ -63,6 +70,21 @@ export class QuadTree {
         return result;
     }
 
+    getAll(result ?: Set<BoardItem>) : Set<BoardItem> {
+        if (!result)
+            result = new Set<BoardItem>();
+        if (this.children.length > 0) {
+            for (const child of this.children)
+                child.getAll(result);
+            return result;
+        }
+
+        for (const item of this.items)
+            result.add(item);
+
+        return result;
+    }
+
     subdivide() : void {
         this.children = [
             new QuadTree(new Rect(this.boundary.x, this.boundary.y, this.boundary.w / 2, this.boundary.h / 2), this.depth + 1),
@@ -79,38 +101,40 @@ export class QuadTree {
     }
 }
 
-export class Chunk {
+export class Chunk extends QuadTree {
     public static readonly maxChunkSize = 10000;
 
     public id = generateId();
     public canvas : HTMLCanvasElement;
     public graphics : Graphics;
 
-    private readonly storage : QuadTree;
-
     constructor(public x : number, public y : number) {
-        this.storage = new QuadTree(new Rect(x, y, Chunk.maxChunkSize, Chunk.maxChunkSize));
-        const canvasContainer = document.getElementById("staticCanvasContainer");
-        this.canvas = document.createElement("canvas");
-        this.canvas.style.left = px(x * Chunk.maxChunkSize);
-        this.canvas.style.top = px(y * Chunk.maxChunkSize);
-        this.canvas.width = Chunk.maxChunkSize;
-        this.canvas.style.width = px(Chunk.maxChunkSize);
-        this.canvas.height = Chunk.maxChunkSize;
-        this.canvas.style.height = px(Chunk.maxChunkSize);
-        canvasContainer?.append(this.canvas);
+        super(new Rect(x, y, Chunk.maxChunkSize, Chunk.maxChunkSize), 0);
+        this.canvas = <canvas
+            width={Chunk.maxChunkSize}
+            height={Chunk.maxChunkSize}
+            style={{
+                left: px(x * Chunk.maxChunkSize),
+                top: px(y * Chunk.maxChunkSize),
+                width: px(Chunk.maxChunkSize),
+                height: px(Chunk.maxChunkSize),
+            }}
+        ></canvas> as HTMLCanvasElement;
+        document.getElementById("staticCanvasContainer")?.append(this.canvas);
         this.graphics = new Graphics(this.canvas);
-        this.graphics.origin(x * Chunk.maxChunkSize, y * Chunk.maxChunkSize);
+        this.resetGraphics();
     }
 
     get key() : string { return `${this.x}_${this.y}`; }
 
-    add(item : BoardItem) : void {
-        this.storage.insert(item);
+    insert(item : BoardItem) : void {
+        super.insert(item);
         item.render(this.graphics);
     }
 
-    remove(item : BoardItem) : void {
-        this.storage.delete(item);
+    resetGraphics() : void {
+        this.graphics.clear();
+        this.graphics.origin(this.x * Chunk.maxChunkSize, this.y * Chunk.maxChunkSize);
+        this.graphics.zoom(viewport.state.scale);
     }
 }

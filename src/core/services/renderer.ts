@@ -1,86 +1,51 @@
-import Graphics from "./renderer/graphics";
+import { RendererLayer } from "./renderer/layer";
 import { createStatelessService, Service } from "../../utils/system/service";
 import createDelegate from "../../utils/system/delegate";
 
-export class DynamicRenderer extends Service {
-    public onRender = createDelegate<[graphics : Graphics, dt : number]>();
-    public onResize = createDelegate<[width : number, height : number]>();
+import { DynamicLayer } from "./renderer/layers/dynamicLayer";
+import { DebugLayer } from "./renderer/layers/debugLayer";
 
-    private graphics ?: Graphics;
+class Renderer extends Service {
+    public onFrameUpdate = createDelegate<[dt : number]>();
+
     private enabled = true;
+    private readonly layerStack : RendererLayer[] = [];
 
     constructor() {
         super({});
     }
 
     start() : void {
-        const canvas = document.getElementById("dynamicCanvas") as HTMLCanvasElement;
-        this.graphics = new Graphics(canvas, true);
-
-        this.onResize.add(this.resize);
+        for (const layer of this.layerStack)
+            layer.start();
 
         this.render(0);
     }
 
     stop() : void {
         this.enabled = false;
-        this.onRender.clear();
-        this.onResize.clear();
+        this.onFrameUpdate.clear();
     }
 
-    private resize(width : number, height : number) : void {
-        this.graphics?.clear();
+    pushLayer(ctor : new () => RendererLayer) : void {
+        this.layerStack.push(new ctor());
     }
 
     private render(dt : number) : void {
-        if (!this.graphics)
-            return;
+        for (const layer of this.layerStack)
+            layer.onRender(dt);
 
-        this.graphics.clear();
-        this.onRender(this.graphics, dt);
+        this.onFrameUpdate(dt);
 
         if (this.enabled)
             window.requestAnimationFrame((t) => this.render(t));
     }
 }
 
-export const dynamicRenderer = createStatelessService(DynamicRenderer);
+const renderer = createStatelessService(Renderer);
+renderer.pushLayer(DynamicLayer);
 
-// interface CanvasChunk {
-//     canvas : HTMLCanvasElement;
-//     ctx :
-// }
+if (import.meta.env.DEBUG)
+    renderer.pushLayer(DebugLayer);
 
-// export class StaticRenderer {
-//     private static readonly maxCanvasSize = 16384;
-
-//     private readonly graphics : Graphics;
-//     // private readonly chunks : Map<string,
-
-//     constructor() {
-//         const canvas = document.getElementById("staticCanvas") as HTMLCanvasElement;
-//         this.graphics = new Graphics(canvas);
-
-//         dynamicRenderer.onResize.add(() => this.render());
-//     }
-
-//     render() : void {
-//         this.graphics.clear("#000000");
-//         for (const item of board.items.values())
-//             item.render(this.graphics);
-//     }
-
-//     add(items : Iterable<BoardItem>) : void {
-//         for (const item of items)
-//             item.render(this.graphics);
-//     }
-
-//     updateRegion(region : MinMaxRect) : void {
-//         const w = region.max.x - region.min.x;
-//         const h = region.max.y - region.min.y;
-//         this.graphics.scissor(region.min.x * Board.cellSize, region.min.y * Board.cellSize, w * Board.cellSize, h * Board.cellSize, () => {
-//             for (const item of board.getItemsFromRegion(region))
-//                 item.render(this.graphics);
-//         });
-//     }
-// }
+export { renderer };

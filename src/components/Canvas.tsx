@@ -1,20 +1,16 @@
-import { Component, createSignal, Show } from "solid-js";
-import { dynamicRenderer } from "../core/services/renderer";
+import { Component } from "solid-js";
 import { input } from "../core/services/input";
 import { createWindowListener } from "../utils/hooks";
 
 import styles from "./Canvas.module.scss";
 import { viewport } from "../core/services/viewport";
 import { px } from "../utils/dom";
+import { setWindowHeight, setWindowWidth } from "../core/services/renderer/layer";
 
 const Canvas : Component = () => {
-    const [width, setWidth] = createSignal(window.innerWidth);
-    const [height, setHeight] = createSignal(window.innerHeight);
-
     createWindowListener("resize", () => {
-        setWidth(window.innerWidth);
-        setHeight(window.innerHeight);
-        dynamicRenderer.onResize(window.innerWidth, window.innerHeight);
+        setWindowWidth(window.innerWidth);
+        setWindowHeight(window.innerHeight);
     });
 
     return (
@@ -35,10 +31,7 @@ const Canvas : Component = () => {
                     left: px(viewport.state.offsetX),
                     top: px(viewport.state.offsetY),
                 }}></div>
-                <div id="canvasOverlayContainer" class={styles.canvasOverlayContainer}>
-                    <canvas id="dynamicCanvas" width={width()} height={height()}></canvas>
-                    <Show when={!!import.meta.env.DEBUG}><canvas id="debugCanvas" width={width()} height={height()}></canvas></Show>
-                </div>
+                <div id="canvasOverlayContainer" class={styles.canvasOverlayContainer}></div>
             </div>
         </div>
     );

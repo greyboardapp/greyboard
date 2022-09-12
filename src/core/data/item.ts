@@ -1,5 +1,6 @@
 import { generateId } from "../../utils/system/id";
 import Graphics from "../services/renderer/graphics";
+import { viewport } from "../services/viewport";
 import Rect, { MinMaxRect } from "./geometry/rect";
 
 export enum BoardItemType {
@@ -17,6 +18,15 @@ export abstract class BoardItem {
     public label : string | null = null;
     public locked = false;
     public zIndex = 0;
+
+    get transform() : Rect {
+        return new Rect(
+            this.rect.x * viewport.state.scale,
+            this.rect.y * viewport.state.scale,
+            this.rect.w * viewport.state.scale,
+            this.rect.h * viewport.state.scale,
+        );
+    }
 
     abstract render(graphics : Graphics) : void;
 }

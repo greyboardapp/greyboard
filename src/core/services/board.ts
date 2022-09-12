@@ -2,6 +2,7 @@ import { createService, Service } from "../../utils/system/service";
 import Point from "../data/geometry/point";
 import { BoardItem } from "../data/item";
 import { Chunk } from "./board/chunk";
+import { viewport } from "./viewport";
 
 interface BoardState {
     name : string;
@@ -19,7 +20,9 @@ export class Board extends Service<BoardState> {
         });
     }
 
-    start() : void {}
+    start() : void {
+        viewport.onZoom.add(this.rebuild);
+    }
 
     add(items : Iterable<BoardItem>) : void {
         for (const item of items)
@@ -27,10 +30,18 @@ export class Board extends Service<BoardState> {
         this.addToChunk(items);
     }
 
+    rebuild() : void {
+        for (const chunk of this.chunks.values()) {
+            chunk.resetGraphics();
+            chunk.deleteAll();
+        }
+        this.addToChunk(this.items.values());
+    }
+
     private addToChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const min = this.getChunkIndex(item.rect.x, item.rect.y);
-            const max = this.getChunkIndex(item.rect.x2, item.rect.y2);
+            const min = this.getChunkIndex(item.transform.x, item.transform.y);
+            const max = this.getChunkIndex(item.transform.x2, item.transform.y2);
             for (let { x } = min; x <= max.x; ++x)
                 for (let { y } = min; y <= max.y; ++y) {
                     const key = this.hash(x, y);
@@ -39,7 +50,7 @@ export class Board extends Service<BoardState> {
                         chunk = new Chunk(x, y);
                         this.chunks.set(key, chunk);
                     }
-                    chunk.add(item);
+                    chunk.insert(item);
                 }
         }
     }
@@ -52,7 +63,7 @@ export class Board extends Service<BoardState> {
                     const key = this.hash(x, y);
                     const chunk = this.chunks.get(key);
                     if (chunk)
-                        chunk.remove(item);
+                        chunk.delete(item);
                 }
         }
     }

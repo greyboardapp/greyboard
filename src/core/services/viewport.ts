@@ -1,29 +1,41 @@
 import Point from "../data/geometry/point";
-import { batched, createService, Service } from "../../utils/system/service";
+import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
+import { input } from "./input";
+import { board } from "./board";
+import { isInRange, pass } from "../../utils/system/misc";
+import createDelegate from "../../utils/system/delegate";
 import { Chunk } from "./board/chunk";
 
 export interface ViewportState {
     offsetX : number;
     offsetY : number;
+    originX : number;
+    originY : number;
     scale : number;
 }
 
 export class Viewport extends Service<ViewportState> {
+    public onZoom = createDelegate();
+
     constructor() {
         super({
             offsetX: Chunk.maxChunkSize / 2,
             offsetY: Chunk.maxChunkSize / 2,
+            // offsetX: 0,
+            // offsetY: 0,
+            originX: 0,
+            originY: 0,
             scale: 1,
         });
 
-        // input.onZoom.add((data) => this.zoom(data.positions[0], data.delta));
+        input.onZoom.add((data) => this.zoom(this.screenToViewport(data.positions[0]), Math.sign(data.delta) * 0.1));
     }
 
     @batched
     pan(d : Point) : void {
-        this.state.offsetX += d.x / this.state.scale;
-        this.state.offsetY += d.y / this.state.scale;
+        this.state.offsetX += d.x;
+        this.state.offsetY += d.y;
     }
 
     @batched
@@ -34,15 +46,22 @@ export class Viewport extends Service<ViewportState> {
 
     @batched
     zoom(c : Point, d : number) : void {
-        // if (!inRange(this.state.scale - d, 0.1, 4))
-        //     return;
-        this.pan(c.inverted());
-        this.state.scale -= d;
-        this.pan(c);
+        if (!isInRange(this.state.scale - d, 0.1, 4))
+            return;
+        const newScale = this.state.scale - d;
+        this.state.offsetX += c.x * this.state.scale - c.x * newScale;
+        this.state.offsetY += c.y * this.state.scale - c.y * newScale;
+        this.state.scale = newScale;
+    }
+
+    @reactive
+    private zoomEvent() : void {
+        pass(this.state.scale);
+        this.onZoom();
     }
 
     screenToViewport(p : Point) : Point {
-        return new Point(-this.state.offsetX + p.x / this.state.scale, -this.state.offsetY + p.y / this.state.scale);
+        return new Point((p.x - this.state.offsetX) / this.state.scale, (p.y - this.state.offsetY) / this.state.scale);
     }
 
     viewportToScreen(p : Point) : Point {
