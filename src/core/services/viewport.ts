@@ -2,7 +2,6 @@ import Point from "../data/geometry/point";
 import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
 import { input } from "./input";
-import { board } from "./board";
 import { isInRange, pass } from "../../utils/system/misc";
 import createDelegate from "../../utils/system/delegate";
 import { Chunk } from "./board/chunk";

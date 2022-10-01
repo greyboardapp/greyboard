@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="greyboardiconslabel">
+    <g id="label">
+      <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <g clip-path="url(#mask_1)">
+        <path d="M10.5276 1.4437C10.0041 0.920152 9.31553 0.593977 8.57887 0.520477L3.52478 0.0162324C1.50967 -0.184791 -0.184792 1.50967 0.0162325 3.52478L0.520478 8.57887C0.593979 9.31557 0.920148 10.0041 1.4437 10.5277L9.97703 19.061C11.229 20.313 13.259 20.313 14.5111 19.061L19.0609 14.5111C20.313 13.259 20.313 11.2291 19.0609 9.97699L10.5276 1.4437L10.5276 1.4437ZM2.45141 4.70273C3.07744 5.32877 4.09243 5.32876 4.71846 4.70273C5.34449 4.0767 5.3445 3.06171 4.71846 2.43567C4.09243 1.80964 3.07744 1.80964 2.45141 2.43567C1.82538 3.06171 1.82537 4.0767 2.45141 4.70273L2.45141 4.70273Z" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      </g>
+    </g>
+  </g>
+</svg>

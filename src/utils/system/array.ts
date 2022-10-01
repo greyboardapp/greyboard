@@ -16,6 +16,7 @@ declare global {
         max<V>(key : (t : T) => V) : T | null;
 
         groupBy<K extends T[keyof T]>(key : (x : T) => K) : Map<K, Array<T>>;
+        groupByToObject<K extends string | number | symbol>(key : (x : T) => K) : Record<K, Array<T>>;
     }
 }
 
@@ -68,6 +69,19 @@ Array.prototype.groupBy = function<T, K extends T[keyof T]> (this : T[], key : (
         const collection = result.get(k);
         if (!collection)
             result.set(k, [item]);
+        else
+            collection.push(item);
+    }
+    return result;
+};
+
+Array.prototype.groupByToObject = function<T, K extends string | number | symbol> (this : T[], key : (x : T) => K) : Record<K, Array<T>> {
+    const result : Record<K, Array<T>> = {} as Record<K, Array<T>>;
+    for (const item of this) {
+        const k = key(item);
+        const collection = result[k];
+        if (!collection)
+            result[k] = [item];
         else
             collection.push(item);
     }

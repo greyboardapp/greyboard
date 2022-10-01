@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="greyboardiconsminus">
+    <g id="minus">
+      <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <g clip-path="url(#mask_1)">
+        <path d="M16 8.5L17.5 8.5C17.9142 8.5 18.2678 8.64645 18.5607 8.93934C18.8536 9.23223 19 9.58579 19 10C19 10.4142 18.8536 10.7678 18.5607 11.0607C18.2678 11.3536 17.9142 11.5 17.5 11.5L2.5 11.5C2.08579 11.5 1.73223 11.3536 1.43934 11.0607C1.14645 10.7678 1 10.4142 1 10C1 9.58579 1.14645 9.23223 1.43934 8.93934C1.73223 8.64645 2.08579 8.5 2.5 8.5L16 8.5Z" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      </g>
+    </g>
+  </g>
+</svg>

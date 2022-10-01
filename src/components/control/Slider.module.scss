@@ -1,0 +1,84 @@
+@import "../../global";
+
+.slider {
+    @include centeredInlineFlex();
+
+    > input[type="range"] {
+        appearance: none;
+        height: 4px;
+        border-radius: 2px;
+        cursor: e-resize;
+
+        @include themed() {
+            background-color: color($bg);
+        }
+
+        &::-webkit-slider-thumb,
+        &::-moz-range-thumb {
+            @include transition();
+
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 0;
+            outline: 0;
+            border-radius: 50%;
+
+            @include themed() {
+                background-color: color($secondary);
+            }
+        }
+
+        &:hover {
+            &::-webkit-slider-thumb,
+            &::-moz-range-thumb {
+                @include themed() {
+                    background-color: color($secondaryFocus);
+                }
+            }
+        }
+
+        &:focus,
+        &:active {
+            &::-webkit-slider-thumb,
+            &::-moz-range-thumb {
+                @include themed() {
+                    background-color: color($primary);
+                }
+            }
+        }
+    }
+
+    > input[type="number"] {
+        margin-left: 10px;
+        width: 30px;
+        height: 1rem;
+        appearance: textfield;
+        border: 0;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        text-align: center;
+        box-shadow: 0 0 0 2px transparent inset;
+        outline: 2px solid transparent;
+        transition: box-shadow 0.2s $timingCurve, outline 0.2s $timingCurve;
+
+        @include themed() {
+            color: color($bgText);
+            background-color: color($bg);
+
+            &::selection {
+                background-color: color($primary);
+            }
+
+            &:focus {
+                outline: 2px solid color($primary);
+                box-shadow: 0 0 0 2px color($shadow) inset;
+            }
+        }
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+        }
+    }
+}

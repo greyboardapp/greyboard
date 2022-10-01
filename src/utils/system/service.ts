@@ -40,7 +40,7 @@ export function createService<T extends StoreNode, S extends Service<T>>(ctor : 
         else
             Reflect.set(service, funcName, func.bind(service));
         if (details?.reactive)
-            createEffect(() => { func.call(service); });
+            createEffect((prev) => func.call(service, prev));
     }
     services.push(service);
     return service;

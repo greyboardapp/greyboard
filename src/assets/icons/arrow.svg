@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="greyboardiconsarrow">
+    <g id="arrow">
+      <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <g clip-path="url(#mask_1)">
+        <path d="M15.9691 13.0019C15.9691 13.8373 16.6463 14.5146 17.4817 14.5146C18.3172 14.5146 18.9944 13.8373 18.9944 13.0019L18.9944 2.65475C18.9988 2.60799 19.001 2.56061 19.001 2.5127C19.001 1.67874 18.3261 1.00241 17.4927 1.00004C17.4891 1.00001 17.4854 1 17.4817 1C17.4784 1 17.475 1.00001 17.4717 1.00003L6.99904 1.00003C6.16361 1.00003 5.48637 1.67728 5.48637 2.5127C5.48637 3.34812 6.16361 4.02537 6.99904 4.02537L13.8345 4.02537L1.44209 16.4177C0.851359 17.0085 0.851359 17.9662 1.44209 18.557C2.03282 19.1477 2.99059 19.1477 3.58133 18.557L15.9691 6.16928L15.9691 13.0019L15.9691 13.0019Z" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      </g>
+    </g>
+  </g>
+</svg>

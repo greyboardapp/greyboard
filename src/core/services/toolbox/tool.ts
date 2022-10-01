@@ -1,36 +1,37 @@
+import { SVGIcon } from "../../../components/data/Icon";
 import { BoardItem } from "../../data/item";
 import { board } from "../board";
 import { PointerEventData } from "../input";
 import Graphics from "../renderer/graphics";
 
 export class ToolCategory {
-    public static Shapes = new ToolCategory("Shapes");
-    public static Controls = new ToolCategory("Controls");
+    public tools : Tool[];
+    public icon : SVGIcon;
 
-    public lastUsedTool : Tool | null = null;
-    constructor(public name : string) {}
-
-    get icon() : string {
-        return this.lastUsedTool?.icon || "";
+    constructor(public name : string, ...tools : Tool[]) {
+        this.tools = tools;
+        for (const tool of this.tools)
+            tool.category = this;
+        this.icon = this.tools[0].icon;
     }
 }
 
+export type ToolHierarchy = Array<Tool | ToolCategory>;
+
 export interface ToolDescription {
     name : string;
-    icon : string;
-    category : ToolCategory;
+    icon : SVGIcon;
 }
 
 export class Tool implements ToolDescription {
     public name : string;
-    public icon : string;
-    public category : ToolCategory;
+    public icon : SVGIcon;
+    public category ?: ToolCategory;
     public actionStarted = false;
 
     constructor(description : ToolDescription) {
         this.name = description.name;
         this.icon = description.icon;
-        this.category = description.category;
     }
 
     onSelected(previous ?: Tool) : void {}

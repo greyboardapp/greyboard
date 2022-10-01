@@ -1,15 +1,16 @@
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
-import { CreatorTool, ToolCategory } from "./tool";
+import { CreatorTool } from "./tool";
 import { PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
+
+import rectangleIcon from "../../../assets/icons/rectangle.svg";
 
 export class RectangleTool extends CreatorTool<Rectangle> {
     constructor() {
         super({
             name: "Rectangle",
-            icon: "",
-            category: ToolCategory.Shapes,
+            icon: rectangleIcon,
         });
     }
 

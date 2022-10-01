@@ -1,0 +1,65 @@
+@import "../../global";
+
+.toolbar {
+    display: flex;
+    padding: 5px;
+    pointer-events: all;
+    gap: 5px;
+
+    @include themed() {
+        background-color: color($fg);
+    }
+
+    &.top,
+    &.floating {
+        flex-direction: row;
+        align-items: center;
+        border-bottom-right-radius: 10px;
+    }
+
+    &.left {
+        flex-direction: column;
+        justify-content: space-between;
+        width: 50px;
+        height: 100%;
+    }
+
+    &.floating {
+        border-radius: 10px;
+    }
+
+    .toolbarGroup {
+        display: flex;
+        gap: 5px;
+    }
+
+    .toolbarTitle {
+        margin: 0 5px;
+        font-weight: 500;
+
+        @include themed() {
+            color: color($fgText);
+        }
+    }
+
+    .toolbarText {
+        @include smallUppercaseText();
+
+        text-align: center;
+        margin: 5px 0;
+
+        @include themed() {
+            color: color($fgText);
+        }
+    }
+}
+
+.innerCorner {
+    position: fixed;
+    top: 50px;
+    left: 50px;
+
+    @include themed() {
+        color: color($fg);
+    }
+}

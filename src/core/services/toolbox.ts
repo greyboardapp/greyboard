@@ -1,12 +1,15 @@
 import Color from "../../utils/system/color";
-import { createService, Service } from "../../utils/system/service";
-import { Tool } from "./toolbox/tool";
+import { createService, reactive, Service } from "../../utils/system/service";
+import { Tool, ToolCategory, ToolHierarchy } from "./toolbox/tool";
 import Graphics from "./renderer/graphics";
 import { input, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
+import { RectangleTool } from "./toolbox/rectangle";
 
 export interface ToolboxState {
+    toolHierarchy : ToolHierarchy;
+    colorPalette : number[];
     selectedTool ?: Tool;
     selectedColor : number;
     selectedWeight : number;
@@ -15,24 +18,34 @@ export interface ToolboxState {
 }
 
 export class Toolbox extends Service<ToolboxState> {
-    public tools : Tool[] = [];
-    public colors : number[] = [];
+    public tools : Tool[];
 
     constructor() {
         super({
+            toolHierarchy: [
+                new PencilTool(),
+                new ViewTool(),
+                new ToolCategory("Shapes", new RectangleTool()),
+            ],
+            colorPalette: [
+                0xFFFFFF,
+            ],
             selectedColor: 0xFFFFFF,
             selectedWeight: 4,
             selectedHexColor: () => Color.UIntToHex(this.state.selectedColor),
         });
 
-        this.tools = [
-            new PencilTool(),
-            new ViewTool(),
-        ];
+        this.tools = this.state.toolHierarchy.flatMap((entry) => ((entry instanceof Tool) ? [entry] : entry.tools));
+    }
 
-        this.colors = [
-            0xFFFFFF,
-        ];
+    @reactive
+    onSelectedToolChanged(prev ?: Tool) : Tool | undefined {
+        if (prev)
+            prev.onDeselected();
+        if (this.state.selectedTool?.category)
+            this.state.selectedTool.category.icon = this.state.selectedTool.icon;
+        this.state.selectedTool?.onSelected(prev);
+        return this.state.selectedTool;
     }
 
     getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {
@@ -44,20 +57,12 @@ export class Toolbox extends Service<ToolboxState> {
     }
 
     start() : void {
-        [this.state.selectedTool] = this.tools;
-        [this.state.selectedColor] = this.colors;
+        this.state.selectedTool = this.getTool(PencilTool) ?? this.tools[0];
+        [this.state.selectedColor] = this.state.colorPalette;
 
         input.onPointerDown.add(this.pointerDownEvent);
         input.onPointerMove.add(this.pointerMoveEvent);
         input.onPointerUp.add(this.pointerUpEvent);
-    }
-
-    selectTool(tool : Tool) : void {
-        const previous = this.state.selectedTool;
-        if (previous)
-            previous.onDeselected();
-        this.state.selectedTool = tool;
-        this.state.selectedTool.onSelected(previous);
     }
 
     private pointerDownEvent(data : PointerEventData) : void {
@@ -68,7 +73,7 @@ export class Toolbox extends Service<ToolboxState> {
             const viewTool = this.getTool(ViewTool);
             if (!viewTool)
                 return;
-            this.selectTool(viewTool);
+            this.state.selectedTool = viewTool;
         }
 
         this.state.selectedTool.actionStarted = true;

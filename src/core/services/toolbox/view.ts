@@ -1,10 +1,12 @@
 import tweenjs, { Tween } from "@tweenjs/tween.js";
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
-import { Tool, ToolCategory } from "./tool";
+import { Tool } from "./tool";
 import { PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
 import { viewport, ViewportState } from "../viewport";
+
+import handIcon from "../../../assets/icons/hand.svg";
 
 export class ViewTool extends Tool {
     private prevTool ?: Tool;
@@ -13,8 +15,7 @@ export class ViewTool extends Tool {
     constructor() {
         super({
             name: "View",
-            icon: "",
-            category: ToolCategory.Controls,
+            icon: handIcon,
         });
     }
 
@@ -38,9 +39,6 @@ export class ViewTool extends Tool {
     }
 
     onActionEnd(data : PointerEventData) : void {
-        if (this.prevTool)
-            toolbox.selectTool(this.prevTool);
-
         const movement = data.movement.first();
         if (!movement || (Math.abs(movement.x) <= 2 && Math.abs(movement.y) <= 2))
             return;
@@ -50,5 +48,8 @@ export class ViewTool extends Tool {
             .easing(tweenjs.Easing.Cubic.Out)
             .start()
             .onComplete(() => { this.inertiaTween = null; });
+
+        if (this.prevTool)
+            toolbox.state.selectedTool = this.prevTool;
     }
 }

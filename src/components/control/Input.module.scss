@@ -1,0 +1,47 @@
+@import "../../global";
+
+.input {
+    @include centeredInlineFlex();
+
+    font-size: 0.8rem;
+    font-weight: 500;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 0 0 2px transparent inset;
+    outline: 2px solid transparent;
+    transition: box-shadow 0.2s $timingCurve, outline 0.2s $timingCurve;
+
+    @include themed() {
+        color: color($bgText);
+        background-color: color($bg);
+
+        &:hover,
+        &:focus-within {
+            box-shadow: 0 0 0 2px color($shadow) inset;
+        }
+
+        &:focus-within {
+            outline: 2px solid color($primary);
+        }
+    }
+
+    > i {
+        margin-left: 10px;
+    }
+
+    > input {
+        padding: 10px;
+        border: 0;
+        outline: 0;
+        color: currentcolor;
+        background-color: transparent;
+        flex-grow: 1;
+        flex-shrink: 1;
+
+        &::selection {
+            @include themed() {
+                background-color: color($primary);
+            }
+        }
+    }
+}

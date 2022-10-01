@@ -1,0 +1,48 @@
+@import "../../global";
+
+.button {
+    @include centeredInlineFlex();
+    @include smallUppercaseText();
+    @include transition();
+
+    border: 0;
+    outline: 0;
+    border-radius: 99px;
+    padding: 7px 15px;
+    cursor: pointer;
+
+    @include themed() {
+        color: color($secondaryText);
+        background-color: color($secondary);
+
+        &:hover {
+            background-color: color($secondaryFocus);
+        }
+
+        &.primary {
+            color: color($primaryText);
+            background-color: color($primary);
+
+            &:hover {
+                background-color: color($primaryFocus);
+            }
+        }
+
+        &.transparent {
+            color: color($fgText);
+            background-color: transparent;
+
+            &:hover {
+                background-color: color($opaque);
+            }
+        }
+    }
+
+    &.big {
+        padding: 10px 20px;
+    }
+
+    > i {
+        margin-right: 10px;
+    }
+}

@@ -1,0 +1,25 @@
+@import "../../global";
+
+.userBubble {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+
+    @include themed() {
+        background-color: color($fg);
+    }
+
+    &.active {
+        @include themed() {
+            box-shadow: 0 0 0 3px color($primary) inset;
+        }
+    }
+
+    &.afk {
+        opacity: 0.5;
+    }
+}

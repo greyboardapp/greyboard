@@ -1,14 +1,15 @@
-import { CreatorTool, ToolCategory } from "./tool";
+import { CreatorTool } from "./tool";
 import { PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
 import Path from "../../data/items/path";
+
+import pencilIcon from "../../../assets/icons/pencil.svg";
 
 export class PencilTool extends CreatorTool<Path> {
     constructor() {
         super({
             name: "Pencil",
-            icon: "",
-            category: ToolCategory.Shapes,
+            icon: pencilIcon,
         });
     }
 

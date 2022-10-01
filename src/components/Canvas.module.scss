@@ -1,5 +1,11 @@
+@import "../global";
+
 .canvasLayerRoot {
     position: relative;
+
+    @include themed() {
+        background-color: color($bg);
+    }
 }
 
 .staticCanvasContainer {

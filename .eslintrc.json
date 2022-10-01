@@ -4,6 +4,7 @@
         "@gergoszaszvaradi/eslint-config-solid"
     ],
     "rules": {
-        "no-extend-native": "off"
+        "no-extend-native": "off",
+        "no-return-assign": "off"
     }
 }

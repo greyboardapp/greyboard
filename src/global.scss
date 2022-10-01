@@ -1,0 +1,88 @@
+@use "sass:map";
+
+$bg: "bg";
+$fg: "fg";
+$fgText: "text-fg";
+$bgText: "text-bg";
+$primary: "primary";
+$primaryFocus: "primary-focus";
+$primaryText: "primary-text";
+$secondary: "secondary";
+$secondaryFocus: "secondary-focus";
+$secondaryText: "secondary-text";
+$opaque: "opaque";
+$shadow: "shadow";
+$themes: (
+    light: (
+        bg: #222,
+        fg: #fff,
+        text-fg: #111,
+        text-bg: #fff,
+        primary: #fc8210,
+        primary-focus: #b85900,
+        primary-text: #fff,
+        secondary: #686868,
+        secondary-focus: #444,
+        secondary-text: #fff,
+        opaque: #0000001a,
+        shadow: #0003,
+    ),
+    dark: (
+        bg: #222,
+        fg: #313131,
+        text-fg: #fff,
+        text-bg: white,
+        primary: #fc8210,
+        primary-focus: #ce6503,
+        primary-text: #fff,
+        secondary: #686868,
+        secondary-focus: #444,
+        secondary-text: #fff,
+        opaque: #ffffff1a,
+        shadow: #0003,
+    )
+);
+$timingCurve: cubic-bezier(0, 1, 0.2, 1);
+
+@mixin themed ($restriction: null) {
+    @each $theme, $map in $themes {
+        @if not $restriction or $restriction == $theme {
+            :global(.theme-#{$theme}) & {
+                $themeMap: () !global !default;
+
+                @each $key, $submap in $map {
+                    $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
+                    $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                }
+                @content;
+            }
+        }
+    }
+}
+
+@function color ($key) {
+    @return map-get($themeMap, $key);
+}
+
+@mixin smallUppercaseText () {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+@mixin transition () {
+    transition: background-color 0.2s $timingCurve, color 0.2s $timingCurve;
+}
+
+@mixin centeredFlex () {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin centeredInlineFlex () {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}

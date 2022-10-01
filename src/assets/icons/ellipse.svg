@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="greyboardiconsellipse">
+    <g id="ellipse">
+      <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <g clip-path="url(#mask_1)">
+        <path d="M18.5 10C18.5 13.2948 15.0241 16.5 10 16.5C4.97593 16.5 1.5 13.2948 1.5 10C1.5 6.7052 4.97593 3.5 10 3.5C15.0241 3.5 18.5 6.7052 18.5 10L18.5 10Z" id="Shape" fill="none" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="3" />
+      </g>
+    </g>
+  </g>
+</svg>

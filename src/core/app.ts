@@ -2,8 +2,6 @@ import tweenjs from "@tweenjs/tween.js";
 import { startServices, stopServices } from "../utils/system/service";
 import { renderer } from "./services/renderer";
 
-import "../utils/system/array";
-
 import "./services/viewport";
 import "./services/toolbox";
 

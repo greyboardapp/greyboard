@@ -1,3 +1,9 @@
 {
-    "extends": "@gergoszaszvaradi/stylelint-config"
+    "extends": "@gergoszaszvaradi/stylelint-config",
+    "rules": {
+        "max-line-length": 200,
+        "scss/at-mixin-named-arguments": "never",
+        "max-nesting-depth": 5,
+        "selector-max-compound-selectors": 5
+    }
 }
