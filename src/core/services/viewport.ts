@@ -21,8 +21,6 @@ export class Viewport extends Service<ViewportState> {
         super({
             offsetX: Chunk.maxChunkSize / 2,
             offsetY: Chunk.maxChunkSize / 2,
-            // offsetX: 0,
-            // offsetY: 0,
             originX: 0,
             originY: 0,
             scale: 1,

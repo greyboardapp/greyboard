@@ -26,6 +26,25 @@ export interface PointerEventData {
     delta : number;
 }
 
+export class Shortcut {
+    constructor(
+        public key : string,
+        public modifiers : KeyModifiers = KeyModifiers.None,
+    ) {}
+
+    toString() : string {
+        const str : string[] = [];
+        if (this.modifiers & KeyModifiers.Control)
+            str.push("CTRL");
+        if (this.modifiers & KeyModifiers.Shift)
+            str.push("SHIFT");
+        if (this.modifiers & KeyModifiers.Alt)
+            str.push("ALT");
+        str.push(this.key);
+        return str.join(" + ");
+    }
+}
+
 export class Input extends Service {
     public onPointerDown = createDelegate<[data : PointerEventData]>();
     public onPointerMove = createDelegate<[data : PointerEventData]>();

@@ -21,6 +21,7 @@ export class Board extends Service<BoardState> {
     }
 
     start() : void {
+        // HACK: For now this solution works, but to increase performance move only affected items between chunks
         viewport.onZoom.add(this.rebuild);
     }
 

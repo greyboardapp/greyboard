@@ -2,18 +2,20 @@ import Color from "../../../utils/system/color";
 import Rect from "../../data/geometry/rect";
 
 export default class Graphics {
+    private static readonly backgroundColor = "#222222";
+
     private readonly ctx : CanvasRenderingContext2D;
-    constructor(private readonly canvas : HTMLCanvasElement, alpha = false) {
+    constructor(private readonly canvas : HTMLCanvasElement, private readonly alpha = false) {
         const ctx = canvas.getContext("2d", { alpha });
         if (!ctx)
             throw new Error("no context");
         this.ctx = ctx;
     }
 
-    clear(color ?: string) : void {
+    clear() : void {
         this.reset();
-        if (color) {
-            this.ctx.fillStyle = "#000000";
+        if (!this.alpha) {
+            this.ctx.fillStyle = Graphics.backgroundColor;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         } else {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -37,7 +39,7 @@ export default class Graphics {
         this.ctx.beginPath();
         this.ctx.rect(x, y, w, h);
         this.ctx.clip();
-        this.ctx.fillStyle = "#000000";
+        this.ctx.fillStyle = Graphics.backgroundColor;
         this.ctx.fillRect(x, y, w, h);
         render();
         this.ctx.restore();

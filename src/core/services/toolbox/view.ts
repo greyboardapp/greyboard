@@ -2,7 +2,7 @@ import tweenjs, { Tween } from "@tweenjs/tween.js";
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
 import { Tool } from "./tool";
-import { PointerEventData } from "../input";
+import { MouseButton, PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 import { viewport, ViewportState } from "../viewport";
 
@@ -16,6 +16,7 @@ export class ViewTool extends Tool {
         super({
             name: "View",
             icon: handIcon,
+            shortcut: new Shortcut("V"),
         });
     }
 
@@ -40,16 +41,14 @@ export class ViewTool extends Tool {
 
     onActionEnd(data : PointerEventData) : void {
         const movement = data.movement.first();
-        if (!movement || (Math.abs(movement.x) <= 2 && Math.abs(movement.y) <= 2))
-            return;
+        if (movement && (Math.abs(movement.x) > 2 || Math.abs(movement.y) > 2))
+            this.inertiaTween = new tweenjs.Tween(viewport.state)
+                .to({ offsetX: viewport.state.offsetX + movement.x * 5, offsetY: viewport.state.offsetY + movement.y * 5 }, 500)
+                .easing(tweenjs.Easing.Cubic.Out)
+                .start()
+                .onComplete(() => { this.inertiaTween = null; });
 
-        this.inertiaTween = new tweenjs.Tween(viewport.state)
-            .to({ offsetX: viewport.state.offsetX + movement.x * 5, offsetY: viewport.state.offsetY + movement.y * 5 }, 500)
-            .easing(tweenjs.Easing.Cubic.Out)
-            .start()
-            .onComplete(() => { this.inertiaTween = null; });
-
-        if (this.prevTool)
+        if (this.prevTool && data.button === MouseButton.Auxiliary)
             toolbox.state.selectedTool = this.prevTool;
     }
 }

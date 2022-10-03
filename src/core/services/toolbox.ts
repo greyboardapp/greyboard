@@ -1,6 +1,6 @@
 import Color from "../../utils/system/color";
-import { createService, reactive, Service } from "../../utils/system/service";
-import { Tool, ToolCategory, ToolHierarchy } from "./toolbox/tool";
+import { batched, createService, reactive, Service } from "../../utils/system/service";
+import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
 import Graphics from "./renderer/graphics";
 import { input, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
@@ -25,7 +25,7 @@ export class Toolbox extends Service<ToolboxState> {
             toolHierarchy: [
                 new PencilTool(),
                 new ViewTool(),
-                new ToolCategory("Shapes", new RectangleTool()),
+                makeToolCategory("Shapes", new RectangleTool(), new PencilTool()),
             ],
             colorPalette: [
                 0xFFFFFF,
@@ -39,21 +39,20 @@ export class Toolbox extends Service<ToolboxState> {
     }
 
     @reactive
+    @batched
     onSelectedToolChanged(prev ?: Tool) : Tool | undefined {
         if (prev)
             prev.onDeselected();
-        if (this.state.selectedTool?.category)
-            this.state.selectedTool.category.icon = this.state.selectedTool.icon;
         this.state.selectedTool?.onSelected(prev);
         return this.state.selectedTool;
     }
 
     getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {
-        return this.tools.find((tool) => tool instanceof toolType) || null;
+        return this.tools.find((tool) => tool instanceof toolType) ?? null;
     }
 
     getToolByName(name : string) : Tool | null {
-        return this.tools.find((tool) => tool.name === name) || null;
+        return this.tools.find((tool) => tool.name === name) ?? null;
     }
 
     start() : void {

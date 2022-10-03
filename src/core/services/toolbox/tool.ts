@@ -1,19 +1,24 @@
 import { SVGIcon } from "../../../components/data/Icon";
 import { BoardItem } from "../../data/item";
 import { board } from "../board";
-import { PointerEventData } from "../input";
+import { PointerEventData, Shortcut } from "../input";
 import Graphics from "../renderer/graphics";
 
-export class ToolCategory {
-    public tools : Tool[];
-    public icon : SVGIcon;
+export interface ToolCategory {
+    name : string;
+    tools : Tool[];
+    lastUsedTool : Tool;
+}
 
-    constructor(public name : string, ...tools : Tool[]) {
-        this.tools = tools;
-        for (const tool of this.tools)
-            tool.category = this;
-        this.icon = this.tools[0].icon;
-    }
+export function makeToolCategory(name : string, ...tools : Tool[]) : ToolCategory {
+    const category : ToolCategory = {
+        name,
+        tools,
+        lastUsedTool: tools[0],
+    };
+    for (const tool of tools)
+        tool.category = category;
+    return category;
 }
 
 export type ToolHierarchy = Array<Tool | ToolCategory>;
@@ -21,17 +26,20 @@ export type ToolHierarchy = Array<Tool | ToolCategory>;
 export interface ToolDescription {
     name : string;
     icon : SVGIcon;
+    shortcut : Shortcut;
 }
 
 export class Tool implements ToolDescription {
     public name : string;
     public icon : SVGIcon;
+    public shortcut : Shortcut;
     public category ?: ToolCategory;
     public actionStarted = false;
 
     constructor(description : ToolDescription) {
         this.name = description.name;
         this.icon = description.icon;
+        this.shortcut = description.shortcut;
     }
 
     onSelected(previous ?: Tool) : void {}

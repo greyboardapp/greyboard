@@ -1,7 +1,7 @@
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
 import { CreatorTool } from "./tool";
-import { PointerEventData } from "../input";
+import { PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 
 import rectangleIcon from "../../../assets/icons/rectangle.svg";
@@ -11,6 +11,7 @@ export class RectangleTool extends CreatorTool<Rectangle> {
         super({
             name: "Rectangle",
             icon: rectangleIcon,
+            shortcut: new Shortcut("R"),
         });
     }
 

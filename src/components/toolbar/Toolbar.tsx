@@ -5,11 +5,12 @@ import styles from "./Toolbar.module.scss";
 
 interface ToolbarProps {
     variant : "top" | "left" | "floating";
+    class ?: string;
 }
 
 const Toolbar : ParentComponent<ToolbarProps> = (props) => (
     <div
-        class={cls(styles.toolbar, styles[props.variant])}
+        class={cls(styles.toolbar, styles[props.variant], props.class)}
     >
         {props.children}
     </div>

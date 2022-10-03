@@ -27,6 +27,7 @@ import layerIcon from "../assets/icons/layer.svg";
 import settingsIcon from "../assets/icons/settings.svg";
 import ToolbarText from "../components/toolbar/ToolbarText";
 import { Tool } from "../core/services/toolbox/tool";
+import ToolbarPopup from "../components/toolbar/ToolbarPopup";
 
 const IndexPage : Component = () => {
     onMount(() => app.start());
@@ -40,11 +41,11 @@ const IndexPage : Component = () => {
                     <Toolbar variant="top">
                         <ToolbarButton icon={menuIcon} />
                         <ToolbarTitle text={board.state.name} />
-                        <ToolbarButton icon={saveIcon} />
-                        <ToolbarButton icon={exportIcon} />
-                        <ToolbarButton icon={deleteIcon} />
-                        <ToolbarButton icon={undoIcon} />
-                        <ToolbarButton icon={redoIcon} />
+                        <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", text: "Save" }} />
+                        <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", text: "Export" }} />
+                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", text: "Delete" }} />
+                        <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", text: "Undo" }} />
+                        <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", text: "Redo" }} />
                     </Toolbar>
                     <div class="flex h">
                         <UserBubble name="Jsdsadfoh Iuds" />
@@ -55,15 +56,17 @@ const IndexPage : Component = () => {
                     <Toolbar variant="left">
                         <div class={`${toolbarStyles.toolbarGroup} v`}>
                             <For each={toolbox.state.toolHierarchy}>
-                                {(entry) => <ToolbarButton icon={entry.icon} active={toolbox.state.selectedTool === entry} onClick={() => (entry instanceof Tool) && (toolbox.state.selectedTool = entry)} />
-                                    // if (category && tools.length > 1)
-                                    //     return <ToolbarButton icon={category.icon} />;
-                                    // return (
-                                    //     <For each={tools}>
-                                    //         {(tool) => <ToolbarButton icon={tool.icon} active={tool.name === toolbox.state.selectedTool?.name} />}
-                                    //     </For>
-                                    // );
-                                }
+                                {(entry) => {
+                                    if (entry instanceof Tool)
+                                        return (
+                                            <ToolbarButton
+                                                icon={entry.icon}
+                                                active={toolbox.state.selectedTool === entry}
+                                                tooltip={{ orientation: "right", text: entry.name, shortcut: entry.shortcut }}
+                                                onClick={() => (toolbox.state.selectedTool = entry)} />
+                                        );
+                                    return <ToolbarPopup category={entry} />;
+                                }}
                             </For>
                         </div>
                         <div class={`${toolbarStyles.toolbarGroup} v`}>

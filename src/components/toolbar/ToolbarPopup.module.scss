@@ -1,0 +1,14 @@
+@import "../../global";
+
+.toolbarPopupActuator {
+    position: relative;
+
+    .toolbarPopup {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-top: -55px;
+        transform-origin: left center;
+        padding: 50px 50px 50px 10px;
+    }
+}

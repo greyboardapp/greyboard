@@ -1,5 +1,5 @@
 import { CreatorTool } from "./tool";
-import { PointerEventData } from "../input";
+import { PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 import Path from "../../data/items/path";
 
@@ -10,6 +10,7 @@ export class PencilTool extends CreatorTool<Path> {
         super({
             name: "Pencil",
             icon: pencilIcon,
+            shortcut: new Shortcut("B"),
         });
     }
 
