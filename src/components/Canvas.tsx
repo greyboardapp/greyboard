@@ -13,6 +13,14 @@ const Canvas : Component = () => {
         setWindowHeight(window.innerHeight);
     });
 
+    createWindowListener("keydown", (e) => {
+        input.processKeyDownEvent(e as KeyboardEvent);
+    });
+
+    createWindowListener("keyup", (e) => {
+        input.processKeyUpEvent(e as KeyboardEvent);
+    });
+
     return (
         <div
             class={styles.canvasContainer}

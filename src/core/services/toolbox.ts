@@ -25,7 +25,7 @@ export class Toolbox extends Service<ToolboxState> {
             toolHierarchy: [
                 new PencilTool(),
                 new ViewTool(),
-                makeToolCategory("Shapes", new RectangleTool(), new PencilTool()),
+                makeToolCategory("Shapes", new RectangleTool()),
             ],
             colorPalette: [
                 0xFFFFFF,
@@ -62,6 +62,9 @@ export class Toolbox extends Service<ToolboxState> {
         input.onPointerDown.add(this.pointerDownEvent);
         input.onPointerMove.add(this.pointerMoveEvent);
         input.onPointerUp.add(this.pointerUpEvent);
+
+        for (const tool of this.tools)
+            input.registerShortcut(tool.shortcut, () => (this.state.selectedTool = tool));
     }
 
     private pointerDownEvent(data : PointerEventData) : void {
