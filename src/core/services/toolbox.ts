@@ -1,5 +1,5 @@
 import Color from "../../utils/system/color";
-import { batched, createService, reactive, Service } from "../../utils/system/service";
+import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
 import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
 import Graphics from "./renderer/graphics";
 import { input, MouseButton, PointerEventData } from "./input";
@@ -47,6 +47,12 @@ export class Toolbox extends Service<ToolboxState> {
         return this.state.selectedTool;
     }
 
+    @detached
+    private selectToolTemporarily(tool : Tool) : void {
+        this.state.selectedTool = tool;
+        this.onSelectedToolChanged();
+    }
+
     getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {
         return this.tools.find((tool) => tool instanceof toolType) ?? null;
     }
@@ -75,11 +81,13 @@ export class Toolbox extends Service<ToolboxState> {
             const viewTool = this.getTool(ViewTool);
             if (!viewTool)
                 return;
-            this.state.selectedTool = viewTool;
+            if (this.state.selectedTool !== viewTool)
+                this.state.selectedTool = viewTool;
+            this.state.selectedTool.actionStarted = true;
         }
 
-        this.state.selectedTool.actionStarted = true;
-        this.state.selectedTool.onActionStart(data);
+        if (this.state.selectedTool.onActionStart(data))
+            this.state.selectedTool.actionStarted = true;
     }
 
     private pointerMoveEvent(data : PointerEventData) : void {

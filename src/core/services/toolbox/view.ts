@@ -28,9 +28,14 @@ export class ViewTool extends Tool {
         this.prevTool = previous;
     }
 
-    onActionStart(data : PointerEventData) : void {
+    onActionStart(data : PointerEventData) : boolean {
+        if (data.button !== MouseButton.Primary)
+            return false;
+
         if (this.inertiaTween)
             tweenjs.remove(this.inertiaTween);
+
+        return true;
     }
 
     onActionMove(data : PointerEventData) : void {
@@ -50,5 +55,6 @@ export class ViewTool extends Tool {
 
         if (this.prevTool && data.button === MouseButton.Auxiliary)
             toolbox.state.selectedTool = this.prevTool;
+        this.prevTool = undefined;
     }
 }

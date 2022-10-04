@@ -1,5 +1,5 @@
 import { CreatorTool } from "./tool";
-import { PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 import Path from "../../data/items/path";
 
@@ -18,9 +18,12 @@ export class PencilTool extends CreatorTool<Path> {
         return new Path([], toolbox.state.selectedColor, toolbox.state.selectedWeight, true);
     }
 
-    onActionStart(data : PointerEventData) : void {
+    onActionStart(data : PointerEventData) : boolean {
+        if (data.button !== MouseButton.Primary)
+            return false;
         this.item = this.new();
         this.item.points.push(data.positions[0]);
+        return true;
     }
 
     onActionMove(data : PointerEventData) : void {

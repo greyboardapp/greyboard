@@ -45,7 +45,7 @@ export class Tool implements ToolDescription {
     onSelected(previous ?: Tool) : void {}
     onDeselected() : void {}
 
-    onActionStart(data : PointerEventData) : void {}
+    onActionStart(data : PointerEventData) : boolean { return true; }
     onActionMove(data : PointerEventData) : void {}
     onActionEnd(data : PointerEventData) : void {}
 

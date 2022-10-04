@@ -1,7 +1,7 @@
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
 import { CreatorTool } from "./tool";
-import { PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 
 import rectangleIcon from "../../../assets/icons/rectangle.svg";
@@ -19,10 +19,13 @@ export class RectangleTool extends CreatorTool<Rectangle> {
         return new Rectangle(new Rect(), toolbox.state.selectedColor, toolbox.state.selectedWeight, true);
     }
 
-    onActionStart(data : PointerEventData) : void {
+    onActionStart(data : PointerEventData) : boolean {
+        if (data.button !== MouseButton.Primary)
+            return false;
         this.item = this.new();
         this.item.rect.x = data.positions[0].x;
         this.item.rect.y = data.positions[0].y;
+        return true;
     }
 
     onActionMove(data : PointerEventData) : void {

@@ -1,11 +1,12 @@
 import "reflect-metadata";
-import { Accessor, batch, createEffect } from "solid-js";
+import { Accessor, batch, createEffect, untrack } from "solid-js";
 import { createMutable, StoreNode } from "solid-js/store";
 
 const SERVICE_METHOD_DETAILS_META_KEY = "ServiceMethodDetails";
 
 interface ServiceMethodDetails {
     batched ?: boolean;
+    detached ?: boolean;
     reactive ?: boolean;
 }
 
@@ -41,6 +42,8 @@ export function createService<T extends StoreNode, S extends Service<T>>(ctor : 
             Reflect.set(service, funcName, func.bind(service));
         if (details?.reactive)
             createEffect((prev) => func.call(service, prev));
+        else if (details?.detached)
+            untrack(() => { func.call(service); });
     }
     services.push(service);
     return service;
@@ -81,6 +84,13 @@ export function batched(target : Object, propertyKey : string, descriptor : Prop
 export function reactive(target : Object, propertyKey : string, descriptor : PropertyDescriptor) : PropertyDescriptor {
     const details = Reflect.getOwnMetadata(SERVICE_METHOD_DETAILS_META_KEY, target, propertyKey) as ServiceMethodDetails ?? {};
     details.reactive = true;
+    Reflect.defineMetadata(SERVICE_METHOD_DETAILS_META_KEY, details, target, propertyKey);
+    return descriptor;
+}
+
+export function detached(target : Object, propertyKey : string, descriptor : PropertyDescriptor) : PropertyDescriptor {
+    const details = Reflect.getOwnMetadata(SERVICE_METHOD_DETAILS_META_KEY, target, propertyKey) as ServiceMethodDetails ?? {};
+    details.detached = true;
     Reflect.defineMetadata(SERVICE_METHOD_DETAILS_META_KEY, details, target, propertyKey);
     return descriptor;
 }
