@@ -1,11 +1,12 @@
 import { createService, Service } from "../../utils/system/service";
-import Point from "../data/geometry/point";
 import { BoardItem } from "../data/item";
 import { Chunk } from "./board/chunk";
 import { viewport } from "./viewport";
 
 interface BoardState {
     name : string;
+
+    // NOTE: properties in this state will change once collaboration will be implemented.
     isPublic : boolean;
 }
 
@@ -39,12 +40,15 @@ export class Board extends Service<BoardState> {
         this.addToChunk(this.items.values());
     }
 
+    // TODO: Find a better name since items are not necessarily added to a single chunk
     private addToChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const min = this.getChunkIndex(item.transform.x, item.transform.y);
-            const max = this.getChunkIndex(item.transform.x2, item.transform.y2);
-            for (let { x } = min; x <= max.x; ++x)
-                for (let { y } = min; y <= max.y; ++y) {
+            const minX = this.truncateCoordinate(item.transform.x);
+            const minY = this.truncateCoordinate(item.transform.y);
+            const maxX = this.truncateCoordinate(item.transform.x2);
+            const maxY = this.truncateCoordinate(item.transform.y2);
+            for (let x = minX; x <= maxX; ++x)
+                for (let y = minY; y <= maxY; ++y) {
                     const key = this.hash(x, y);
                     let chunk = this.chunks.get(key);
                     if (!chunk) {
@@ -69,21 +73,8 @@ export class Board extends Service<BoardState> {
         }
     }
 
-    // getItemsFromRegion(region : MinMaxRect) : Set<BoardItem> {
-    //     const items = new Set<BoardItem>();
-    //     for (let { x } = region.min; x <= region.max.x; ++x)
-    //         for (let { y } = region.min; y <= region.max.y; ++y) {
-    //             const key = this.hash(x, y);
-    //             const cell = this.cells.get(key);
-    //             if (cell)
-    //                 for (const item of cell.values())
-    //                     items.add(item);
-    //         }
-    //     return items;
-    // }
-
-    private getChunkIndex(x : number, y : number) : Point {
-        return new Point(Math.floor(x / Chunk.maxChunkSize), Math.floor(y / Chunk.maxChunkSize));
+    private truncateCoordinate(x : number) : number {
+        return Math.floor(x / Chunk.maxChunkSize);
     }
 
     private hash(x : number, y : number) : string {

@@ -42,5 +42,8 @@
         "source.fixAll.stylelint": true
     },
     
-    "typescript.preferences.importModuleSpecifier": "relative"
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "cSpell.words": [
+        "tweenjs"
+    ]
 }

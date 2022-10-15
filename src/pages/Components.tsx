@@ -9,9 +9,13 @@ import Toolbar from "../components/toolbar/Toolbar";
 import Button from "../components/control/Button";
 import Input from "../components/control/Input";
 import Slider from "../components/control/Slider";
+import ColorPicker from "../components/data/ColorPicker";
+import Color from "../utils/system/color";
 
 const [str, setStr] = createSignal("Type something");
 const [num, setNum] = createSignal(5);
+
+const [color, setColor] = createSignal(0x00FF00FF);
 
 const ComponentsPage : Component = () => (
     <div class={styles.bg}>
@@ -55,6 +59,11 @@ const ComponentsPage : Component = () => (
         <Slider model={[num, setNum]} />
         <Slider model={[num, setNum]} showValue />
         <Slider model={[num, setNum]} min={0} max={10} step={0.1} showValue />
+
+        <h1>Color Picker</h1>
+        <ColorPicker color={color()} onChange={setColor} />
+        <p>{Color.UIntToRGBA(color()).join(", ")}</p>
+        <button onClick={() => setColor(Color.RGBAToUInt(Math.random() * 255, Math.random() * 255, Math.random() * 255, 1))}>Random color</button>
     </div>
 );
 

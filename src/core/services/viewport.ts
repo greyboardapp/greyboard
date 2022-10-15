@@ -25,8 +25,6 @@ export class Viewport extends Service<ViewportState> {
             originY: 0,
             scale: 1,
         });
-
-        input.onZoom.add((data) => this.zoom(this.screenToViewport(data.positions[0]), Math.sign(data.delta) * 0.1));
     }
 
     @batched
@@ -55,6 +53,10 @@ export class Viewport extends Service<ViewportState> {
     private zoomEvent() : void {
         pass(this.state.scale);
         this.onZoom();
+    }
+
+    start() : void {
+        input.onZoom.add((data) => this.zoom(this.screenToViewport(data.positions[0]), Math.sign(data.delta) * 0.1));
     }
 
     screenToViewport(p : Point) : Point {

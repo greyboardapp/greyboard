@@ -1,7 +1,6 @@
 import Color from "../../utils/system/color";
 import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
 import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
-import Graphics from "./renderer/graphics";
 import { input, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
@@ -103,10 +102,6 @@ export class Toolbox extends Service<ToolboxState> {
 
         this.state.selectedTool.actionStarted = false;
         this.state.selectedTool.onActionEnd(data);
-    }
-
-    private renderEvent(graphics : Graphics, dt : number) : void {
-        this.state.selectedTool?.onRender(graphics, dt);
     }
 }
 
