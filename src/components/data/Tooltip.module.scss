@@ -4,9 +4,11 @@
     position: absolute;
     z-index: 1;
     border-radius: 5px;
-    padding: 7px;
+    padding: 10px 8px;
     pointer-events: none;
     white-space: nowrap;
+
+    // text-transform: uppercase;
 
     @include themed() {
         background-color: color($fg);

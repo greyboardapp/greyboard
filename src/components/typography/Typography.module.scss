@@ -1,0 +1,32 @@
+@import "../../global";
+
+p,
+h1,
+h2,
+h3,
+h4 {
+    @include themed() {
+        color: color($fgText);
+    }
+
+    &.uppercase {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    &.faded { opacity: 0.5; }
+    &.bold { font-weight: bold; }
+}
+
+p {
+    font-size: 1rem;
+
+    &.s { @include fontSize(0.8rem); }
+    &.m { @include fontSize(1rem); }
+    &.l { @include fontSize(1.125rem); }
+    &.xl { @include fontSize(1.5rem); }
+}
+
+h1 { @include fontSize(3.5rem); }
+h2 { @include fontSize(2.5rem); }
+h3 { @include fontSize(1.5rem); }
+h4 { @include fontSize(1.125rem); }
