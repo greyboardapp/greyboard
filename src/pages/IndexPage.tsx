@@ -37,6 +37,7 @@ import Block from "../components/layout/Block";
 import Panel from "../components/surfaces/Panel";
 import Text from "../components/typography/Text";
 import Grid from "../components/layout/Grid";
+import ToolbarDivider from "../components/toolbar/ToolbarDivider";
 
 const IndexPage : Component = () => {
     onMount(() => app.start());
@@ -52,7 +53,7 @@ const IndexPage : Component = () => {
                         <ToolbarTitle text={board.state.name} />
                         <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", key: "actions.save" }} />
                         <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", key: "actions.export" }} />
-                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", key: "actions.delete" }} />
+                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", key: "actions.clear" }} />
                         <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", key: "actions.undo" }} />
                         <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", key: "actions.redo" }} />
                     </Toolbar>
@@ -103,13 +104,14 @@ const IndexPage : Component = () => {
                                     );
                                 }}
                             </For>
+                            <ToolbarDivider />
                             <ToolbarPopup
                                 origin="corner"
                                 actuator={<ToolbarButton icon={paletteIcon} />}
                             >
                                 <Panel>
                                     <Block>
-                                        <Text key="titles.strokeWeight" size="s" uppercase faded bold />
+                                        <Text key="titles.strokeWeight" size="s" uppercase faded bold class="mb1" />
                                         <Slider min={1} max={10} model={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]} showValue />
                                     </Block>
                                     <Text key="titles.color" size="s" uppercase faded bold class="mb3" />

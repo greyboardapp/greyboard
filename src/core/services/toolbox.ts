@@ -5,6 +5,9 @@ import { input, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
 import { RectangleTool } from "./toolbox/rectangle";
+import { FilledRectangleTool } from "./toolbox/filledRectangle";
+import { FilledEllipseTool } from "./toolbox/filledEllipse";
+import { EllipseTool } from "./toolbox/ellipse";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -25,11 +28,15 @@ export class Toolbox extends Service<ToolboxState> {
             toolHierarchy: [
                 new PencilTool(),
                 new ViewTool(),
-                makeToolCategory("Shapes", new RectangleTool()),
+                makeToolCategory("Shapes",
+                    new FilledRectangleTool(),
+                    new RectangleTool(),
+                    new FilledEllipseTool(),
+                    new EllipseTool()),
             ],
             colorPalette: [],
             selectedColorIndex: 0,
-            selectedWeight: 4,
+            selectedWeight: 2,
             selectedColor: () => this.state.colorPalette[this.state.selectedColorIndex],
             selectedHexColor: () => Color.UIntToHex(this.state.selectedColor()),
         });

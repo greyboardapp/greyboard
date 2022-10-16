@@ -11,13 +11,22 @@ interface ToolbarPopupProps {
 }
 
 const ToolbarPopup : ParentComponent<ToolbarPopupProps> = (props) => {
+    let timer : number | null = null;
     const [open, setOpen] = createSignal(false);
 
     return (
         <div
             class={styles.toolbarPopupActuator}
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
+            onMouseEnter={() => {
+                if (timer)
+                    clearTimeout(timer);
+                setOpen(true);
+            }}
+            onMouseLeave={() => {
+                if (timer)
+                    clearTimeout(timer);
+                timer = setTimeout(() => setOpen(false), 300);
+            }}
         >
             {props.actuator}
             <Presence>
@@ -27,9 +36,9 @@ const ToolbarPopup : ParentComponent<ToolbarPopupProps> = (props) => {
                         style={{
                             "transform-origin": props.origin === "center" ? "left center" : "left top",
                         }}
-                        initial={{ scale: 0.75, opacity: 0, paddingTop: 0 }}
-                        animate={{ scale: 1, opacity: 1, paddingTop: "50px", transition: quickEaseInTransition }}
-                        exit={{ scale: 0.75, opacity: 0, paddingTop: "50px", transition: quickEaseOutTransition }}
+                        initial={{ scale: 0.75, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, transition: quickEaseInTransition }}
+                        exit={{ scale: 0.75, opacity: 0, transition: quickEaseOutTransition }}
                     >
                         {props.children}
                     </Motion.div>

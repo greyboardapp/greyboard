@@ -4,6 +4,7 @@ import { toolbox } from "../toolbox";
 import Path from "../../data/items/path";
 
 import pencilIcon from "../../../assets/icons/pencil.svg";
+import { viewport } from "../viewport";
 
 export class PencilTool extends CreatorTool<Path> {
     constructor() {
@@ -15,7 +16,7 @@ export class PencilTool extends CreatorTool<Path> {
     }
 
     new() : Path {
-        return new Path([], toolbox.state.selectedColor(), toolbox.state.selectedWeight, true);
+        return new Path([], toolbox.state.selectedColor(), viewport.pixelsToViewport(toolbox.state.selectedWeight), true);
     }
 
     onActionStart(data : PointerEventData) : boolean {
@@ -35,5 +36,10 @@ export class PencilTool extends CreatorTool<Path> {
 
         this.item.process();
         this.create();
+    }
+
+    create() : void {
+        this.item.weight = toolbox.state.selectedWeight;
+        super.create();
     }
 }

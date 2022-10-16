@@ -19,7 +19,7 @@ export default class Path extends BoardItem {
 
     render(graphics : Graphics) : void {
         graphics.path(new Path2D(getSvgPathFromStroke(getStroke(this.points, {
-            size: this.weight,
+            size: this.weight * 2,
         }))), this.color);
     }
 

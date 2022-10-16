@@ -72,7 +72,7 @@ export class Viewport extends Service<ViewportState> {
     }
 
     pixelsToViewport(pixels : number) : number {
-        return pixels / this.state.scale;
+        return pixels * this.state.scale;
     }
 
     getScreenRect() : Rect {

@@ -45,21 +45,36 @@ export default class Graphics {
         this.ctx.restore();
     }
 
-    rect(rect : Rect, color : number, filled = false) : void {
-        this.rectangle(rect.x, rect.y, rect.w, rect.h, color, filled);
+    rect(rect : Rect, color : number, weight : number, filled = false) : void {
+        this.rectangle(rect.x, rect.y, rect.w, rect.h, color, weight, filled);
     }
 
-    rectangle(x : number, y : number, w : number, h : number, color : number, filled = false) : void {
+    rectangle(x : number, y : number, w : number, h : number, color : number, weight : number, filled = false) : void {
         if (filled) {
             this.ctx.fillStyle = Color.UIntToHex(color);
             this.ctx.fillRect(x, y, w, h);
         } else {
             this.ctx.strokeStyle = Color.UIntToHex(color);
+            this.ctx.lineWidth = weight;
             this.ctx.beginPath();
             this.ctx.rect(x, y, w, h);
             this.ctx.stroke();
             this.ctx.closePath();
         }
+    }
+
+    ellipse(rect : Rect, color : number, weight : number, filled = false) : void {
+        this.ctx.beginPath();
+        this.ctx.ellipse(rect.x + rect.w / 2, rect.y + rect.h / 2, Math.abs(rect.w / 2), Math.abs(rect.h / 2), 0, 0, 360);
+        if (filled) {
+            this.ctx.fillStyle = Color.UIntToHex(color);
+            this.ctx.fill();
+        } else {
+            this.ctx.strokeStyle = Color.UIntToHex(color);
+            this.ctx.lineWidth = weight;
+            this.ctx.stroke();
+        }
+        this.ctx.closePath();
     }
 
     path(path : Path2D, color : number) : void {

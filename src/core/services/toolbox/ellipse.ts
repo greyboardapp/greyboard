@@ -1,24 +1,24 @@
 import Rect from "../../data/geometry/rect";
-import Rectangle from "../../data/items/rectangle";
+import Ellipse from "../../data/items/ellipse";
 import { CreatorTool } from "./tool";
 import { MouseButton, PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
 
-import rectangleIcon from "../../../assets/icons/rectangle.svg";
+import ellipseIcon from "../../../assets/icons/ellipse.svg";
 import { viewport } from "../viewport";
 import Point from "../../data/geometry/point";
 
-export class RectangleTool extends CreatorTool<Rectangle> {
+export class EllipseTool extends CreatorTool<Ellipse> {
     constructor() {
         super({
-            name: "tools.rectangle",
-            icon: rectangleIcon,
-            shortcut: new Shortcut("R"),
+            name: "tools.ellipse",
+            icon: ellipseIcon,
+            shortcut: new Shortcut("C"),
         });
     }
 
-    new() : Rectangle {
-        return new Rectangle(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, false);
+    new() : Ellipse {
+        return new Ellipse(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, false);
     }
 
     onActionStart(data : PointerEventData) : boolean {

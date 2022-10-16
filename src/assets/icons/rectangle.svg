@@ -10,7 +10,7 @@
     <g id="rectangle">
       <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
       <g clip-path="url(#mask_1)">
-        <path d="M1.5 3.5L18.5 3.5L18.5 16.5L1.5 16.5L1.5 3.5Z" id="Rectangle" fill="none" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="3" />
+        <path d="M0 2L20 2L20 18L0 18L0 2L0 2ZM3 5L3 15L17 15L17 5L3 5L3 5Z" id="Vector" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
       </g>
     </g>
   </g>
