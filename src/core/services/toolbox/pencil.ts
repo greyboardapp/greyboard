@@ -8,14 +8,14 @@ import pencilIcon from "../../../assets/icons/pencil.svg";
 export class PencilTool extends CreatorTool<Path> {
     constructor() {
         super({
-            name: "Pencil",
+            name: "tools.pencil",
             icon: pencilIcon,
             shortcut: new Shortcut("B"),
         });
     }
 
     new() : Path {
-        return new Path([], toolbox.state.selectedColor, toolbox.state.selectedWeight, true);
+        return new Path([], toolbox.state.selectedColor(), toolbox.state.selectedWeight, true);
     }
 
     onActionStart(data : PointerEventData) : boolean {

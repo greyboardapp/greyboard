@@ -35,7 +35,7 @@ const ToolbarButton : Component<ToolbarButtonProps> = (props) => {
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ ...quickEaseInTransition, delay: 0.5 }}
                         >
-                            <Tooltip orientation={tooltip.orientation} text={tooltip.text} shortcut={tooltip.shortcut} />
+                            <Tooltip orientation={tooltip.orientation} key={tooltip.key} shortcut={tooltip.shortcut} />
                         </Motion.div>
                     )}
                 </Show>

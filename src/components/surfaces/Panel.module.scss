@@ -1,0 +1,11 @@
+@import "../../global";
+
+.panel {
+    border-radius: 5px;
+    padding: 20px;
+
+    @include themed() {
+        background-color: color($fg);
+        box-shadow: 0 5px 10px color($shadow);
+    }
+}

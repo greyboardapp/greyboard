@@ -14,8 +14,7 @@ enum Interaction {
 }
 
 interface ColorPickerProps {
-    color : number;
-    onChange : (color : number) => void;
+    model : [() => number, (v : number) => void];
 }
 
 function getRelativePosition(el : HTMLElement, e : MouseEvent) : Point {
@@ -38,7 +37,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
     const color = createMemo(() => Color.HSVToUInt(hueValue(), saturationValue(), varianceValue()));
 
     createEffect(() => {
-        const [h, s, v] = Color.UIntToHSV(props.color);
+        const [h, s, v] = Color.UIntToHSV(props.model[0]());
         if (activeInteraction !== Interaction.None)
             return;
         setHueValue(h);
@@ -59,7 +58,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
             setSaturationValue(pos.x);
             setVarianceValue(pos.y);
         }
-        props.onChange(color());
+        props.model[1](color());
     };
 
     const handlePointerDown = (e : MouseEvent, interaction : Interaction) : void => {
@@ -90,7 +89,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
                     style={{
                         left: pct(saturationValue()),
                         top: pct(1 - varianceValue()),
-                        "background-color": rgba(Color.UIntToRGBA(color())),
+                        "background-color": Color.UIntToHex(color()),
                     }}
                 ></div>
             </div>

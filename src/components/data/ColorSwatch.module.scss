@@ -1,0 +1,26 @@
+@import "../../global";
+
+.colorSwatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px #0000001a;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    @include themed() {
+        outline: 2px solid color($fg);
+    }
+
+    &:hover {
+        @include themed() {
+            box-shadow: inset 0 0 0 2px #0000001a, 0 0 0 4px color($secondary);
+        }
+    }
+
+    &.active {
+        @include themed() {
+            box-shadow: inset 0 0 0 2px #0000001a, 0 0 0 4px color($primary);
+        }
+    }
+}

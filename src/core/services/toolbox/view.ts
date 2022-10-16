@@ -14,14 +14,14 @@ export class ViewTool extends Tool {
 
     constructor() {
         super({
-            name: "View",
+            name: "tools.view",
             icon: handIcon,
             shortcut: new Shortcut("V"),
         });
     }
 
     new() : Rectangle {
-        return new Rectangle(new Rect(), toolbox.state.selectedColor, toolbox.state.selectedWeight, true);
+        return new Rectangle(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, true);
     }
 
     onSelected(previous ?: Tool) : void {

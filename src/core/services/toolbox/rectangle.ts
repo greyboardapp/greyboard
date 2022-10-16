@@ -9,14 +9,14 @@ import rectangleIcon from "../../../assets/icons/rectangle.svg";
 export class RectangleTool extends CreatorTool<Rectangle> {
     constructor() {
         super({
-            name: "Rectangle",
+            name: "tools.rectangle",
             icon: rectangleIcon,
             shortcut: new Shortcut("R"),
         });
     }
 
     new() : Rectangle {
-        return new Rectangle(new Rect(), toolbox.state.selectedColor, toolbox.state.selectedWeight, true);
+        return new Rectangle(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, true);
     }
 
     onActionStart(data : PointerEventData) : boolean {

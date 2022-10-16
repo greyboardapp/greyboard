@@ -8,6 +8,7 @@
 
     @include themed() {
         background-color: color($fg);
+        box-shadow: 0 5px 10px color($shadow);
     }
 
     &.top,
@@ -26,6 +27,11 @@
 
     &.floating {
         border-radius: 10px;
+        margin-top: -5px;
+
+        @include themed() {
+            box-shadow: 0 5px 10px color($shadow);
+        }
     }
 
     .toolbarGroup {

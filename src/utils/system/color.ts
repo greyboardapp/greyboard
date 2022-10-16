@@ -1,6 +1,6 @@
 export default class Color {
     static UIntToHex(color : number) : string {
-        return `#${color.toString(16)}`;
+        return `#${color.toString(16).padStart(8, "0")}`;
     }
 
     static UIntToRGBA(color : number) : [number, number, number, number] {
@@ -33,7 +33,7 @@ export default class Color {
             Math.round([v, c, b, b, d, v][m] * 255),
             Math.round([d, v, v, c, b, b][m] * 255),
             Math.round([b, b, d, v, v, c][m] * 255),
-            1,
+            255,
         ];
     }
 

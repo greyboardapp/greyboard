@@ -1,10 +1,10 @@
-import { Component, Show, Signal } from "solid-js";
+import { Component, Show } from "solid-js";
 import { clamp, floor } from "../../utils/system/math";
 
 import styles from "./Slider.module.scss";
 
 interface SliderProps {
-    model : Signal<number>;
+    model : [() => number, (v : number) => void];
     min ?: number;
     max ?: number;
     step ?: number;

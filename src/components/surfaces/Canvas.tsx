@@ -1,11 +1,11 @@
 import { Component } from "solid-js";
-import { input } from "../core/services/input";
-import { createWindowListener } from "../utils/hooks";
+import { input } from "../../core/services/input";
+import { createWindowListener } from "../../utils/hooks";
 
 import styles from "./Canvas.module.scss";
-import { viewport } from "../core/services/viewport";
-import { px } from "../utils/dom";
-import { setWindowHeight, setWindowWidth } from "../core/services/renderer/layer";
+import { viewport } from "../../core/services/viewport";
+import { px } from "../../utils/dom";
+import { setWindowHeight, setWindowWidth } from "../../core/services/renderer/layer";
 
 const Canvas : Component = () => {
     createWindowListener("resize", () => {

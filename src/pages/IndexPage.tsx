@@ -1,5 +1,6 @@
 import { Component, For, onCleanup, onMount } from "solid-js";
-import Canvas from "../components/Canvas";
+import { Rerun } from "@solid-primitives/keyed";
+import Canvas from "../components/surfaces/Canvas";
 import Toolbar from "../components/toolbar/Toolbar";
 import ToolbarButton from "../components/toolbar/ToolbarButton";
 import app from "../core/app";
@@ -19,7 +20,8 @@ import exportIcon from "../assets/icons/export.svg";
 import deleteIcon from "../assets/icons/delete.svg";
 import undoIcon from "../assets/icons/undo.svg";
 import redoIcon from "../assets/icons/redo.svg";
-import peopleIcon from "../assets/icons/people.svg";
+// import peopleIcon from "../assets/icons/people.svg";
+import paletteIcon from "../assets/icons/palette.svg";
 
 import plusIcon from "../assets/icons/plus.svg";
 import minusIcon from "../assets/icons/minus.svg";
@@ -28,6 +30,13 @@ import settingsIcon from "../assets/icons/settings.svg";
 import ToolbarText from "../components/toolbar/ToolbarText";
 import { Tool } from "../core/services/toolbox/tool";
 import ToolbarPopup from "../components/toolbar/ToolbarPopup";
+import Slider from "../components/control/Slider";
+import ColorPicker from "../components/data/ColorPicker";
+import ColorSwatch from "../components/data/ColorSwatch";
+import Block from "../components/layout/Block";
+import Panel from "../components/surfaces/Panel";
+import Text from "../components/typography/Text";
+import Grid from "../components/layout/Grid";
 
 const IndexPage : Component = () => {
     onMount(() => app.start());
@@ -41,15 +50,15 @@ const IndexPage : Component = () => {
                     <Toolbar variant="top">
                         <ToolbarButton icon={menuIcon} />
                         <ToolbarTitle text={board.state.name} />
-                        <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", text: "Save" }} />
-                        <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", text: "Export" }} />
-                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", text: "Delete" }} />
-                        <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", text: "Undo" }} />
-                        <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", text: "Redo" }} />
+                        <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", key: "actions.save" }} />
+                        <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", key: "actions.export" }} />
+                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", key: "actions.delete" }} />
+                        <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", key: "actions.undo" }} />
+                        <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", key: "actions.redo" }} />
                     </Toolbar>
                     <div class="flex h">
                         <UserBubble name="Jsdsadfoh Iuds" />
-                        <Button icon={peopleIcon} text={"share"} onClick={(e) => console.log(e)} />
+                        {/* <Button icon={peopleIcon} text={"share"} onClick={(e) => console.log(e)} /> */}
                     </div>
                 </div>
                 <div class="left flex v v-spaced">
@@ -62,12 +71,66 @@ const IndexPage : Component = () => {
                                             <ToolbarButton
                                                 icon={entry.icon}
                                                 active={toolbox.state.selectedTool === entry}
-                                                tooltip={{ orientation: "right", text: entry.name, shortcut: entry.shortcut }}
+                                                tooltip={{ orientation: "right", key: entry.name, shortcut: entry.shortcut }}
                                                 onClick={() => (toolbox.state.selectedTool = entry)} />
                                         );
-                                    return <ToolbarPopup category={entry} />;
+                                    return (
+                                        <ToolbarPopup
+                                            origin="center"
+                                            active={!!toolbox.state.selectedTool && entry.tools.includes(toolbox.state.selectedTool)}
+                                            actuator={
+                                                <Rerun on={entry.lastUsedTool}>
+                                                    <ToolbarButton
+                                                        icon={entry.lastUsedTool.icon}
+                                                        active={toolbox.state.selectedTool && entry.tools.includes(toolbox.state.selectedTool)}
+                                                        tooltip={{ orientation: "right", key: entry.lastUsedTool.name, shortcut: entry.lastUsedTool.shortcut }}
+                                                        onClick={() => (toolbox.state.selectedTool = entry.lastUsedTool)}
+                                                    />
+                                                </Rerun>
+                                            }
+                                        >
+                                            <Toolbar variant="floating">
+                                                <For each={entry.tools}>
+                                                    {(tool) => <ToolbarButton
+                                                        icon={tool.icon}
+                                                        active={toolbox.state.selectedTool === tool}
+                                                        tooltip={{ orientation: "top", key: tool.name, shortcut: tool.shortcut }}
+                                                        onClick={() => (toolbox.state.selectedTool = entry.lastUsedTool = tool)}
+                                                    />}
+                                                </For>
+                                            </Toolbar>
+                                        </ToolbarPopup>
+                                    );
                                 }}
                             </For>
+                            <ToolbarPopup
+                                origin="corner"
+                                actuator={<ToolbarButton icon={paletteIcon} />}
+                            >
+                                <Panel>
+                                    <Block>
+                                        <Text key="titles.strokeWeight" size="s" uppercase faded bold />
+                                        <Slider min={1} max={10} model={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]} showValue />
+                                    </Block>
+                                    <Text key="titles.color" size="s" uppercase faded bold class="mb3" />
+                                    <Grid class="mb3">
+                                        <For each={toolbox.state.colorPalette}>
+                                            {(color, index) => (
+                                                <ColorSwatch
+                                                    // Disabled since we know for a fact that the order of the colors will not change
+                                                    // eslint-disable-next-line solid/reactivity
+                                                    model={[() => color, (v) => (toolbox.state.selectedColorIndex = index())]}
+                                                    active={toolbox.state.selectedColorIndex === index()}
+                                                />
+                                            )}
+                                        </For>
+                                    </Grid>
+                                    <Block>
+                                        <ColorPicker model={[toolbox.state.selectedColor, toolbox.updateSelectedColorValue]} />
+                                    </Block>
+                                    <Button key="buttons.resetPalette" variant="transparent" fluent onClick={() => toolbox.resetColorPalette()} />
+                                </Panel>
+                            </ToolbarPopup>
                         </div>
                         <div class={`${toolbarStyles.toolbarGroup} v`}>
                             <ToolbarButton icon={plusIcon} />

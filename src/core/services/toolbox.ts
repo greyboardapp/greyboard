@@ -9,10 +9,11 @@ import { RectangleTool } from "./toolbox/rectangle";
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
     colorPalette : number[];
+    selectedColorIndex : number;
     selectedTool ?: Tool;
-    selectedColor : number;
     selectedWeight : number;
 
+    selectedColor : () => number;
     selectedHexColor : () => string;
 }
 
@@ -26,14 +27,14 @@ export class Toolbox extends Service<ToolboxState> {
                 new ViewTool(),
                 makeToolCategory("Shapes", new RectangleTool()),
             ],
-            colorPalette: [
-                0xFFFFFF,
-            ],
-            selectedColor: 0xFFFFFF,
+            colorPalette: [],
+            selectedColorIndex: 0,
             selectedWeight: 4,
-            selectedHexColor: () => Color.UIntToHex(this.state.selectedColor),
+            selectedColor: () => this.state.colorPalette[this.state.selectedColorIndex],
+            selectedHexColor: () => Color.UIntToHex(this.state.selectedColor()),
         });
 
+        this.resetColorPalette();
         this.tools = this.state.toolHierarchy.flatMap((entry) => ((entry instanceof Tool) ? [entry] : entry.tools));
     }
 
@@ -52,6 +53,29 @@ export class Toolbox extends Service<ToolboxState> {
         this.onSelectedToolChanged();
     }
 
+    updateSelectedColorValue(v : number) : void {
+        this.state.colorPalette[this.state.selectedColorIndex] = v;
+    }
+
+    resetColorPalette() : void {
+        this.state.colorPalette = [
+            0xFFFFFFFF,
+            0x757575FF,
+            0xFFEB3BFF,
+            0xFF9800FF,
+            0xF44336FF,
+            0x9C27B0FF,
+            0xE0E0E0FF,
+            0x212121FF,
+            0x4CAF50FF,
+            0x009688FF,
+            0x2196F3FF,
+            0x3F51B5FF,
+        ];
+
+        console.log(this.state.colorPalette.map((color) => Color.UIntToHex(color)));
+    }
+
     getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {
         return this.tools.find((tool) => tool instanceof toolType) ?? null;
     }
@@ -62,7 +86,7 @@ export class Toolbox extends Service<ToolboxState> {
 
     start() : void {
         this.state.selectedTool = this.getTool(PencilTool) ?? this.tools[0];
-        [this.state.selectedColor] = this.state.colorPalette;
+        // [this.state.selectedColor] = this.state.colorPalette;
 
         input.onPointerDown.add(this.pointerDownEvent);
         input.onPointerMove.add(this.pointerMoveEvent);

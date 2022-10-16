@@ -131,6 +131,8 @@ export class Input extends Service {
     processKeyDownEvent(e : KeyboardEvent) : void {
         if ((e.target as HTMLElement).tagName === "INPUT")
             return;
+        if (e.key.startsWith("F") && e.key.length > 1)
+            return;
         e.preventDefault();
         const data = this.toKeyboardEventData(e);
         this.pressedKeyboardButtons.set(data.button, true);
@@ -139,6 +141,8 @@ export class Input extends Service {
 
     processKeyUpEvent(e : KeyboardEvent) : void {
         if ((e.target as HTMLElement).tagName === "INPUT")
+            return;
+        if (e.key.startsWith("F") && e.key.length > 1)
             return;
         e.preventDefault();
         const data = this.toKeyboardEventData(e);
