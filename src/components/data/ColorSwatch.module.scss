@@ -4,7 +4,6 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    box-shadow: inset 0 0 0 2px #0000001a;
     box-sizing: border-box;
     cursor: pointer;
     transition: all 0.2s $timingCurve;
@@ -15,13 +14,13 @@
 
     &:hover {
         @include themed() {
-            box-shadow: inset 0 0 0 2px #0000001a, 0 0 0 4px color($secondary);
+            box-shadow: 0 0 0 4px color($secondary);
         }
     }
 
     &.active {
         @include themed() {
-            box-shadow: inset 0 0 0 2px #0000001a, 0 0 0 4px color($primary);
+            box-shadow: 0 0 0 4px color($primary);
         }
     }
 }

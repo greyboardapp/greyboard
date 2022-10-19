@@ -36,6 +36,15 @@
                 background-color: color($opaque);
             }
         }
+
+        &.dark {
+            color: color($fgText);
+            background-color: color($bg);
+
+            &:hover {
+                background-color: color($secondaryFocus);
+            }
+        }
     }
 
     &.big {
