@@ -1,5 +1,7 @@
 import { createService, Service } from "../../utils/system/service";
+import Rect from "../data/geometry/rect";
 import { BoardItem } from "../data/item";
+import { createAction } from "./actions";
 import { Chunk } from "./board/chunk";
 import { viewport } from "./viewport";
 
@@ -13,6 +15,16 @@ interface BoardState {
 export class Board extends Service<BoardState> {
     public readonly items = new Map<number, BoardItem>();
     public readonly chunks = new Map<string, Chunk>();
+
+    public readonly addAction = createAction(
+        (items : Iterable<BoardItem>) => this.add(items),
+        (items : Iterable<BoardItem>) => this.remove(items),
+    );
+
+    public readonly removeAction = createAction(
+        (items : Iterable<BoardItem>) => this.remove(items),
+        (items : Iterable<BoardItem>) => this.add(items),
+    );
 
     constructor() {
         super({
@@ -32,12 +44,46 @@ export class Board extends Service<BoardState> {
         this.addToChunk(items);
     }
 
+    remove(items : Iterable<BoardItem>) : void {
+        for (const item of items)
+            this.items.delete(item.id);
+        this.removeFromChunk(items);
+    }
+
+    removeByIds(ids : Iterable<number>) : void {
+        const items : BoardItem[] = [];
+
+        for (const id of ids) {
+            const item = this.items.get(id);
+            if (item)
+                items.push(item);
+        }
+
+        this.removeFromChunk(items);
+    }
+
     rebuild() : void {
         for (const chunk of this.chunks.values()) {
             chunk.resetGraphics();
             chunk.deleteAll();
         }
         this.addToChunk(this.items.values());
+    }
+
+    getItemsWithinRect(rect : Rect) : BoardItem[] {
+        const items : BoardItem[] = [];
+        const minX = this.truncateCoordinate(rect.x);
+        const minY = this.truncateCoordinate(rect.y);
+        const maxX = this.truncateCoordinate(rect.x2);
+        const maxY = this.truncateCoordinate(rect.y2);
+        for (let x = minX; x <= maxX; ++x)
+            for (let y = minY; y <= maxY; ++y) {
+                const key = this.hash(x, y);
+                const chunk = this.chunks.get(key);
+                if (chunk)
+                    items.push(...chunk.get(rect));
+            }
+        return items;
     }
 
     // TODO: Find a better name since items are not necessarily added to a single chunk
@@ -62,13 +108,17 @@ export class Board extends Service<BoardState> {
 
     private removeFromChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const { min, max } = item.cell;
-            for (let { x } = min; x <= max.x; ++x)
-                for (let { y } = min; y <= max.y; ++y) {
+            const minX = this.truncateCoordinate(item.transform.x);
+            const minY = this.truncateCoordinate(item.transform.y);
+            const maxX = this.truncateCoordinate(item.transform.x2);
+            const maxY = this.truncateCoordinate(item.transform.y2);
+            for (let x = minX; x <= maxX; ++x)
+                for (let y = minY; y <= maxY; ++y) {
                     const key = this.hash(x, y);
                     const chunk = this.chunks.get(key);
+                    // HACK: For now this works but in the future let's implement this so that the deleteMany function can be used effectively
                     if (chunk)
-                        chunk.delete(item);
+                        chunk.deleteMany([item]);
                 }
         }
     }

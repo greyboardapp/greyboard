@@ -62,7 +62,7 @@ export abstract class CreatorTool<T extends BoardItem> extends Tool {
     }
 
     create() : void {
-        board.add([this.item]);
+        board.addAction([this.item]);
     }
 
     onRender(graphics : Graphics, dt : number) : void {

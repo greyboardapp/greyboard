@@ -1,7 +1,9 @@
 import { px } from "../../../utils/dom";
 import { generateId } from "../../../utils/system/id";
-import Rect from "../../data/geometry/rect";
+import Point from "../../data/geometry/point";
+import Rect, { MinMaxRect } from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
+import { board } from "../board";
 import Graphics from "../renderer/graphics";
 import { viewport } from "../viewport";
 
@@ -109,15 +111,15 @@ export class Chunk extends QuadTree {
     public graphics : Graphics;
 
     constructor(public x : number, public y : number) {
-        super(new Rect(x, y, Chunk.maxChunkSize, Chunk.maxChunkSize), 0);
+        super(new Rect(x * Chunk.maxChunkSize, y * Chunk.maxChunkSize, Chunk.maxChunkSize, Chunk.maxChunkSize), 0);
         this.canvas = <canvas
             width={Chunk.maxChunkSize}
             height={Chunk.maxChunkSize}
             style={{
-                left: px(x * Chunk.maxChunkSize),
-                top: px(y * Chunk.maxChunkSize),
-                width: px(Chunk.maxChunkSize),
-                height: px(Chunk.maxChunkSize),
+                left: px(this.boundary.x),
+                top: px(this.boundary.y),
+                width: px(this.boundary.w),
+                height: px(this.boundary.h),
             }}
         ></canvas> as HTMLCanvasElement;
         document.getElementById("staticCanvasContainer")?.append(this.canvas);
@@ -130,6 +132,19 @@ export class Chunk extends QuadTree {
     insert(item : BoardItem) : void {
         super.insert(item);
         item.render(this.graphics);
+    }
+
+    deleteMany(items : Iterable<BoardItem>) : void {
+        const bb = new MinMaxRect(new Point(Infinity, Infinity), new Point(-Infinity, -Infinity));
+        for (const item of items) {
+            this.delete(item);
+            bb.append(item.rect);
+        }
+
+        this.graphics.scissor(bb.x - 15, bb.y - 15, bb.w + 30, bb.h + 30, () => {
+            for (const item of board.getItemsWithinRect(bb.toRect()))
+                item.render(this.graphics);
+        });
     }
 
     resetGraphics() : void {

@@ -40,18 +40,42 @@ export default class Rect {
     }
 
     intersects(other : Rect) : boolean {
-        return (!(other.x > this.x2 || other.x2 < this.x || other.y > this.y2 || other.y2 < this.y));
+        return (!(other.x >= this.x2 || other.x2 <= this.x || other.y >= this.y2 || other.y2 <= this.y));
     }
 }
 
 export class MinMaxRect {
     constructor(public min : Point = new Point(), public max : Point = new Point()) {}
 
-    append(other : MinMaxRect) : void {
-        this.min.x = Math.min(this.min.x, other.min.x);
-        this.min.y = Math.min(this.min.y, other.min.y);
-        this.max.x = Math.max(this.max.x, other.max.x);
-        this.max.y = Math.max(this.max.y, other.max.y);
+    get x() : number {
+        return this.min.x;
+    }
+
+    get x2() : number {
+        return this.max.x;
+    }
+
+    get y() : number {
+        return this.min.y;
+    }
+
+    get y2() : number {
+        return this.max.y;
+    }
+
+    get w() : number {
+        return this.max.x - this.min.x;
+    }
+
+    get h() : number {
+        return this.max.y - this.min.y;
+    }
+
+    append(other : MinMaxRect | Rect) : void {
+        this.min.x = Math.min(this.min.x, other.x);
+        this.min.y = Math.min(this.min.y, other.y);
+        this.max.x = Math.max(this.max.x, other.x2);
+        this.max.y = Math.max(this.max.y, other.y2);
     }
 
     toRect() : Rect {

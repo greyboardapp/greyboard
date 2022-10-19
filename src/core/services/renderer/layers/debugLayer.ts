@@ -13,6 +13,7 @@ export class DebugLayer extends RendererLayer {
                 Chunk.maxChunkSize,
                 Chunk.maxChunkSize,
                 0xFF0000,
+                2,
             );
     }
 }
