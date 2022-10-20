@@ -9,6 +9,7 @@ import { FilledRectangleTool } from "./toolbox/filledRectangle";
 import { FilledEllipseTool } from "./toolbox/filledEllipse";
 import { EllipseTool } from "./toolbox/ellipse";
 import { EraserTool } from "./toolbox/eraser";
+import { BoxSelectTool } from "./toolbox/boxSelect";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -16,6 +17,7 @@ export interface ToolboxState {
     selectedColorIndex : number;
     selectedTool ?: Tool;
     selectedWeight : number;
+    selectedItemIds : number[];
 
     selectedColor : () => number;
     selectedHexColor : () => string;
@@ -27,6 +29,8 @@ export class Toolbox extends Service<ToolboxState> {
     constructor() {
         super({
             toolHierarchy: [
+                makeToolCategory("Selections",
+                    new BoxSelectTool()),
                 new PencilTool(),
                 new EraserTool(),
                 new ViewTool(),
@@ -39,6 +43,7 @@ export class Toolbox extends Service<ToolboxState> {
             colorPalette: [],
             selectedColorIndex: 0,
             selectedWeight: 2,
+            selectedItemIds: [],
             selectedColor: () => this.state.colorPalette[this.state.selectedColorIndex],
             selectedHexColor: () => Color.UIntToHex(this.state.selectedColor()),
         });
@@ -52,6 +57,8 @@ export class Toolbox extends Service<ToolboxState> {
     onSelectedToolChanged(prev ?: Tool) : Tool | undefined {
         if (prev)
             prev.onDeselected();
+        if (!this.state.selectedTool?.name.includes("Select"))
+            this.state.selectedItemIds = [];
         this.state.selectedTool?.onSelected(prev);
         return this.state.selectedTool;
     }
@@ -81,8 +88,6 @@ export class Toolbox extends Service<ToolboxState> {
             0x2196F3FF,
             0x3F51B5FF,
         ];
-
-        console.log(this.state.colorPalette.map((color) => Color.UIntToHex(color)));
     }
 
     getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {

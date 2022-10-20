@@ -31,4 +31,5 @@ export abstract class BoardItem {
 
     abstract render(graphics : Graphics) : void;
     abstract isInLine(a : Point, b : Point) : boolean;
+    abstract isInRect(rect : Rect) : boolean;
 }

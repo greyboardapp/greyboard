@@ -1,6 +1,6 @@
 import getStroke from "perfect-freehand";
 import { getSvgPathFromStroke } from "../../../utils/svg";
-import { areLinesIntersecting } from "../../../utils/system/intersections";
+import { areLinesIntersecting, isPointInRect } from "../../../utils/system/intersections";
 import Graphics from "../../services/renderer/graphics";
 import { viewport } from "../../services/viewport";
 import Point from "../geometry/point";
@@ -27,6 +27,13 @@ export default class Path extends BoardItem {
     isInLine(a : Point, b : Point) : boolean {
         for (let i = 0; i < this.points.length - 1; ++i)
             if (areLinesIntersecting(a, b, this.points[i], this.points[i + 1]))
+                return true;
+        return false;
+    }
+
+    isInRect(rect : Rect) : boolean {
+        for (const p of this.points)
+            if (isPointInRect(rect, p))
                 return true;
         return false;
     }

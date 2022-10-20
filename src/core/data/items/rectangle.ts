@@ -22,4 +22,8 @@ export default class Rectangle extends BoardItem {
             (!this.filled && (isAIn || isBIn) && (isAIn !== isBIn))
         );
     }
+
+    isInRect(rect : Rect) : boolean {
+        return this.rect.intersects(rect);
+    }
 }
