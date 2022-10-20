@@ -1,5 +1,6 @@
 import getStroke from "perfect-freehand";
 import { getSvgPathFromStroke } from "../../../utils/svg";
+import { areLinesIntersecting } from "../../../utils/system/intersections";
 import Graphics from "../../services/renderer/graphics";
 import { viewport } from "../../services/viewport";
 import Point from "../geometry/point";
@@ -21,6 +22,13 @@ export default class Path extends BoardItem {
         graphics.path(new Path2D(getSvgPathFromStroke(getStroke(this.points, {
             size: this.weight * 2,
         }))), this.color);
+    }
+
+    isInLine(a : Point, b : Point) : boolean {
+        for (let i = 0; i < this.points.length - 1; ++i)
+            if (areLinesIntersecting(a, b, this.points[i], this.points[i + 1]))
+                return true;
+        return false;
     }
 
     private calculateBoundingBox() : void {

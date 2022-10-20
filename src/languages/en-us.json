@@ -1,6 +1,7 @@
 {
     "board.newPlaceholder": "New Board",
     "tools.pencil": "Pencil",
+    "tools.eraser": "Eraser",
     "tools.view": "View",
     "tools.rectangle": "Rectangle",
     "tools.filledRectangle": "Filled Rectangle",

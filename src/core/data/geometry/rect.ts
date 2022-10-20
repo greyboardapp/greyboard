@@ -7,6 +7,22 @@ export default class Rect {
         return new Point(this.x + this.w / 2, this.y + this.h / 2);
     }
 
+    get topLeft() : Point {
+        return new Point(this.x, this.y);
+    }
+
+    get topRight() : Point {
+        return new Point(this.x2, this.y);
+    }
+
+    get bottomRight() : Point {
+        return new Point(this.x2, this.y2);
+    }
+
+    get bottomLeft() : Point {
+        return new Point(this.x, this.y2);
+    }
+
     get area() : number {
         return Math.abs(this.w * this.h);
     }

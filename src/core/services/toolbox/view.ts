@@ -1,6 +1,4 @@
 import tweenjs, { Tween } from "@tweenjs/tween.js";
-import Rect from "../../data/geometry/rect";
-import Rectangle from "../../data/items/rectangle";
 import { Tool } from "./tool";
 import { MouseButton, PointerEventData, Shortcut } from "../input";
 import { toolbox } from "../toolbox";
@@ -18,10 +16,6 @@ export class ViewTool extends Tool {
             icon: handIcon,
             shortcut: new Shortcut("V"),
         });
-    }
-
-    new() : Rectangle {
-        return new Rectangle(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, true);
     }
 
     onSelected(previous ?: Tool) : void {

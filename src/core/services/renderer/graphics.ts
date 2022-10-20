@@ -1,4 +1,5 @@
 import Color from "../../../utils/system/color";
+import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 
 export default class Graphics {
@@ -10,6 +11,8 @@ export default class Graphics {
         if (!ctx)
             throw new Error("no context");
         this.ctx = ctx;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
     }
 
     clear() : void {
@@ -80,5 +83,32 @@ export default class Graphics {
     path(path : Path2D, color : number) : void {
         this.ctx.fillStyle = Color.UIntToHex(color);
         this.ctx.fill(path);
+    }
+
+    curve(points : Point[], color : number, weight : number) : void {
+        if (points.length === 0)
+            return;
+
+        this.ctx.beginPath();
+        if (points.length === 1) {
+            this.ctx.fillStyle = Color.UIntToHex(color);
+            this.ctx.ellipse(points[0].x, points[0].y, weight, weight, 0, 0, 360);
+            this.ctx.fill();
+        } else {
+            this.ctx.strokeStyle = Color.UIntToHex(color);
+            this.ctx.lineWidth = weight;
+            this.ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 0; i < points.length - 1; ++i)
+                this.ctx.quadraticCurveTo(
+                    points[i].x,
+                    points[i].y,
+                    points[i].x + (points[i + 1].x - points[i].x) * 0.5,
+                    points[i].y + (points[i + 1].y - points[i].y) * 0.5,
+                );
+            this.ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+            this.ctx.stroke();
+        }
+
+        this.ctx.closePath();
     }
 }

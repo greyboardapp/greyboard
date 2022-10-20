@@ -8,6 +8,7 @@ import { RectangleTool } from "./toolbox/rectangle";
 import { FilledRectangleTool } from "./toolbox/filledRectangle";
 import { FilledEllipseTool } from "./toolbox/filledEllipse";
 import { EllipseTool } from "./toolbox/ellipse";
+import { EraserTool } from "./toolbox/eraser";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -27,6 +28,7 @@ export class Toolbox extends Service<ToolboxState> {
         super({
             toolHierarchy: [
                 new PencilTool(),
+                new EraserTool(),
                 new ViewTool(),
                 makeToolCategory("Shapes",
                     new FilledRectangleTool(),

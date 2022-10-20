@@ -1,6 +1,7 @@
 import { generateId } from "../../utils/system/id";
 import Graphics from "../services/renderer/graphics";
 import { viewport } from "../services/viewport";
+import Point from "./geometry/point";
 import Rect, { MinMaxRect } from "./geometry/rect";
 
 export enum BoardItemType {
@@ -29,4 +30,5 @@ export abstract class BoardItem {
     }
 
     abstract render(graphics : Graphics) : void;
+    abstract isInLine(a : Point, b : Point) : boolean;
 }
