@@ -2,7 +2,7 @@ import autoBind from "auto-bind";
 import { distSq } from "../../utils/geometry";
 import createDelegate from "../../utils/system/delegate";
 import { createService, Service } from "../../utils/system/service";
-import Point from "../data/geometry/point";
+import Point, { PressurePoint } from "../data/geometry/point";
 
 export enum KeyModifiers {
     None = 0,
@@ -18,10 +18,17 @@ export enum MouseButton {
     Secondary,
 }
 
+export enum PointerType {
+    Mouse,
+    Touch,
+    Pen,
+}
+
 export interface PointerEventData {
+    type : PointerType;
     button : MouseButton;
     modifiers : KeyModifiers;
-    positions : Point[];
+    positions : PressurePoint[];
     movement : Point[];
     delta : number;
 }
@@ -55,7 +62,11 @@ export interface ShortcutBinding {
     callback : (data : KeyboardEventData, shortcut : Shortcut) => void;
 }
 
-export class Input extends Service {
+export interface InputState {
+    lastUsedPointerType : PointerType;
+}
+
+export class Input extends Service<InputState> {
     public onPointerDown = createDelegate<[data : PointerEventData]>();
     public onPointerMove = createDelegate<[data : PointerEventData]>();
     public onPointerUp = createDelegate<[data : PointerEventData]>();
@@ -71,7 +82,9 @@ export class Input extends Service {
     private readonly shortcuts : ShortcutBinding[] = [];
 
     constructor() {
-        super({});
+        super({
+            lastUsedPointerType: PointerType.Mouse,
+        });
         autoBind(this);
     }
 
@@ -88,15 +101,16 @@ export class Input extends Service {
         this.shortcuts.clear();
     }
 
-    processPointerDownEvent(e : MouseEvent | TouchEvent) : void {
+    processPointerDownEvent(e : PointerEvent | TouchEvent) : void {
         e.preventDefault();
         (document.activeElement as HTMLElement).blur();
         const data = this.toPointerEventData(e);
         this.pressedMouseButtons.set(data.button, true);
         this.onPointerDown(data);
+        this.state.lastUsedPointerType = data.type;
     }
 
-    processPointerMoveEvent(e : MouseEvent | TouchEvent) : void {
+    processPointerMoveEvent(e : PointerEvent | TouchEvent) : void {
         e.preventDefault();
         const data = this.toPointerEventData(e);
         this.prevPointerPositions = this.pointerPositions;
@@ -112,17 +126,19 @@ export class Input extends Service {
             }
         }
         this.onPointerMove(data);
+        this.state.lastUsedPointerType = data.type;
     }
 
-    processPointerUpEvent(e : MouseEvent | TouchEvent) : void {
+    processPointerUpEvent(e : PointerEvent | TouchEvent) : void {
         e.preventDefault();
         const data = this.toPointerEventData(e);
         data.movement = this.pointerPositions.map((p, i) => new Point(p.x - (this.prevPointerPositions[i]?.x ?? p.x), p.y - (this.prevPointerPositions[i]?.y ?? p.y)));
         this.pressedMouseButtons.set(data.button, false);
         this.onPointerUp(data);
+        this.state.lastUsedPointerType = data.type;
     }
 
-    processZoomEvent(e : MouseEvent | WheelEvent | TouchEvent) : void {
+    processZoomEvent(e : PointerEvent | WheelEvent | TouchEvent) : void {
         e.preventDefault();
         const data = this.toPointerEventData(e);
         this.onZoom(data);
@@ -160,12 +176,17 @@ export class Input extends Service {
         this.shortcuts.push({ shortcut, callback });
     }
 
-    private toPointerEventData(e : MouseEvent | WheelEvent | TouchEvent) : PointerEventData {
+    private toPointerEventData(e : PointerEvent | WheelEvent | TouchEvent) : PointerEventData {
+        let type = PointerType.Touch;
+        if (e instanceof PointerEvent)
+            type = (e.pointerType === "pen") ? PointerType.Pen : PointerType.Mouse;
+
         return {
-            button: (e instanceof MouseEvent || e instanceof WheelEvent) ? e.button : MouseButton.Primary,
+            type,
+            button: (e instanceof PointerEvent || e instanceof WheelEvent) ? e.button : MouseButton.Primary,
             modifiers: this.getKeyModifiers(e),
-            positions: (e instanceof MouseEvent || e instanceof WheelEvent) ?
-                [new Point(e.clientX, e.clientY)] :
+            positions: (e instanceof PointerEvent || e instanceof WheelEvent) ?
+                [new PressurePoint(e.clientX, e.clientY, (e instanceof PointerEvent && e.pointerType === "pen") ? e.pressure : undefined)] :
                 Array.from(e.touches).map((touch) => new Point(touch.clientX, touch.clientY)),
             movement: [], // movement can not be calculated here since on up event the move fired right before it, resulting in a 0 movement
             delta: e instanceof WheelEvent ? e.deltaY : 0,
@@ -179,7 +200,7 @@ export class Input extends Service {
         };
     }
 
-    private getKeyModifiers(e : MouseEvent | WheelEvent | TouchEvent | KeyboardEvent) : KeyModifiers {
+    private getKeyModifiers(e : PointerEvent | WheelEvent | TouchEvent | KeyboardEvent) : KeyModifiers {
         let modifiers = KeyModifiers.None;
         if (e.altKey)
             modifiers |= KeyModifiers.Alt;

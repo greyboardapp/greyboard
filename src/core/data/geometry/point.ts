@@ -18,3 +18,9 @@ export default class Point {
         return new Point(-this.x, -this.y);
     }
 }
+
+export class PressurePoint extends Point {
+    constructor(public x : number = 0, public y : number = 0, public pressure ?: number) {
+        super(x, y);
+    }
+}
