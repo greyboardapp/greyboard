@@ -50,12 +50,14 @@ const IndexPage : Component = () => {
                 <div class="top flex h h-spaced">
                     <Toolbar variant="top">
                         <ToolbarButton icon={menuIcon} />
-                        <ToolbarTitle text={board.state.name} />
-                        <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", key: "actions.save" }} />
-                        <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", key: "actions.export" }} />
-                        <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", key: "actions.clear" }} />
-                        <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", key: "actions.undo" }} />
-                        <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", key: "actions.redo" }} />
+                        <div class={`${toolbarStyles.toolbarGroup} ${toolbarStyles.shifted} h v-center`}>
+                            <ToolbarTitle text={board.state.name} />
+                            <ToolbarButton icon={saveIcon} tooltip={{ orientation: "bottom", key: "actions.save" }} />
+                            <ToolbarButton icon={exportIcon} tooltip={{ orientation: "bottom", key: "actions.export" }} />
+                            <ToolbarButton icon={deleteIcon} tooltip={{ orientation: "bottom", key: "actions.clear" }} />
+                            <ToolbarButton icon={undoIcon} tooltip={{ orientation: "bottom", key: "actions.undo" }} />
+                            <ToolbarButton icon={redoIcon} tooltip={{ orientation: "bottom", key: "actions.redo" }} />
+                        </div>
                     </Toolbar>
                     <div class="flex h">
                         <UserBubble name="Jsdsadfoh Iuds" />

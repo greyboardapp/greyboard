@@ -4,7 +4,6 @@ import Rect from "../data/geometry/rect";
 import { input } from "./input";
 import { isInRange, pass } from "../../utils/system/misc";
 import createDelegate from "../../utils/system/delegate";
-import { Chunk } from "./board/chunk";
 
 export interface ViewportState {
     offsetX : number;
@@ -19,8 +18,8 @@ export class Viewport extends Service<ViewportState> {
 
     constructor() {
         super({
-            offsetX: Chunk.maxChunkSize / 2,
-            offsetY: Chunk.maxChunkSize / 2,
+            offsetX: 0,
+            offsetY: 0,
             originX: 0,
             originY: 0,
             scale: 1,
@@ -63,8 +62,16 @@ export class Viewport extends Service<ViewportState> {
         return new Point((p.x - this.state.offsetX) / this.state.scale, (p.y - this.state.offsetY) / this.state.scale);
     }
 
+    screenToBoard(p : Point) : Point {
+        return new Point(p.x - this.state.offsetX, p.y - this.state.offsetY);
+    }
+
+    screenToBoardRect(a : Point, b : Point) : Rect {
+        return new Rect(Math.min(a.x, b.x) - this.state.offsetX, Math.min(a.y, b.y) - this.state.offsetY, Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+    }
+
     viewportToScreen(p : Point) : Point {
-        return new Point((this.state.offsetX + p.x) * this.state.scale, (this.state.offsetY + p.y) * this.state.scale);
+        return new Point(this.state.offsetX + p.x * this.state.scale, this.state.offsetY + p.y * this.state.scale);
     }
 
     viewportToScreenRect(r : Rect) : Rect {

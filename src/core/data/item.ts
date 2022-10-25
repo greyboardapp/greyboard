@@ -2,7 +2,7 @@ import { generateId } from "../../utils/system/id";
 import Graphics from "../services/renderer/graphics";
 import { viewport } from "../services/viewport";
 import Point from "./geometry/point";
-import Rect, { MinMaxRect } from "./geometry/rect";
+import Rect from "./geometry/rect";
 
 export enum BoardItemType {
     None = 0,
@@ -14,13 +14,15 @@ export abstract class BoardItem {
     public id : number = generateId();
     public type : BoardItemType = BoardItemType.None;
     public rect : Rect = new Rect();
-    public cell : MinMaxRect = new MinMaxRect();
+    public cell : Rect = new Rect();
     public color = 0xFFFFFFFF;
     public label : string | null = null;
     public locked = false;
     public zIndex = 0;
 
     get transform() : Rect {
+        if (viewport.state.scale === 1)
+            return this.rect;
         return new Rect(
             this.rect.x * viewport.state.scale,
             this.rect.y * viewport.state.scale,

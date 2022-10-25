@@ -10,6 +10,7 @@ class Renderer extends Service {
 
     private enabled = true;
     private readonly layerStack : RendererLayer[] = [];
+    private prevT = 0;
 
     constructor() {
         super({});
@@ -31,21 +32,24 @@ class Renderer extends Service {
         this.layerStack.push(new ctor());
     }
 
-    private render(dt : number) : void {
+    private render(t : number) : void {
+        const dt = (t - this.prevT) * 0.001;
         for (const layer of this.layerStack)
             layer.onRender(dt);
 
         this.onFrameUpdate(dt);
 
+        this.prevT = t;
+
         if (this.enabled)
-            window.requestAnimationFrame((t) => this.render(t));
+            window.requestAnimationFrame((t2) => this.render(t2));
     }
 }
 
 const renderer = createStatelessService(Renderer);
 renderer.pushLayer(DynamicLayer);
 
-if (import.meta.env.DEBUG)
+if (import.meta.env.DEBUG === "true")
     renderer.pushLayer(DebugLayer);
 
 export { renderer };

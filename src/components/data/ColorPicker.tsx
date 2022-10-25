@@ -35,6 +35,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
 
     const hue = createMemo(() => Color.HSVToRGBA(hueValue(), 1, 1));
     const color = createMemo(() => Color.HSVToUInt(hueValue(), saturationValue(), varianceValue()));
+    const hex = createMemo(() => Color.UIntToHex(color()));
 
     createEffect(() => {
         const [h, s, v] = Color.UIntToHSV(props.model[0]());
@@ -89,7 +90,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
                     style={{
                         left: pct(saturationValue()),
                         top: pct(1 - varianceValue()),
-                        "background-color": Color.UIntToHex(color()),
+                        "background-color": hex(),
                     }}
                 ></div>
             </div>

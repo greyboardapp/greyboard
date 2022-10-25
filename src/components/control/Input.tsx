@@ -1,10 +1,10 @@
-import { Component, Show, Signal } from "solid-js";
+import { Component, Show } from "solid-js";
 import Icon, { SVGIcon } from "../data/Icon";
 
 import styles from "./Input.module.scss";
 
 interface InputProps {
-    model : Signal<string>;
+    model : [() => string, (v : string) => void];
     type ?: "text" | "password";
     placeholder ?: string;
     icon ?: SVGIcon;

@@ -22,6 +22,7 @@
         justify-content: space-between;
         width: 50px;
         height: 100%;
+        padding-top: 10px;
     }
 
     &.floating {
@@ -36,6 +37,8 @@
     .toolbarGroup {
         display: flex;
         gap: 5px;
+
+        &.shifted { padding-left: 5px; }
     }
 
     .toolbarTitle {

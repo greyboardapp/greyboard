@@ -6,7 +6,6 @@ import { toolbox } from "../toolbox";
 
 import ellipseIcon from "../../../assets/icons/ellipse.svg";
 import { viewport } from "../viewport";
-import Point from "../../data/geometry/point";
 
 export class EllipseTool extends CreatorTool<Ellipse> {
     constructor() {
@@ -18,7 +17,7 @@ export class EllipseTool extends CreatorTool<Ellipse> {
     }
 
     new() : Ellipse {
-        return new Ellipse(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, false);
+        return new Ellipse(new Rect(), toolbox.state.selectedColor(), viewport.pixelsToViewport(toolbox.state.selectedWeight), false);
     }
 
     onActionStart(data : PointerEventData) : boolean {
@@ -44,12 +43,11 @@ export class EllipseTool extends CreatorTool<Ellipse> {
     }
 
     create() : void {
-        const p1 = viewport.screenToViewport(new Point(this.item.rect.x, this.item.rect.y));
-        const p2 = viewport.screenToViewport(new Point(this.item.rect.x2, this.item.rect.y2));
-        this.item.rect.x = p1.x;
-        this.item.rect.y = p1.y;
-        this.item.rect.x2 = p2.x;
-        this.item.rect.y2 = p2.y;
+        this.item.rect.normalize();
+        const { max } = this.item.rect;
+        this.item.rect.min = viewport.screenToViewport(this.item.rect.min);
+        this.item.rect.max = viewport.screenToViewport(max);
+        this.item.weight = toolbox.state.selectedWeight;
         super.create();
     }
 }

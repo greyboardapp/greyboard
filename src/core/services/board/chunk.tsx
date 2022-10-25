@@ -1,7 +1,6 @@
 import { px } from "../../../utils/dom";
 import { generateId } from "../../../utils/system/id";
-import Point from "../../data/geometry/point";
-import Rect, { MinMaxRect } from "../../data/geometry/rect";
+import Rect from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
 import { board } from "../board";
 import Graphics from "../renderer/graphics";
@@ -10,7 +9,7 @@ import { viewport } from "../viewport";
 export type QuadTreeSubdivisions = [QuadTree, QuadTree, QuadTree, QuadTree] | [];
 
 export class QuadTree {
-    public static readonly maxCapacity = 10;
+    public static readonly maxCapacity = 1;
     public static readonly maxDepth = 10;
 
     public items = new Set<BoardItem>();
@@ -59,14 +58,11 @@ export class QuadTree {
         if (!region.intersects(this.boundary))
             return result;
 
-        if (this.children.length > 0) {
-            for (const child of this.children)
-                child.get(region, result);
-            return result;
-        }
+        for (const child of this.children)
+            child.get(region, result);
 
         for (const item of this.items)
-            if (item.rect.intersects(region))
+            if (item.transform.intersects(region))
                 result.add(item);
 
         return result;
@@ -75,11 +71,9 @@ export class QuadTree {
     getAll(result ?: Set<BoardItem>) : Set<BoardItem> {
         if (!result)
             result = new Set<BoardItem>();
-        if (this.children.length > 0) {
-            for (const child of this.children)
-                child.getAll(result);
-            return result;
-        }
+
+        for (const child of this.children)
+            child.getAll(result);
 
         for (const item of this.items)
             result.add(item);
@@ -95,8 +89,8 @@ export class QuadTree {
             new QuadTree(new Rect(this.boundary.x, this.boundary.y + this.boundary.h / 2, this.boundary.w / 2, this.boundary.h / 2), this.depth + 1),
         ];
 
-        for (const item of this.items)
-            for (const child of this.children)
+        for (const child of this.children)
+            for (const item of this.items)
                 child.insert(item);
 
         this.items.clear();
@@ -135,14 +129,16 @@ export class Chunk extends QuadTree {
     }
 
     deleteMany(items : Iterable<BoardItem>) : void {
-        const bb = new MinMaxRect(new Point(Infinity, Infinity), new Point(-Infinity, -Infinity));
+        const bb = Rect.invertedInfinite();
         for (const item of items) {
             this.delete(item);
             bb.append(item.rect);
         }
 
-        this.graphics.scissor(bb.x - 15, bb.y - 15, bb.w + 30, bb.h + 30, () => {
-            for (const item of board.getItemsWithinRect(bb.toRect()))
+        bb.inflate(15);
+
+        this.graphics.scissor(bb.x, bb.y, bb.w, bb.h, () => {
+            for (const item of board.getItemsWithinRect(bb))
                 item.render(this.graphics);
         });
     }

@@ -36,7 +36,7 @@ export class EraserTool extends Tool {
     onActionMove(data : PointerEventData) : void {
         const pp = viewport.screenToViewport(this.pointerPosition);
         const p = viewport.screenToViewport(data.positions[0]);
-        const items = board.getItemsWithinRect(Rect.fromTwoPoints(pp, p));
+        const items = board.getItemsWithinRect(viewport.screenToBoardRect(this.pointerPosition, data.positions[0]));
         for (const item of items) {
             if (item.locked)
                 continue;
@@ -57,7 +57,8 @@ export class EraserTool extends Tool {
     onRender(graphics : Graphics, dt : number) : void {
         if (!this.actionStarted)
             return;
-        if (this.tail.length > 5)
+        const count = (1 / dt) * 0.1;
+        if (this.tail.length > count)
             this.tail.shift();
         this.tail.push(this.pointerPosition);
 

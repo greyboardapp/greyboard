@@ -49,7 +49,7 @@ export default class Graphics {
     }
 
     rect(rect : Rect, color : number, weight : number, filled = false) : void {
-        this.rectangle(rect.x, rect.y, rect.w, rect.h, color, weight, filled);
+        this.rectangle(rect.x, rect.y, rect.x2 - rect.x, rect.y2 - rect.y, color, weight, filled);
     }
 
     rectangle(x : number, y : number, w : number, h : number, color : number, weight : number, filled = false) : void {

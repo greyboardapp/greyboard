@@ -6,7 +6,6 @@ import { toolbox } from "../toolbox";
 
 import rectangleIcon from "../../../assets/icons/rectangle.svg";
 import { viewport } from "../viewport";
-import Point from "../../data/geometry/point";
 
 export class RectangleTool extends CreatorTool<Rectangle> {
     constructor() {
@@ -18,15 +17,15 @@ export class RectangleTool extends CreatorTool<Rectangle> {
     }
 
     new() : Rectangle {
-        return new Rectangle(new Rect(), toolbox.state.selectedColor(), toolbox.state.selectedWeight, false);
+        return new Rectangle(new Rect(), toolbox.state.selectedColor(), viewport.pixelsToViewport(toolbox.state.selectedWeight), false);
     }
 
     onActionStart(data : PointerEventData) : boolean {
         if (data.button !== MouseButton.Primary)
             return false;
         this.item = this.new();
-        this.item.rect.x = data.positions[0].x;
-        this.item.rect.y = data.positions[0].y;
+        this.item.rect.x = this.item.rect.x2 = data.positions[0].x;
+        this.item.rect.y = this.item.rect.y2 = data.positions[0].y;
         return true;
     }
 
@@ -44,12 +43,11 @@ export class RectangleTool extends CreatorTool<Rectangle> {
     }
 
     create() : void {
-        const p1 = viewport.screenToViewport(new Point(this.item.rect.x, this.item.rect.y));
-        const p2 = viewport.screenToViewport(new Point(this.item.rect.x2, this.item.rect.y2));
-        this.item.rect.x = p1.x;
-        this.item.rect.y = p1.y;
-        this.item.rect.x2 = p2.x;
-        this.item.rect.y2 = p2.y;
+        this.item.rect.normalize();
+        const { max } = this.item.rect;
+        this.item.rect.min = viewport.screenToViewport(this.item.rect.min);
+        this.item.rect.max = viewport.screenToViewport(max);
+        this.item.weight = toolbox.state.selectedWeight;
         super.create();
     }
 }

@@ -88,6 +88,11 @@ export class Input extends Service<InputState> {
         autoBind(this);
     }
 
+    // NOTE: Maybe remove or convert it in a getter.
+    pointerPosition() : Point {
+        return this.pointerPositions[0] ?? new Point();
+    }
+
     start() : void {}
 
     stop() : void {

@@ -49,19 +49,13 @@ export default class Path extends BoardItem {
         for (const point of this.points) {
             if (point.x < this.rect.x)
                 this.rect.x = point.x;
-            if (point.x > this.rect.w)
-                this.rect.w = point.x;
+            if (point.x > this.rect.x2)
+                this.rect.x2 = point.x;
             if (point.y < this.rect.y)
                 this.rect.y = point.y;
-            if (point.y > this.rect.h)
-                this.rect.h = point.y;
+            if (point.y > this.rect.y2)
+                this.rect.y2 = point.y;
         }
-        this.rect.w -= this.rect.x;
-        this.rect.h -= this.rect.y;
-        if (this.rect.w === 0)
-            this.rect.w = 1;
-        if (this.rect.h === 0)
-            this.rect.h = 1;
     }
 
     private normalize() : void {

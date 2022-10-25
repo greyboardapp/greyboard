@@ -1,10 +1,28 @@
 import Point from "./point";
 
 export default class Rect {
-    constructor(public x : number = 0, public y : number = 0, public w : number = 0, public h : number = 0) {}
+    public x2 : number;
+    public y2 : number;
+
+    constructor(public x : number = 0, public y : number = 0, w = 0, h = 0) {
+        this.x2 = x + w;
+        this.y2 = y + h;
+    }
+
+    get area() : number {
+        return Math.abs(this.w * this.h);
+    }
 
     get center() : Point {
-        return new Point(this.x + this.w / 2, this.y + this.h / 2);
+        return new Point(this.x + this.w * 0.5, this.y + this.h * 0.5);
+    }
+
+    get w() : number {
+        return Math.abs(this.x2 - this.x);
+    }
+
+    get h() : number {
+        return Math.abs(this.y2 - this.y);
     }
 
     get topLeft() : Point {
@@ -23,78 +41,106 @@ export default class Rect {
         return new Point(this.x, this.y2);
     }
 
-    get area() : number {
-        return Math.abs(this.w * this.h);
+    get min() : Point {
+        return this.topLeft;
     }
 
-    get x2() : number {
-        return this.x + this.w;
+    get max() : Point {
+        return this.bottomRight;
     }
 
-    get y2() : number {
-        return this.y + this.h;
+    set center(p : Point) {
+        this.x += p.x - this.w * 0.5;
+        this.y += p.y - this.h * 0.5;
     }
 
-    set x2(value : number) {
-        this.w = value - this.x;
+    set w(value : number) {
+        this.x2 = this.x + value;
     }
 
-    set y2(value : number) {
-        this.h = value - this.y;
+    set h(value : number) {
+        this.y2 = this.y + value;
     }
 
-    static infinite() : Rect {
-        return new Rect(-Infinity, -Infinity, Infinity, Infinity);
+    set topLeft(p : Point) {
+        this.x = p.x;
+        this.y = p.y;
     }
 
-    static invertedInfinite() : Rect {
-        return new Rect(Infinity, Infinity, -Infinity, -Infinity);
+    set topRight(p : Point) {
+        this.x2 = p.x;
+        this.y = p.y;
+    }
+
+    set bottomRight(p : Point) {
+        this.x2 = p.x;
+        this.y2 = p.y;
+    }
+
+    set bottomLeft(p : Point) {
+        this.x = p.x;
+        this.y2 = p.y;
+    }
+
+    set min(p : Point) {
+        this.topLeft = p;
+    }
+
+    set max(p : Point) {
+        this.bottomRight = p;
     }
 
     static fromTwoPoints(a : Point, b : Point) : Rect {
-        return new Rect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+        return new Rect(
+            Math.min(a.x, b.x),
+            Math.min(a.y, b.y),
+            Math.abs(b.x - a.x),
+            Math.abs(b.y - a.y),
+        );
+    }
+
+    static infinite() : Rect {
+        const rect = new Rect(-Infinity, -Infinity, 0, 0);
+        rect.x2 = rect.y2 = Infinity;
+        return rect;
+    }
+
+    static invertedInfinite() : Rect {
+        const rect = new Rect(Infinity, Infinity, 0, 0);
+        rect.x2 = rect.y2 = -Infinity;
+        return rect;
+    }
+
+    append(rect : Rect) : void {
+        this.x = Math.min(this.x, rect.x);
+        this.y = Math.min(this.y, rect.y);
+        this.x2 = Math.max(this.x2, rect.x2);
+        this.y2 = Math.max(this.y2, rect.y2);
+    }
+
+    inflate(d : number) : void {
+        this.x -= d;
+        this.y -= d;
+        this.x2 += d;
+        this.y2 += d;
+    }
+
+    normalize() : void {
+        const x = Math.min(this.x, this.x2);
+        const y = Math.min(this.y, this.y2);
+        const x2 = Math.max(this.x, this.x2);
+        const y2 = Math.max(this.y, this.y2);
+        this.x = x;
+        this.y = y;
+        this.x2 = x2;
+        this.y2 = y2;
     }
 
     intersects(other : Rect) : boolean {
         return (!(other.x >= this.x2 || other.x2 <= this.x || other.y >= this.y2 || other.y2 <= this.y));
     }
-}
 
-export class MinMaxRect {
-    constructor(public min : Point = new Point(), public max : Point = new Point()) {}
-
-    get x() : number {
-        return this.min.x;
-    }
-
-    get x2() : number {
-        return this.max.x;
-    }
-
-    get y() : number {
-        return this.min.y;
-    }
-
-    get y2() : number {
-        return this.max.y;
-    }
-
-    get w() : number {
-        return this.max.x - this.min.x;
-    }
-
-    get h() : number {
-        return this.max.y - this.min.y;
-    }
-
-    append(other : MinMaxRect | Rect) : void {
-        this.min.x = Math.min(this.min.x, other.x);
-        this.min.y = Math.min(this.min.y, other.y);
-        this.max.x = Math.max(this.max.x, other.x2);
-        this.max.y = Math.max(this.max.y, other.y2);
-    }
-
-    toRect() : Rect {
-        return new Rect(this.min.x, this.min.y, this.max.x - this.min.x, this.max.y - this.min.x);
+    copy() : Rect {
+        return new Rect(this.x, this.y, this.w, this.h);
     }
 }
