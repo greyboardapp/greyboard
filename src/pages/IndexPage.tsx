@@ -9,7 +9,6 @@ import ToolbarTitle from "../components/toolbar/ToolbarTitle";
 import UserBubble from "../components/data/UserBubble";
 import Button from "../components/control/Button";
 import { viewport } from "../core/services/viewport";
-import { getPercentage } from "../utils/system/misc";
 import { toolbox } from "../core/services/toolbox";
 
 import toolbarStyles from "../components/toolbar/Toolbar.module.scss";
@@ -38,6 +37,7 @@ import Panel from "../components/surfaces/Panel";
 import Text from "../components/typography/Text";
 import Grid from "../components/layout/Grid";
 import ToolbarDivider from "../components/toolbar/ToolbarDivider";
+import { pct } from "../utils/dom/dom";
 
 const IndexPage : Component = () => {
     onMount(() => app.start());
@@ -138,7 +138,7 @@ const IndexPage : Component = () => {
                         </div>
                         <div class={`${toolbarStyles.toolbarGroup} v`}>
                             <ToolbarButton icon={plusIcon} />
-                            <ToolbarText text={getPercentage(viewport.state.scale)} />
+                            <ToolbarText text={pct(viewport.state.scale)} />
                             <ToolbarButton icon={minusIcon} />
                             <ToolbarButton icon={layerIcon} />
                             <ToolbarButton icon={settingsIcon} />

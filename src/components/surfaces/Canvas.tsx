@@ -1,10 +1,10 @@
 import { Component } from "solid-js";
 import { input, PointerType } from "../../core/services/input";
-import { createWindowListener } from "../../utils/hooks";
+import { createWindowListener } from "../../utils/dom/hooks";
 
 import styles from "./Canvas.module.scss";
 import { viewport } from "../../core/services/viewport";
-import { px } from "../../utils/dom";
+import { px } from "../../utils/dom/dom";
 import { setWindowHeight, setWindowWidth } from "../../core/services/renderer/layer";
 import { toolbox } from "../../core/services/toolbox";
 import { ViewTool } from "../../core/services/toolbox/view";

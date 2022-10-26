@@ -19,6 +19,10 @@ export function ceil(v : number, precision = 1) : number {
     return Math.ceil((v + Number.EPSILON) * d) / d;
 }
 
+export function random(min = 0, max = 1) : number {
+    return Math.random() * (max - min) + min;
+}
+
 export function boolSign(v : boolean) : number {
     return v ? 1 : -1;
 }

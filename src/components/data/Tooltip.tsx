@@ -1,7 +1,7 @@
 import { Component, Show } from "solid-js";
 import { Shortcut } from "../../core/services/input";
-import { cls } from "../../utils/dom";
-import { getText } from "../../utils/intl";
+import { cls } from "../../utils/dom/dom";
+import { getText } from "../../utils/system/intl";
 
 import styles from "./Tooltip.module.scss";
 

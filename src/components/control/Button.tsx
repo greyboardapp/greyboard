@@ -1,5 +1,5 @@
 import { Component, Show } from "solid-js";
-import { getText } from "../../utils/intl";
+import { getText } from "../../utils/system/intl";
 import Icon, { SVGIcon } from "../data/Icon";
 
 import styles from "./Button.module.scss";

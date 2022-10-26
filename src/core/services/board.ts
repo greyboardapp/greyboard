@@ -1,3 +1,4 @@
+import { floor } from "../../utils/math/math";
 import { createService, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
 import { BoardItem } from "../data/item";
@@ -116,10 +117,10 @@ export class Board extends Service<BoardState> {
 
     private truncateRegion(r : Rect) : Rect {
         return new Rect(
-            Math.floor(r.x / Chunk.maxChunkSize),
-            Math.floor(r.y / Chunk.maxChunkSize),
-            Math.floor(r.w / Chunk.maxChunkSize),
-            Math.floor(r.h / Chunk.maxChunkSize),
+            floor(r.x / Chunk.maxChunkSize),
+            floor(r.y / Chunk.maxChunkSize),
+            floor(r.w / Chunk.maxChunkSize),
+            floor(r.h / Chunk.maxChunkSize),
         );
     }
 

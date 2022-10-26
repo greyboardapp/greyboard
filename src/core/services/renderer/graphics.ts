@@ -1,4 +1,4 @@
-import Color from "../../../utils/system/color";
+import Color from "../../../utils/datatypes/color";
 import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 

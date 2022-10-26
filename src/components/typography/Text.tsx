@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { LanguageTexts } from "../../languages/languages";
-import { getText } from "../../utils/intl";
+import { getText } from "../../utils/system/intl";
 
 import styles from "./Typography.module.scss";
 

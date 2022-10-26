@@ -1,9 +1,9 @@
 import { Component, createEffect, createMemo, createSignal } from "solid-js";
 import Point from "../../core/data/geometry/point";
-import { cls, pct, rgba } from "../../utils/dom";
-import { createWindowListener } from "../../utils/hooks";
-import Color from "../../utils/system/color";
-import { clamp } from "../../utils/system/math";
+import { cls, pct, rgba } from "../../utils/dom/dom";
+import { createWindowListener } from "../../utils/dom/hooks";
+import Color from "../../utils/datatypes/color";
+import { clamp } from "../../utils/math/math";
 
 import styles from "./ColorPicker.module.scss";
 

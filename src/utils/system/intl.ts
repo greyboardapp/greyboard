@@ -1,5 +1,5 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
-import { isLocaleValid, languages, LanguageTexts } from "../languages/languages";
+import { isLocaleValid, languages, LanguageTexts } from "../../languages/languages";
 
 const STORAGE_KEY = "language-locale";
 

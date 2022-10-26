@@ -1,3 +1,5 @@
+import { floor, round } from "../math/math";
+
 export default class Color {
     static UIntToHex(color : number) : string {
         return `#${color.toString(16).padStart(8, "0")}`;
@@ -24,15 +26,15 @@ export default class Color {
 
     static HSVToRGBA(h : number, s : number, v : number) : [number, number, number, number] {
         h *= 6;
-        const hh = Math.floor(h);
+        const hh = floor(h);
         const b = v * (1 - s);
         const c = v * (1 - (h - hh) * s);
         const d = v * (1 - (1 - h + hh) * s);
         const m = hh % 6;
         return [
-            Math.round([v, c, b, b, d, v][m] * 255),
-            Math.round([d, v, v, c, b, b][m] * 255),
-            Math.round([b, b, d, v, v, c][m] * 255),
+            round([v, c, b, b, d, v][m] * 255),
+            round([d, v, v, c, b, b][m] * 255),
+            round([b, b, d, v, v, c][m] * 255),
             255,
         ];
     }

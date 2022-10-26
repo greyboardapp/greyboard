@@ -1,4 +1,4 @@
-import Point from "../core/data/geometry/point";
+import Point from "../../core/data/geometry/point";
 import { dist } from "./geometry";
 
 export function neg(p : Point) : Point {

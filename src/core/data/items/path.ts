@@ -1,7 +1,7 @@
-import { distSq, distToSegmentSq } from "../../../utils/geometry";
-import { add, dot, mul, norm, per, rotAround, sub } from "../../../utils/linearAlgebra";
-import { areLinesIntersecting, isPointInRect } from "../../../utils/system/intersections";
-import { linearLerpPoint } from "../../../utils/system/math";
+import { distSq, distToSegmentSq } from "../../../utils/math/geometry";
+import { add, dot, mul, norm, per, rotAround, sub } from "../../../utils/math/linearAlgebra";
+import { areLinesIntersecting, isPointInRect } from "../../../utils/math/intersections";
+import { linearLerpPoint } from "../../../utils/math/math";
 import Graphics from "../../services/renderer/graphics";
 import { viewport } from "../../services/viewport";
 import Point, { PressurePoint } from "../geometry/point";

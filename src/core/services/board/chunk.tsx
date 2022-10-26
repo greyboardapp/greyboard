@@ -1,5 +1,5 @@
-import { px } from "../../../utils/dom";
-import { generateId } from "../../../utils/system/id";
+import { px } from "../../../utils/dom/dom";
+import { generateId } from "../../../utils/datatypes/id";
 import { getOperatingSystem, OperatingSystem } from "../../../utils/system/system";
 import Rect from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
@@ -10,7 +10,7 @@ import { viewport } from "../viewport";
 export type QuadTreeSubdivisions = [QuadTree, QuadTree, QuadTree, QuadTree] | [];
 
 export class QuadTree {
-    public static readonly maxCapacity = 1;
+    public static readonly maxCapacity = 10;
     public static readonly maxDepth = 10;
 
     public items = new Set<BoardItem>();
@@ -103,16 +103,13 @@ export class QuadTree {
 }
 
 export class Chunk extends QuadTree {
-    public static maxChunkSize = 0;
+    public static maxChunkSize = getOperatingSystem() === OperatingSystem.Windows ? 10000 : 2000;
 
     public id = generateId();
     public canvas : HTMLCanvasElement;
     public graphics : Graphics;
 
     constructor(public x : number, public y : number) {
-        if (!Chunk.maxChunkSize)
-            Chunk.maxChunkSize = getOperatingSystem() === OperatingSystem.Windows ? 10000 : 2000;
-
         super(new Rect(x * Chunk.maxChunkSize, y * Chunk.maxChunkSize, Chunk.maxChunkSize, Chunk.maxChunkSize), 0);
         this.canvas = <canvas
             width={Chunk.maxChunkSize}

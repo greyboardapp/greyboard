@@ -1,6 +1,6 @@
 import { RendererLayer } from "./renderer/layer";
 import { createStatelessService, Service } from "../../utils/system/service";
-import createDelegate from "../../utils/system/delegate";
+import createDelegate from "../../utils/datatypes/delegate";
 
 import { DynamicLayer } from "./renderer/layers/dynamicLayer";
 import { DebugLayer } from "./renderer/layers/debugLayer";

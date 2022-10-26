@@ -1,7 +1,8 @@
 import { nanoid } from "nanoid";
+import { floor, random } from "../math/math";
 
 export function generateId() : number {
-    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    return floor(random(0, Number.MAX_SAFE_INTEGER));
 }
 
 export function generateStringId() : string {

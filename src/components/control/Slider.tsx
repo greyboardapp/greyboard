@@ -1,5 +1,5 @@
 import { Component, Show } from "solid-js";
-import { clamp, floor } from "../../utils/system/math";
+import { clamp, floor } from "../../utils/math/math";
 
 import styles from "./Slider.module.scss";
 

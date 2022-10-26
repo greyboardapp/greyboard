@@ -1,5 +1,5 @@
 import { ParentComponent } from "solid-js";
-import { cls } from "../../utils/dom";
+import { cls } from "../../utils/dom/dom";
 
 interface BlockProps {
     class ?: string;

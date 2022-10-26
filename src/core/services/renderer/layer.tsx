@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { px } from "../../../utils/dom";
+import { px } from "../../../utils/dom/dom";
 import Graphics from "./graphics";
 
 export const [windowWidth, setWindowWidth] = createSignal(window.innerWidth);

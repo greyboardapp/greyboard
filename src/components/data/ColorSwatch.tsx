@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import Color from "../../utils/system/color";
+import Color from "../../utils/datatypes/color";
 
 import styles from "./ColorSwatch.module.scss";
 

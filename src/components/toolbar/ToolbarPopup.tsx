@@ -2,7 +2,7 @@ import { createSignal, JSX, ParentComponent, Show } from "solid-js";
 import { Motion, Presence } from "@motionone/solid";
 
 import styles from "./ToolbarPopup.module.scss";
-import { quickEaseOutTransition, quickEaseInTransition } from "../../utils/motion";
+import { quickEaseOutTransition, quickEaseInTransition } from "../../utils/dom/motion";
 
 interface ToolbarPopupProps {
     actuator : JSX.Element;

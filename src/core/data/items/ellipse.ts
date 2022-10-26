@@ -1,4 +1,4 @@
-import { isPointInEllipse } from "../../../utils/system/intersections";
+import { isPointInEllipse } from "../../../utils/math/intersections";
 import Graphics from "../../services/renderer/graphics";
 import Point from "../geometry/point";
 import Rect from "../geometry/rect";

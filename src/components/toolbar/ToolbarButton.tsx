@@ -1,6 +1,6 @@
 import { Motion, Presence } from "@motionone/solid";
 import { Component, createSignal, Show } from "solid-js";
-import { quickEaseInTransition } from "../../utils/motion";
+import { quickEaseInTransition } from "../../utils/dom/motion";
 import Icon, { SVGIcon } from "../data/Icon";
 import Tooltip, { TooltipProps } from "../data/Tooltip";
 

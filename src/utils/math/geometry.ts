@@ -1,5 +1,5 @@
-import Point from "../core/data/geometry/point";
-import { linearLerpPoint, boolSign } from "./system/math";
+import Point from "../../core/data/geometry/point";
+import { linearLerpPoint, boolSign } from "./math";
 
 export function angleInRadians(a : Point, b : Point) : number {
     return Math.atan2(a.y - b.y, b.x - a.x);
@@ -34,19 +34,4 @@ export function perpendicularPoint(a : Point, b : Point, d : number) : Point {
     const by = -((b.x - a.x) / (b.y - a.y));
     const s = (d / Math.sqrt(1 + by ** 2)) * boolSign(a.y < b.y);
     return new Point(a.x + s, a.y + by * s);
-}
-
-export function intersectionPointsFromLines(a1 : Point, a2 : Point, b1 : Point, b2 : Point) : Point {
-    const d = (a1.x - a2.x) * (b1.y - b2.y) - (a1.y - a2.y) * (b1.x - b2.x);
-
-    if (d === 0)
-        return new Point(
-            (a2.x + b1.x) / 2,
-            (a2.y + b1.y) / 2,
-        );
-
-    return new Point(
-        ((a1.x * a2.y - a1.y * a2.x) * (b1.x - b2.x) - (a1.x - a2.x) * (b1.x * b2.y - b1.y * b2.x)) / d,
-        ((a1.x * a2.y - a1.y * a2.x) * (b1.y - b2.y) - (a1.y - a2.y) * (b1.x * b2.y - b1.y * b2.x)) / d,
-    );
 }

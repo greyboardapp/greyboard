@@ -3,7 +3,7 @@ import { batched, createService, reactive, Service } from "../../utils/system/se
 import Rect from "../data/geometry/rect";
 import { input } from "./input";
 import { isInRange, pass } from "../../utils/system/misc";
-import createDelegate from "../../utils/system/delegate";
+import createDelegate from "../../utils/datatypes/delegate";
 
 export interface ViewportState {
     offsetX : number;

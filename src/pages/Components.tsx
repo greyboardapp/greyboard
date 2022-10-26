@@ -10,10 +10,11 @@ import Button from "../components/control/Button";
 import Input from "../components/control/Input";
 import Slider from "../components/control/Slider";
 import ColorPicker from "../components/data/ColorPicker";
-import Color from "../utils/system/color";
+import Color from "../utils/datatypes/color";
 import Text from "../components/typography/Text";
-import { locale, setLocale } from "../utils/intl";
+import { locale, setLocale } from "../utils/system/intl";
 import Title from "../components/typography/Title";
+import { random } from "../utils/math/math";
 
 const [str, setStr] = createSignal("Type something");
 const [num, setNum] = createSignal(5);
@@ -87,7 +88,7 @@ const ComponentsPage : Component = () => (
         <h1>Color Picker</h1>
         <ColorPicker model={[color, setColor]} />
         <p>{Color.UIntToRGBA(color()).join(", ")}</p>
-        <button onClick={() => setColor(Color.RGBAToUInt(Math.random() * 255, Math.random() * 255, Math.random() * 255, 1))}>Random color</button>
+        <button onClick={() => setColor(Color.RGBAToUInt(random(0, 255), random(0, 255), random(0, 255), 1))}>Random color</button>
     </div>
 );
 

@@ -1,6 +1,6 @@
 import autoBind from "auto-bind";
-import { distSq } from "../../utils/geometry";
-import createDelegate from "../../utils/system/delegate";
+import { distSq } from "../../utils/math/geometry";
+import createDelegate from "../../utils/datatypes/delegate";
 import { createService, Service } from "../../utils/system/service";
 import Point, { PressurePoint } from "../data/geometry/point";
 

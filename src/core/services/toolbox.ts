@@ -1,4 +1,4 @@
-import Color from "../../utils/system/color";
+import Color from "../../utils/datatypes/color";
 import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
 import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
 import { input, MouseButton, PointerEventData } from "./input";

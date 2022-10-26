@@ -1,4 +1,4 @@
-import { generateId } from "../../utils/system/id";
+import { generateId } from "../../utils/datatypes/id";
 import Graphics from "../services/renderer/graphics";
 import Point from "./geometry/point";
 import Rect from "./geometry/rect";

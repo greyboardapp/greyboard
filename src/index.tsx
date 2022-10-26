@@ -1,8 +1,8 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 
-import "./utils/system/array";
-import "./utils/system/map";
+import "./utils/datatypes/array";
+import "./utils/datatypes/map";
 
 import App from "./App";
 

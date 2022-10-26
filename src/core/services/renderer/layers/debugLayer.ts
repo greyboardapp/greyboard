@@ -1,4 +1,4 @@
-import { isPointInRect } from "../../../../utils/system/intersections";
+import { isPointInRect } from "../../../../utils/math/intersections";
 import Rect from "../../../data/geometry/rect";
 import { board } from "../../board";
 import { QuadTree } from "../../board/chunk";
