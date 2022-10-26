@@ -1,5 +1,6 @@
 import { px } from "../../../utils/dom";
 import { generateId } from "../../../utils/system/id";
+import { getOperatingSystem, OperatingSystem } from "../../../utils/system/system";
 import Rect from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
 import { board } from "../board";
@@ -18,7 +19,8 @@ export class QuadTree {
     constructor(public boundary : Rect, private readonly depth = 0) {}
 
     insert(item : BoardItem) : void {
-        if (!item.transform.intersects(this.boundary))
+        const bb = viewport.viewportToBoardRect(item.rect);
+        if (!bb.intersects(this.boundary))
             return;
 
         if (this.items.size < QuadTree.maxCapacity || this.depth >= QuadTree.maxDepth) {
@@ -32,7 +34,8 @@ export class QuadTree {
     }
 
     delete(item : BoardItem) : void {
-        if (!item.transform.intersects(this.boundary))
+        const bb = viewport.viewportToBoardRect(item.rect);
+        if (!bb.intersects(this.boundary))
             return;
 
         for (const i of this.items)
@@ -61,9 +64,11 @@ export class QuadTree {
         for (const child of this.children)
             child.get(region, result);
 
-        for (const item of this.items)
-            if (item.transform.intersects(region))
+        for (const item of this.items) {
+            const bb = viewport.viewportToBoardRect(item.rect);
+            if (bb.intersects(region))
                 result.add(item);
+        }
 
         return result;
     }
@@ -98,13 +103,16 @@ export class QuadTree {
 }
 
 export class Chunk extends QuadTree {
-    public static readonly maxChunkSize = 10000;
+    public static maxChunkSize = 0;
 
     public id = generateId();
     public canvas : HTMLCanvasElement;
     public graphics : Graphics;
 
     constructor(public x : number, public y : number) {
+        if (!Chunk.maxChunkSize)
+            Chunk.maxChunkSize = getOperatingSystem() === OperatingSystem.Windows ? 10000 : 2000;
+
         super(new Rect(x * Chunk.maxChunkSize, y * Chunk.maxChunkSize, Chunk.maxChunkSize, Chunk.maxChunkSize), 0);
         this.canvas = <canvas
             width={Chunk.maxChunkSize}
@@ -138,7 +146,7 @@ export class Chunk extends QuadTree {
         bb.inflate(15);
 
         this.graphics.scissor(bb.x, bb.y, bb.w, bb.h, () => {
-            for (const item of board.getItemsWithinRect(bb))
+            for (const item of board.getItemsWithinRect(viewport.viewportToBoardRect(bb)))
                 item.render(this.graphics);
         });
     }

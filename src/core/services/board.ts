@@ -72,12 +72,9 @@ export class Board extends Service<BoardState> {
 
     getItemsWithinRect(rect : Rect) : BoardItem[] {
         const items : BoardItem[] = [];
-        const minX = this.truncateCoordinate(rect.x);
-        const minY = this.truncateCoordinate(rect.y);
-        const maxX = this.truncateCoordinate(rect.x2);
-        const maxY = this.truncateCoordinate(rect.y2);
-        for (let x = minX; x <= maxX; ++x)
-            for (let y = minY; y <= maxY; ++y) {
+        const region = this.truncateRegion(rect);
+        for (let { x } = region.min; x <= region.max.x; ++x)
+            for (let { y } = region.min; y <= region.max.y; ++y) {
                 const key = this.hash(x, y);
                 const chunk = this.chunks.get(key);
                 if (chunk)
@@ -89,12 +86,9 @@ export class Board extends Service<BoardState> {
     // TODO: Find a better name since items are not necessarily added to a single chunk
     private addToChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const minX = this.truncateCoordinate(item.transform.x);
-            const minY = this.truncateCoordinate(item.transform.y);
-            const maxX = this.truncateCoordinate(item.transform.x2);
-            const maxY = this.truncateCoordinate(item.transform.y2);
-            for (let x = minX; x <= maxX; ++x)
-                for (let y = minY; y <= maxY; ++y) {
+            const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
+            for (let { x } = region.min; x <= region.max.x; ++x)
+                for (let { y } = region.min; y <= region.max.y; ++y) {
                     const key = this.hash(x, y);
                     let chunk = this.chunks.get(key);
                     if (!chunk) {
@@ -108,12 +102,9 @@ export class Board extends Service<BoardState> {
 
     private removeFromChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
-            const minX = this.truncateCoordinate(item.transform.x);
-            const minY = this.truncateCoordinate(item.transform.y);
-            const maxX = this.truncateCoordinate(item.transform.x2);
-            const maxY = this.truncateCoordinate(item.transform.y2);
-            for (let x = minX; x <= maxX; ++x)
-                for (let y = minY; y <= maxY; ++y) {
+            const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
+            for (let { x } = region.min; x <= region.max.x; ++x)
+                for (let { y } = region.min; y <= region.max.y; ++y) {
                     const key = this.hash(x, y);
                     const chunk = this.chunks.get(key);
                     // HACK: For now this works but in the future let's implement this so that the deleteMany function can be used effectively
@@ -123,8 +114,13 @@ export class Board extends Service<BoardState> {
         }
     }
 
-    private truncateCoordinate(x : number) : number {
-        return Math.floor(x / Chunk.maxChunkSize);
+    private truncateRegion(r : Rect) : Rect {
+        return new Rect(
+            Math.floor(r.x / Chunk.maxChunkSize),
+            Math.floor(r.y / Chunk.maxChunkSize),
+            Math.floor(r.w / Chunk.maxChunkSize),
+            Math.floor(r.h / Chunk.maxChunkSize),
+        );
     }
 
     private hash(x : number, y : number) : string {

@@ -15,7 +15,7 @@ export class DebugLayer extends RendererLayer {
             // this.renderRect(chunk.boundary, 0x00FF00FF, 3);
 
         for (const item of board.items.values()) {
-            const t = item.transform;
+            const t = viewport.viewportToBoardRect(item.rect);
             this.graphics.rectangle(t.x + viewport.state.offsetX, t.y + viewport.state.offsetY, t.w, t.h, 0xFFFFFFFF, 1);
             // this.renderRect(item.rect, 0xFFFFFFFF, 1);
         }

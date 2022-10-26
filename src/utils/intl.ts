@@ -3,7 +3,7 @@ import { isLocaleValid, languages, LanguageTexts } from "../languages/languages"
 
 const STORAGE_KEY = "language-locale";
 
-let languageLocale = localStorage.getItem(STORAGE_KEY) ?? "en-us";
+let languageLocale = localStorage.getItem(STORAGE_KEY) ?? window.navigator.language.toLowerCase() ?? "en-us";
 if (!isLocaleValid(languageLocale))
     languageLocale = "en-us";
 

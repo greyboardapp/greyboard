@@ -74,6 +74,18 @@ export class Viewport extends Service<ViewportState> {
         return new Point(this.state.offsetX + p.x * this.state.scale, this.state.offsetY + p.y * this.state.scale);
     }
 
+    viewportToBoard(p : Point) : Point {
+        if (this.state.scale === 1)
+            return p;
+        return new Point(p.x * this.state.scale, p.y * this.state.scale);
+    }
+
+    viewportToBoardRect(r : Rect) : Rect {
+        if (this.state.scale === 1)
+            return r;
+        return new Rect(r.x * this.state.scale, r.y * this.state.scale, r.w * this.state.scale, r.h * this.state.scale);
+    }
+
     viewportToScreenRect(r : Rect) : Rect {
         return new Rect((this.state.offsetX + r.x) * this.state.scale, (this.state.offsetY + r.y) * this.state.scale, r.w * this.state.scale, r.h * this.state.scale);
     }
