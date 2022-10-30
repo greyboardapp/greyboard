@@ -1,44 +1,51 @@
 @use "sass:map";
 
 $bg: "bg";
-$fg: "fg";
-$fgText: "text-fg";
-$bgText: "text-bg";
+$panelBg: "panel-bg";
+$panelText: "panel-text";
 $primary: "primary";
 $primaryFocus: "primary-focus";
 $primaryText: "primary-text";
 $secondary: "secondary";
 $secondaryFocus: "secondary-focus";
 $secondaryText: "secondary-text";
+$inputBg: "input-bg";
+$inputText: "input-text";
 $opaque: "opaque";
+$opaqueDark: "opaque-dark";
 $shadow: "shadow";
+
 $themes: (
     light: (
         bg: #222,
-        fg: #fff,
-        text-fg: #111,
-        text-bg: #fff,
+        panel-bg: #fff,
+        panel-text: #111,
         primary: #fc8210,
         primary-focus: #b85900,
         primary-text: #fff,
         secondary: #686868,
         secondary-focus: #444,
         secondary-text: #fff,
+        input-bg: #e6e6e6,
+        input-text: #111,
         opaque: #0000001a,
+        opaque-dark: #0000001a,
         shadow: #0003,
     ),
     dark: (
         bg: #222,
-        fg: #313131,
-        text-fg: #fff,
-        text-bg: white,
+        panel-bg: #313131,
+        panel-text: #fff,
         primary: #fc8210,
         primary-focus: #ce6503,
         primary-text: #fff,
         secondary: #686868,
         secondary-focus: #444,
         secondary-text: #fff,
+        input-bg: #222,
+        input-text: #fff,
         opaque: #ffffff1a,
+        opaque-dark: #0000001a,
         shadow: #0003,
     )
 );

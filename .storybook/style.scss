@@ -1,0 +1,33 @@
+@import "../src/global";
+
+html,
+body.sb-show-main,
+#root,
+.sb-theme-container,
+.sb-theme-column {
+    min-height: 100vh;
+}
+
+body.sb-show-main {
+    padding: 0 !important;
+    height: 100%;
+}
+
+.sb-theme-container {
+    display: flex;
+    flex-wrap: nowrap;
+
+    .sb-theme-column {
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+
+        &.theme-light {
+            background-color: map-get(map-get($themes, "light"), $panelBg);
+        }
+
+        &.theme-dark {
+            background-color: map-get(map-get($themes, "dark"), $panelBg);
+        }
+    }
+}

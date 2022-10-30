@@ -3,59 +3,114 @@
 .button {
     @include centeredInlineFlex();
     @include smallUppercaseText();
-    @include transition();
 
+    position: relative;
+    overflow: hidden;
     border: 0;
     outline: 0;
-    border-radius: 99px;
-    padding: 7px 15px;
+    border-radius: 999px;
+    transition: all 0.2s $timingCurve;
     cursor: pointer;
 
     @include themed() {
-        color: color($secondaryText);
-        background-color: color($secondary);
+        outline: 3px solid transparent;
 
-        &:hover {
-            background-color: color($secondaryFocus);
-        }
+        &:disabled {
+            color: color($secondaryFocus);
+            background-color: color($secondary);
 
-        &.primary {
-            color: color($primaryText);
-            background-color: color($primary);
-
-            &:hover {
-                background-color: color($primaryFocus);
+            &.tertiary {
+                color: color($secondary);
+                background-color: transparent;
             }
         }
 
-        &.transparent {
-            color: color($fgText);
-            background-color: transparent;
-
-            &:hover {
-                background-color: color($opaque);
+        &:not(:disabled) {
+            &:active {
+                outline: 3px solid color($shadow);
             }
-        }
 
-        &.dark {
-            color: color($fgText);
-            background-color: color($bg);
+            &.primary {
+                color: color($primaryText);
+                background-color: color($primary);
 
-            &:hover {
-                background-color: color($secondaryFocus);
+                &:hover {
+                    background-color: color($primaryFocus);
+                }
+            }
+
+            &.secondary {
+                color: color($secondaryText);
+                background-color: color($secondary);
+
+                &:hover {
+                    background-color: color($secondaryFocus);
+                }
+            }
+
+            &.tertiary {
+                color: color($panelText);
+                background-color: transparent;
+
+                &:hover {
+                    background-color: color($opaque);
+                }
             }
         }
     }
 
-    &.big {
-        padding: 10px 20px;
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    &.xs {
+        height: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    &.s {
+        height: 2rem;
+        padding: 0 1rem;
+    }
+
+    &.m {
+        height: 2.5rem;
+        padding: 0 1.5rem;
     }
 
     &.fluent {
         width: 100%;
     }
 
-    > i {
-        margin-right: 10px;
+    > * {
+        z-index: 1;
     }
+
+    > svg {
+        margin-right: 0.5rem;
+
+        &.loadingIcon {
+            animation: loading-icon-spin 1s linear 0s infinite;
+        }
+    }
+
+    > .loadingProgress {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 0;
+        width: 50%;
+        transition: width 0.2s;
+
+        @include themed() {
+            background-color: color($opaqueDark);
+        }
+    }
+}
+
+@keyframes loading-icon-spin {
+    0% { rotate: 0deg; }
+    100% { rotate: 360deg; }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <g id="greyboardiconsloading">
+    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Rectangle" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none"/>
+    <path d="M3 10C3 6.13401 6.13402 3 10 3L10 5Q7.92891 5 6.46446 6.46447C5.48813 7.44079 4.99996 8.61931 5 10C5 11.3807 5.48817 12.5592 6.46446 13.5355Q7.92891 15 10 15Q12.0711 15 13.5355 13.5355C14.5118 12.5592 15 11.3807 15 10L17 10C17 13.866 13.866 17 10 17C6.13402 17 3 13.866 3 10Z" id="Vector-Subtract" fill="#FFFFFF" fill-rule="evenodd" stroke="none"/>
+  </g>
+</svg>

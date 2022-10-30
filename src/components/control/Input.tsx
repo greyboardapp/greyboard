@@ -1,25 +1,50 @@
+import { cva, VariantProps } from "class-variance-authority";
 import { Component, Show } from "solid-js";
 import Icon, { SVGIcon } from "../data/Icon";
 
 import styles from "./Input.module.scss";
 
-interface InputProps {
-    model : [() => string, (v : string) => void];
-    type ?: "text" | "password";
+const InputVariants = {
+    type: {
+        text: "",
+        password: "",
+    },
+    size: {
+        xs: styles.xs,
+        s: styles.s,
+        m: styles.m,
+    },
+    disabled: {
+        true: styles.disabled,
+    },
+};
+
+const inputStyles = cva(styles.input, {
+    variants: InputVariants,
+    defaultVariants: {
+        type: "text",
+        size: "m",
+        disabled: false,
+    },
+});
+
+interface InputProps extends VariantProps<typeof inputStyles> {
+    model : [() => string | number, (v : string | number) => void];
     placeholder ?: string;
     icon ?: SVGIcon;
     onChange ?: (e : Event) => void;
 }
 
 const Input : Component<InputProps> = (props) => (
-    <div class={styles.input}>
-        <Show when={props.icon}>
+    <div class={inputStyles(props)}>
+        <Show when={props.size !== "xs" && props.icon}>
             {(icon) => <Icon icon={icon}/>}
         </Show>
         <input
             type={props.type ?? "text"}
             placeholder={props.placeholder ?? ""}
             value={props.model[0]()}
+            disabled={props.disabled ?? false}
             onInput={(e) => props.model[1]((e.target as HTMLInputElement).value)}
             onChange={(e) => props.onChange && props.onChange(e)}
             max={3}
@@ -28,3 +53,4 @@ const Input : Component<InputProps> = (props) => (
 );
 
 export default Input;
+export { InputVariants };

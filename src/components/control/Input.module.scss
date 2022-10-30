@@ -3,34 +3,30 @@
 .input {
     @include centeredInlineFlex();
 
-    font-size: 0.8rem;
-    font-weight: 500;
     overflow: hidden;
-    border-radius: 10px;
     box-shadow: 0 0 0 2px transparent inset;
     outline: 2px solid transparent;
     transition: box-shadow 0.2s $timingCurve, outline 0.2s $timingCurve;
 
     @include themed() {
-        color: color($bgText);
-        background-color: color($bg);
+        color: color($inputText);
+        background-color: color($inputBg);
 
-        &:hover,
-        &:focus-within {
-            box-shadow: 0 0 0 2px color($shadow) inset;
+        &:not(.disabled) {
+            &:hover,
+            &:focus-within {
+                box-shadow: 0 0 0 2px color($shadow) inset;
+            }
+
+            &:focus-within {
+                outline: 2px solid color($primary);
+            }
         }
-
-        &:focus-within {
-            outline: 2px solid color($primary);
-        }
-    }
-
-    > i {
-        margin-left: 10px;
     }
 
     > input {
-        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: 500;
         border: 0;
         outline: 0;
         color: currentcolor;
@@ -42,6 +38,50 @@
             @include themed() {
                 background-color: color($primary);
             }
+        }
+    }
+
+    &.disabled {
+        opacity: 0.75;
+        cursor: not-allowed;
+
+        > input {
+            cursor: not-allowed;
+        }
+    }
+
+    &.xs {
+        border-radius: 3px;
+
+        > input {
+            height: 1rem;
+            padding: 0 0.25rem;
+        }
+    }
+
+    &.s {
+        border-radius: 5px;
+
+        > input {
+            height: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        > svg {
+            margin-left: 0.5rem;
+        }
+    }
+
+    &.m {
+        border-radius: 10px;
+
+        > input {
+            height: 2.5rem;
+            padding: 0 1rem;
+        }
+
+        > svg {
+            margin-left: 1rem;
         }
     }
 }

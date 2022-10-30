@@ -17,8 +17,10 @@ createEffect(() => {
 });
 
 export const getText = (key : keyof LanguageTexts) : string | undefined => {
-    if (!(key in language().texts))
+    if (!(key in language().texts)) {
         console.warn(`Language key '${key}' not found.`);
+        return key.toString();
+    }
     return language().texts[key];
 };
 export { language, locale, setLocale };

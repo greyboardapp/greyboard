@@ -11,10 +11,10 @@
         border-radius: 2px;
         width: 100%;
         flex-grow: 1;
-        cursor: e-resize;
+        cursor: ew-resize;
 
         @include themed() {
-            background-color: color($bg);
+            background-color: color($inputBg);
         }
 
         &::-webkit-slider-thumb,
@@ -33,52 +33,40 @@
             }
         }
 
-        &:hover {
-            &::-webkit-slider-thumb,
-            &::-moz-range-thumb {
-                @include themed() {
-                    background-color: color($secondaryFocus);
-                }
-            }
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.75;
         }
 
-        &:focus,
-        &:active {
-            &::-webkit-slider-thumb,
-            &::-moz-range-thumb {
-                @include themed() {
-                    background-color: color($primary);
+        &:not(:disabled) {
+            &:hover {
+                &::-webkit-slider-thumb,
+                &::-moz-range-thumb {
+                    @include themed() {
+                        background-color: color($secondaryFocus);
+                    }
+                }
+            }
+
+            &:focus,
+            &:active {
+                &::-webkit-slider-thumb,
+                &::-moz-range-thumb {
+                    @include themed() {
+                        background-color: color($primary);
+                    }
                 }
             }
         }
     }
 
-    > input[type="number"] {
-        margin-left: 10px;
+    &.showValue > input[type="range"] {
+        margin-right: 0.5rem;
+    }
+
+    input[type="text"] {
         width: 30px;
-        height: 1rem;
-        appearance: textfield;
-        border: 0;
-        border-radius: 3px;
-        font-size: 0.8rem;
         text-align: center;
-        box-shadow: 0 0 0 2px transparent inset;
-        outline: 2px solid transparent;
-        transition: box-shadow 0.2s $timingCurve, outline 0.2s $timingCurve;
-
-        @include themed() {
-            color: color($bgText);
-            background-color: color($bg);
-
-            &::selection {
-                background-color: color($primary);
-            }
-
-            &:focus {
-                outline: 2px solid color($primary);
-                box-shadow: 0 0 0 2px color($shadow) inset;
-            }
-        }
 
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {

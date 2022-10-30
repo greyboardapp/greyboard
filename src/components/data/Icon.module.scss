@@ -1,7 +1,5 @@
 @import "../../global";
 
-i.icon {
-    > svg g path {
-        fill: currentcolor !important;
-    }
+svg.icon g path {
+    fill: currentcolor !important;
 }
