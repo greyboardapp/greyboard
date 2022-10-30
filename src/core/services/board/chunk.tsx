@@ -130,7 +130,7 @@ export class Chunk extends QuadTree {
 
     insert(item : BoardItem) : void {
         super.insert(item);
-        item.render(this.graphics);
+        item.render(this.graphics, false);
     }
 
     deleteMany(items : Iterable<BoardItem>) : void {
@@ -144,7 +144,7 @@ export class Chunk extends QuadTree {
 
         this.graphics.scissor(bb.x, bb.y, bb.w, bb.h, () => {
             for (const item of board.getItemsWithinRect(viewport.viewportToBoardRect(bb)))
-                item.render(this.graphics);
+                item.render(this.graphics, false);
         });
     }
 

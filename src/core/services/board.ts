@@ -1,7 +1,12 @@
+import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import { floor } from "../../utils/math/math";
 import { createService, Service } from "../../utils/system/service";
+import Point, { PressurePoint } from "../data/geometry/point";
 import Rect from "../data/geometry/rect";
-import { BoardItem } from "../data/item";
+import { BoardItem, BoardItemType } from "../data/item";
+import Ellipse from "../data/items/ellipse";
+import Path from "../data/items/path";
+import Rectangle from "../data/items/rectangle";
 import { createAction } from "./actions";
 import { Chunk } from "./board/chunk";
 import { viewport } from "./viewport";
@@ -81,6 +86,56 @@ export class Board extends Service<BoardState> {
                 if (chunk)
                     items.push(...chunk.get(rect));
             }
+        return items;
+    }
+
+    getItemsAtPoint(p : Point) : BoardItem[] {
+        return this.getItemsWithinRect(new Rect(p.x, p.y, 1, 1));
+    }
+
+    serialize(items ?: Iterable<BoardItem>) : ByteBuffer {
+        const itemsToSerialize = Array.from(items ?? this.items.values());
+        const buffer = new ByteBuffer(itemsToSerialize.reduce((len, item) => len + item.getSerializedSize(), 0));
+        for (const item of itemsToSerialize)
+            item.serialize(buffer);
+        return buffer;
+    }
+
+    deserialize(buffer : ByteBuffer) : BoardItem[] {
+        const items : BoardItem[] = [];
+        while (!buffer.eod) {
+            const [type, locked, zIndex] = buffer.readFormatted("bbb");
+            const label = buffer.readString();
+            const rect = new Rect(...buffer.readFormatted("ffff"));
+            let item : BoardItem;
+
+            if (type === BoardItemType.Path) {
+                const [color, weight] = buffer.readFormatted("ib");
+                const count = buffer.readUInt();
+                const points : PressurePoint[] = [];
+                for (let i = 0; i < count; i++)
+                    points.push(new PressurePoint(...buffer.readFormatted("fff")));
+                item = new Path(points, color, weight);
+                item.rect = rect;
+            } else if (type === BoardItemType.Rectangle) {
+                const [color, weight] = buffer.readFormatted("ib");
+                const filled = buffer.readByte();
+                item = new Rectangle(rect, color, weight, filled === 1);
+            } else if (type === BoardItemType.Ellipse) {
+                const [color, weight] = buffer.readFormatted("ib");
+                const filled = buffer.readByte();
+                item = new Ellipse(rect, color, weight, filled === 1);
+            } else {
+                continue;
+            }
+
+            if (item) {
+                item.locked = locked === 1;
+                item.zIndex = zIndex;
+                item.label = label;
+                items.push(item);
+            }
+        }
         return items;
     }
 

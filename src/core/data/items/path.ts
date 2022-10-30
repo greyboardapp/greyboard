@@ -6,14 +6,16 @@ import Graphics from "../../services/renderer/graphics";
 import { viewport } from "../../services/viewport";
 import Point, { PressurePoint } from "../geometry/point";
 import Rect from "../geometry/rect";
-import { BoardItem } from "../item";
+import { BoardItemType, BoardShapeItem } from "../item";
+import { ByteBuffer } from "../../../utils/datatypes/byteBuffer";
 
-export default class Path extends BoardItem {
+export default class Path extends BoardShapeItem {
     private static readonly threshold = 0.5;
     private static readonly maxResolution = 5;
 
-    constructor(public points : PressurePoint[], public color : number, public weight : number, public filled : boolean = false) {
-        super();
+    public type = BoardItemType.Path;
+    constructor(public points : PressurePoint[], color : number, weight : number) {
+        super(BoardItemType.Path, color, weight);
         this.rect = Rect.invertedInfinite();
     }
 
@@ -24,28 +26,40 @@ export default class Path extends BoardItem {
             return new PressurePoint(vp.x, vp.y, point.pressure);
         });
         this.calculateBoundingBox();
+        this.normalize();
     }
 
-    render(graphics : Graphics) : void {
-        const points = this.generateStroke();
+    render(graphics : Graphics, isTemporary : boolean) : void {
+        const points = this.generateStroke(isTemporary);
         graphics.path(new Path2D(this.getSvgPathFromStroke(points)), this.color);
     }
 
     isInLine(a : Point, b : Point) : boolean {
-        for (let i = 0; i < this.points.length - 1; ++i)
-            if (areLinesIntersecting(a, b, this.points[i], this.points[i + 1]))
+        const points = this.destabilize();
+        for (let i = 0; i < points.length - 1; ++i)
+            if (areLinesIntersecting(a, b, points[i], points[i + 1]))
                 return true;
         return false;
     }
 
     isInRect(rect : Rect) : boolean {
-        for (const p of this.points)
+        for (const p of this.destabilize())
             if (isPointInRect(rect, p))
                 return true;
         return false;
     }
 
-    private calculateBoundingBox() : void {
+    // base + point count + each point x, y, pressure
+    getSerializedSize() : number { return super.getSerializedSize() + 4 + this.points.length * 3 * 4; }
+    serialize(buffer : ByteBuffer) : ByteBuffer {
+        super.serialize(buffer);
+        buffer.writeUInt(this.points.length);
+        for (const point of this.points)
+            buffer.writeFormatted("fff", point.x, point.y, point.pressure ?? 0);
+        return buffer;
+    }
+
+    calculateBoundingBox() : void {
         for (const point of this.points) {
             if (point.x < this.rect.x)
                 this.rect.x = point.x;
@@ -63,6 +77,14 @@ export default class Path extends BoardItem {
             point.x = (point.x - this.rect.x) / this.rect.w;
             point.y = (point.y - this.rect.y) / this.rect.h;
         }
+    }
+
+    private destabilize() : PressurePoint[] {
+        return this.points.map((p) => new PressurePoint(
+            p.x * this.rect.w + this.rect.x,
+            p.y * this.rect.h + this.rect.y,
+            p.pressure ?? 0,
+        ));
     }
 
     private optimize() : void {
@@ -99,7 +121,7 @@ export default class Path extends BoardItem {
         console.debug(`Optimized from ${count} to ${this.points.length}. ${this.points.length / count}`);
     }
 
-    private generateStroke() : Point[] {
+    private generateStroke(isTemporary : boolean) : Point[] {
         if (this.points.length === 0)
             return [];
 
@@ -107,11 +129,13 @@ export default class Path extends BoardItem {
         const left : Point[] = [];
         const right : Point[] = [];
 
-        if (this.points.length === 1) {
+        const points = isTemporary ? this.points : this.destabilize();
+
+        if (points.length === 1) {
             for (let step = 1 / 8, i = 0; i <= 1; i += step) {
                 const s = Math.sin(FIXED_PI * i * 2);
                 const c = Math.cos(FIXED_PI * i * 2);
-                left.push(new Point(this.points[0].x + c * this.weight, this.points[0].y + s * this.weight));
+                left.push(new Point(points[0].x + c * this.weight, points[0].y + s * this.weight));
             }
             return left;
         }
@@ -119,20 +143,20 @@ export default class Path extends BoardItem {
         const size = this.weight * 2;
         const minDist = this.weight ** 2;
 
-        if (this.points[0].pressure === undefined)
-            this.points[0].pressure = 0.2;
+        if (!points[0].pressure)
+            points[0].pressure = 0.2;
 
-        for (let i = 0; i < this.points.length; ++i) {
-            const curr = this.points[i];
-            const prev = (i > 0) ? this.points[i - 1] : curr;
-            const next = (i < this.points.length - 1) ? this.points[i + 1] : curr;
+        for (let i = 0; i < points.length; ++i) {
+            const curr = points[i];
+            const prev = (i > 0) ? points[i - 1] : curr;
+            const next = (i < points.length - 1) ? points[i + 1] : curr;
             const dist = distSq(prev, curr);
 
             const cv = norm(sub(prev, curr));
             const nv = norm(sub(curr, next));
-            const ndot = (i < this.points.length - 1) ? dot(cv, nv) : 1;
+            const ndot = (i < points.length - 1) ? dot(cv, nv) : 1;
 
-            if (curr.pressure === undefined) {
+            if (!curr.pressure) {
                 const sp = Math.min(1, dist / size);
                 const pp = prev.pressure ?? 0;
                 curr.pressure = Math.min(1, pp + (sp - pp) * (Math.min(1, 1 - sp) * 0.275));

@@ -90,6 +90,10 @@ export class Viewport extends Service<ViewportState> {
         return new Rect((this.state.offsetX + r.x) * this.state.scale, (this.state.offsetY + r.y) * this.state.scale, r.w * this.state.scale, r.h * this.state.scale);
     }
 
+    boardToScreenRect(r : Rect) : Rect {
+        return new Rect(r.x / this.state.scale + this.state.offsetX, r.y / this.state.scale + this.state.offsetY, r.w / this.state.scale, r.h / this.state.scale);
+    }
+
     pixelsToViewport(pixels : number) : number {
         return pixels * this.state.scale;
     }

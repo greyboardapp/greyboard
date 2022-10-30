@@ -38,6 +38,7 @@ import Text from "../components/typography/Text";
 import Grid from "../components/layout/Grid";
 import ToolbarDivider from "../components/toolbar/ToolbarDivider";
 import { pct } from "../utils/dom/dom";
+import SelectionBox from "../components/app/SelectionBox";
 
 const IndexPage : Component = () => {
     onMount(() => app.start());
@@ -148,6 +149,8 @@ const IndexPage : Component = () => {
                 <svg class={toolbarStyles.innerCorner} width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10 0H0V10C0 4.47715 4.47715 0 10 0Z" fill="currentColor"></path>
                 </svg>
+
+                <SelectionBox />
             </div>
         </>
     );

@@ -32,9 +32,15 @@ export class BoxSelectTool extends Tool {
     onActionMove(data : PointerEventData) : void {
         [this.end] = data.positions;
 
-        const rect = Rect.fromTwoPoints(viewport.screenToViewport(this.start), viewport.screenToViewport(this.end));
-        const items = board.getItemsWithinRect(rect);
-        toolbox.state.selectedItemIds = items.filter((item) => !item.locked && item.isInRect(rect)).map((item) => item.id);
+        if (this.start.x === this.end.x && this.start.y === this.end.y) {
+            const items = board.getItemsAtPoint(this.end);
+            const item = items.sort((a, b) => b.zIndex - a.zIndex).last();
+            toolbox.state.selectedItemIds = item ? [item.id] : [];
+        } else {
+            const rect = Rect.fromTwoPoints(viewport.screenToViewport(this.start), viewport.screenToViewport(this.end));
+            const items = board.getItemsWithinRect(rect);
+            toolbox.state.selectedItemIds = items.filter((item) => !item.locked && item.isInRect(rect)).map((item) => item.id);
+        }
     }
 
     onActionEnd(data : PointerEventData) : void {

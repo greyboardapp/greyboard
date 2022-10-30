@@ -10,6 +10,9 @@ import { FilledEllipseTool } from "./toolbox/filledEllipse";
 import { EllipseTool } from "./toolbox/ellipse";
 import { EraserTool } from "./toolbox/eraser";
 import { BoxSelectTool } from "./toolbox/boxSelect";
+import { board } from "./board";
+import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
+import { pass } from "../../utils/system/misc";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -108,6 +111,31 @@ export class Toolbox extends Service<ToolboxState> {
 
         for (const tool of this.tools)
             input.registerShortcut(tool.shortcut, () => (this.state.selectedTool = tool));
+    }
+
+    copyToClipboard() : void {
+        const items = this.state.selectedItemIds.flatMap((id) => board.items.get(id) ?? []);
+        const buffer = board.serialize(items);
+        window.navigator.clipboard.writeText(buffer.encode());
+    }
+
+    pasteFromClipboard(data : DataTransfer) : void {
+        try {
+            if (data.items.length === 0)
+                return;
+            const [item] = data.items;
+            if (item.type.startsWith("text")) {
+                const buffer = ByteBuffer.decode(data.getData("text"));
+                const items = board.deserialize(buffer);
+                for (const i of items) {
+                    i.rect.x += 10;
+                    i.rect.y += 10;
+                    i.rect.x2 += 10;
+                    i.rect.y2 += 10;
+                }
+                board.addAction(items);
+            }
+        } catch (e) { pass(e); }
     }
 
     private pointerDownEvent(data : PointerEventData) : void {

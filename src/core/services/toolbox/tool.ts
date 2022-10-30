@@ -67,7 +67,7 @@ export abstract class CreatorTool<T extends BoardItem> extends Tool {
 
     onRender(graphics : Graphics, dt : number) : void {
         if (this.actionStarted)
-            this.item.render(graphics);
+            this.item.render(graphics, true);
     }
 
     abstract new() : T;

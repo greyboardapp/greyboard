@@ -1,15 +1,16 @@
+import { ByteBuffer } from "../../../utils/datatypes/byteBuffer";
 import { isPointInRect } from "../../../utils/math/intersections";
 import Graphics from "../../services/renderer/graphics";
 import Point from "../geometry/point";
 import Rect from "../geometry/rect";
-import { BoardItem } from "../item";
+import { BoardItemType, BoardShapeItem } from "../item";
 
-export default class Rectangle extends BoardItem {
-    constructor(public rect : Rect, public color : number, public weight : number, public filled : boolean = false) {
-        super();
+export default class Rectangle extends BoardShapeItem {
+    constructor(public rect : Rect, color : number, weight : number, public filled : boolean = false) {
+        super(BoardItemType.Rectangle, color, weight);
     }
 
-    render(graphics : Graphics) : void {
+    render(graphics : Graphics, isTemporary : boolean) : void {
         graphics.rect(this.rect, this.color, this.weight, this.filled);
     }
 
@@ -25,5 +26,13 @@ export default class Rectangle extends BoardItem {
 
     isInRect(rect : Rect) : boolean {
         return this.rect.intersects(rect);
+    }
+
+    // base + filled
+    getSerializedSize() : number { return super.getSerializedSize() + 1; }
+    serialize(buffer : ByteBuffer) : ByteBuffer {
+        super.serialize(buffer);
+        buffer.writeByte(this.filled ? 1 : 0);
+        return buffer;
     }
 }

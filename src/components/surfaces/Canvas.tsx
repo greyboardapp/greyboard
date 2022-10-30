@@ -23,6 +23,15 @@ const Canvas : Component = () => {
         input.processKeyUpEvent(e as KeyboardEvent);
     });
 
+    createWindowListener("copy", toolbox.copyToClipboard);
+
+    createWindowListener("paste", (e) => {
+        const data = (e as ClipboardEvent).clipboardData;
+        if (!data)
+            return;
+        toolbox.pasteFromClipboard(data);
+    });
+
     const getCursor = () : string => {
         // BUG: actionStarted is not tracked by reactivity. When the View tool is selected and used with primary button, cursor gets stuck on "grabbing"
         if (toolbox.state.selectedTool === toolbox.getTool(ViewTool) && toolbox.state.selectedTool.actionStarted)
@@ -45,11 +54,15 @@ const Canvas : Component = () => {
             onTouchCancel={(e) : void => input.processPointerUpEvent(e)}
             onWheel={(e) : void => input.processZoomEvent(e)}
         >
-            <div id="canvasLayerRoot" class={styles.canvasLayerRoot}>
+            <div id="canvasLayerRoot"
+                class={styles.canvasLayerRoot}
+                style={{
+                    cursor: getCursor(),
+                }}
+            >
                 <div id="staticCanvasContainer" class={styles.staticCanvasContainer} style={{
                     left: px(viewport.state.offsetX),
                     top: px(viewport.state.offsetY),
-                    cursor: getCursor(),
                 }}></div>
                 <div id="canvasOverlayContainer" class={styles.canvasOverlayContainer}></div>
             </div>

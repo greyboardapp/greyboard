@@ -152,12 +152,17 @@ export class Input extends Service<InputState> {
     processKeyDownEvent(e : KeyboardEvent) : void {
         if ((e.target as HTMLElement).tagName === "INPUT")
             return;
-        if (e.key.startsWith("F") && e.key.length > 1)
-            return;
-        e.preventDefault();
         const data = this.toKeyboardEventData(e);
         this.pressedKeyboardButtons.set(data.button, true);
         this.onKeyDown(data);
+
+        for (const shortcut of this.shortcuts)
+            if (shortcut.shortcut.key.toUpperCase() === data.button.toUpperCase() && shortcut.shortcut.modifiers === data.modifiers) {
+                e.preventDefault();
+                this.onShortcutFired(data, shortcut.shortcut);
+                shortcut.callback(data, shortcut.shortcut);
+                break;
+            }
     }
 
     processKeyUpEvent(e : KeyboardEvent) : void {
@@ -165,16 +170,9 @@ export class Input extends Service<InputState> {
             return;
         if (e.key.startsWith("F") && e.key.length > 1)
             return;
-        e.preventDefault();
         const data = this.toKeyboardEventData(e);
         this.pressedKeyboardButtons.set(data.button, false);
         this.onKeyUp(data);
-        for (const shortcut of this.shortcuts)
-            if (shortcut.shortcut.key.toUpperCase() === data.button.toUpperCase() && shortcut.shortcut.modifiers === data.modifiers) {
-                this.onShortcutFired(data, shortcut.shortcut);
-                shortcut.callback(data, shortcut.shortcut);
-                break;
-            }
     }
 
     registerShortcut(shortcut : Shortcut, callback : (data : KeyboardEventData, shortcut : Shortcut) => void) : void {
