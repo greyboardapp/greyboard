@@ -23,6 +23,7 @@ const sliderStyles = cva(styles.slider, {
 });
 
 interface SliderProps extends VariantProps<typeof sliderStyles> {
+    id ?: string;
     model : [() => number, (v : number) => void];
     min ?: number;
     max ?: number;
@@ -33,6 +34,7 @@ interface SliderProps extends VariantProps<typeof sliderStyles> {
 const Slider : Component<SliderProps> = (props) => (
     <div class={sliderStyles(props)}>
         <input
+            id={props.id}
             type="range"
             min={props.min}
             max={props.max}

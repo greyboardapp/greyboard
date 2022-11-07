@@ -1,0 +1,26 @@
+@import "../../global";
+
+.avatarList {
+    display: flex;
+    align-items: center;
+
+    > *:not(span, :first-child) {
+        margin-left: -5px;
+    }
+
+    > span {
+        margin-left: 5px;
+
+        @include themed() {
+            color: color($panelText);
+            opacity: 0.5;
+            user-select: none;
+        }
+    }
+
+    @for $i from 0 to 9 {
+        > *:nth-child(#{$i}) {
+            z-index: 9 - $i;
+        }
+    }
+}

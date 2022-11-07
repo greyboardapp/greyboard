@@ -1,47 +1,38 @@
-import { Motion, Presence } from "@motionone/solid";
-import { Component, createSignal, Show } from "solid-js";
-import { quickEaseInTransition } from "../../utils/dom/motion";
+import { cva, VariantProps } from "class-variance-authority";
+import { Component } from "solid-js";
 import Icon, { SVGIcon } from "../data/Icon";
-import Tooltip, { TooltipProps } from "../data/Tooltip";
 
 import styles from "./ToolbarButton.module.scss";
 
-interface ToolbarButtonProps {
+const ToolbarButtonVariants = {
+    active: {
+        true: styles.active,
+    },
+};
+
+const toolbarButtonStyles = cva(styles.toolbarButton, {
+    variants: ToolbarButtonVariants,
+    defaultVariants: {
+        active: false,
+    },
+});
+
+interface ToolbarButtonProps extends VariantProps<typeof toolbarButtonStyles> {
     icon : SVGIcon;
-    active ?: boolean;
-    tooltip ?: TooltipProps;
+    disabled ?: boolean;
     onClick ?: (e : MouseEvent) => void;
 }
 
-const ToolbarButton : Component<ToolbarButtonProps> = (props) => {
-    const [tooltipVisible, setTooltipVisible] = createSignal(false);
-    return (
-        <button
-            classList={{
-                [styles.toolbarButton]: true,
-                [styles.active]: props.active,
-            }}
-            onClick={(e) => props.onClick && props.onClick(e)}
-            onMouseEnter={() => setTooltipVisible(true)}
-            onMouseLeave={() => setTooltipVisible(false)}
-        >
-            <Icon icon={props.icon} />
-            <Presence>
-                <Show when={!props.active && tooltipVisible() && props.tooltip}>
-                    {(tooltip) => (
-                        <Motion.div
-                            class={styles.tooltipRoot}
-                            initial={{ scale: 0.75, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ ...quickEaseInTransition, delay: 0.5 }}
-                        >
-                            <Tooltip orientation={tooltip.orientation} key={tooltip.key} shortcut={tooltip.shortcut} />
-                        </Motion.div>
-                    )}
-                </Show>
-            </Presence>
-        </button>
-    );
-};
+const ToolbarButton : Component<ToolbarButtonProps> = (props) => (
+    <button
+        class={toolbarButtonStyles(props)}
+        disabled={props.disabled}
+        onClick={(e) => props.onClick && props.onClick(e)}
+    >
+        <Icon icon={props.icon} />
+    </button>
+);
 
 export default ToolbarButton;
+export { ToolbarButtonVariants };
+export type { ToolbarButtonProps };

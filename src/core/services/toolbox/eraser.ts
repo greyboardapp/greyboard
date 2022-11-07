@@ -1,13 +1,14 @@
 import { Tool } from "./tool";
 
 import eraserIcon from "../../../assets/icons/eraser.svg";
-import { PointerEventData, Shortcut } from "../input";
+import { PointerEventData } from "../input";
 import Point from "../../data/geometry/point";
 import { BoardItem } from "../../data/item";
 import Graphics from "../renderer/graphics";
 import { board } from "../board";
 import Rect from "../../data/geometry/rect";
 import { viewport } from "../viewport";
+import { Shortcut } from "../commands";
 
 export class EraserTool extends Tool {
     private pointerPosition = new Point();

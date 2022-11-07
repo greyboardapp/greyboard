@@ -8,6 +8,7 @@ import Point, { PressurePoint } from "../geometry/point";
 import Rect from "../geometry/rect";
 import { BoardItemType, BoardShapeItem } from "../item";
 import { ByteBuffer } from "../../../utils/datatypes/byteBuffer";
+import logger from "../../../utils/system/logger";
 
 export default class Path extends BoardShapeItem {
     private static readonly threshold = 0.5;
@@ -118,7 +119,7 @@ export default class Path extends BoardShapeItem {
         if (this.points.length === 2 && this.points[0].x === this.points[1].x && this.points[0].y === this.points[1].y)
             this.points = [this.points[0]];
 
-        console.debug(`Optimized from ${count} to ${this.points.length}. ${this.points.length / count}`);
+        logger.debug(`Optimized from ${count} to ${this.points.length}. ${this.points.length / count}`);
     }
 
     private generateStroke(isTemporary : boolean) : Point[] {

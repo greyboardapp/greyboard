@@ -1,0 +1,27 @@
+@import "../../global";
+
+.shortcut {
+    @include smallUppercaseText();
+
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+
+    @include themed() {
+        color: color($panelText);
+    }
+
+    .key {
+        @include smallUppercaseText();
+
+        border-radius: 3px;
+        padding: 0 3px;
+        border-top: 2px solid transparent;
+
+        @include themed() {
+            background-color: color($secondary);
+            color: color($secondaryText);
+            border-bottom: 2px solid color($secondaryFocus);
+        }
+    }
+}

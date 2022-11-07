@@ -6,8 +6,8 @@ import ToolbarButton from "../components/toolbar/ToolbarButton";
 import app from "../core/app";
 import { board } from "../core/services/board";
 import ToolbarTitle from "../components/toolbar/ToolbarTitle";
-import UserBubble from "../components/data/UserBubble";
-import Button from "../components/control/Button";
+import UserBubble from "../components/data/Avatar";
+import Button from "../components/controls/Button";
 import { viewport } from "../core/services/viewport";
 import { toolbox } from "../core/services/toolbox";
 
@@ -29,7 +29,7 @@ import settingsIcon from "../assets/icons/settings.svg";
 import ToolbarText from "../components/toolbar/ToolbarText";
 import { Tool } from "../core/services/toolbox/tool";
 import ToolbarPopup from "../components/toolbar/ToolbarPopup";
-import Slider from "../components/control/Slider";
+import Slider from "../components/controls/Slider";
 import ColorPicker from "../components/data/ColorPicker";
 import ColorSwatch from "../components/data/ColorSwatch";
 import Block from "../components/layout/Block";
@@ -62,7 +62,6 @@ const IndexPage : Component = () => {
                     </Toolbar>
                     <div class="flex h">
                         <UserBubble name="Jsdsadfoh Iuds" />
-                        {/* <Button icon={peopleIcon} text={"share"} onClick={(e) => console.log(e)} /> */}
                     </div>
                 </div>
                 <div class="left flex v v-spaced">
@@ -114,10 +113,10 @@ const IndexPage : Component = () => {
                             >
                                 <Panel>
                                     <Block>
-                                        <Text key="titles.strokeWeight" size="s" uppercase faded bold class="mb1" />
+                                        <Text content="titles.strokeWeight" size="s" uppercase faded bold class="mb1" />
                                         <Slider min={1} max={10} model={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]} showValue />
                                     </Block>
-                                    <Text key="titles.color" size="s" uppercase faded bold class="mb3" />
+                                    <Text content="titles.color" size="s" uppercase faded bold class="mb3" />
                                     <Grid class="mb3">
                                         <For each={toolbox.state.colorPalette}>
                                             {(color, index) => (
@@ -133,7 +132,7 @@ const IndexPage : Component = () => {
                                     <Block>
                                         <ColorPicker model={[toolbox.state.selectedColor, toolbox.updateSelectedColorValue]} />
                                     </Block>
-                                    <Button key="buttons.resetPalette" variant="transparent" fluent onClick={() => toolbox.resetColorPalette()} />
+                                    <Button content="buttons.resetPalette" variant="transparent" fluent onClick={() => toolbox.resetColorPalette()} />
                                 </Panel>
                             </ToolbarPopup>
                         </div>

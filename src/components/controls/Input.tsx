@@ -29,6 +29,7 @@ const inputStyles = cva(styles.input, {
 });
 
 interface InputProps extends VariantProps<typeof inputStyles> {
+    id ?: string;
     model : [() => string | number, (v : string | number) => void];
     placeholder ?: string;
     icon ?: SVGIcon;
@@ -37,10 +38,11 @@ interface InputProps extends VariantProps<typeof inputStyles> {
 
 const Input : Component<InputProps> = (props) => (
     <div class={inputStyles(props)}>
-        <Show when={props.size !== "xs" && props.icon}>
+        <Show when={props.size !== "xs" && props.icon} keyed>
             {(icon) => <Icon icon={icon}/>}
         </Show>
         <input
+            id={props.id}
             type={props.type ?? "text"}
             placeholder={props.placeholder ?? ""}
             value={props.model[0]()}

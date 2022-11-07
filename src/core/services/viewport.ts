@@ -1,27 +1,27 @@
 import Point from "../data/geometry/point";
 import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
-import { input } from "./input";
+import { input, KeyModifiers } from "./input";
 import { isInRange, pass } from "../../utils/system/misc";
 import createDelegate from "../../utils/datatypes/delegate";
+import { createCommand, Shortcut } from "./commands";
 
 export interface ViewportState {
     offsetX : number;
     offsetY : number;
-    originX : number;
-    originY : number;
     scale : number;
 }
 
 export class Viewport extends Service<ViewportState> {
     public onZoom = createDelegate();
 
+    public zoomIn = createCommand(new Shortcut("=", KeyModifiers.Control), () => this.zoom(this.getScreenRect().center, -0.1));
+    public zoomOut = createCommand(new Shortcut("-", KeyModifiers.Control), () => this.zoom(this.getScreenRect().center, 0.1));
+
     constructor() {
         super({
             offsetX: 0,
             offsetY: 0,
-            originX: 0,
-            originY: 0,
             scale: 1,
         });
     }

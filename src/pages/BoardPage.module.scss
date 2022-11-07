@@ -1,0 +1,23 @@
+@import "../global";
+
+.ui {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+
+    @include themed() {
+        color: color($panelText);
+    }
+
+    .innerCorner {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+
+        @include themed() {
+            color: color($panelBg);
+        }
+    }
+}

@@ -9,6 +9,13 @@ export default defineConfig(({ mode }) => {
             solidPlugin(),
             solidSvg({
                 defaultExport: "component",
+                svgo: {
+                    svgoConfig: {
+                        plugins: {
+                            cleanupIds: false,
+                        }
+                    }
+                }
             }),
         ],
         server: {

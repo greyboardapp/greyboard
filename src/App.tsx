@@ -1,21 +1,23 @@
 import { Route, Router, Routes } from "@solidjs/router";
-import { Component, createSignal, Show } from "solid-js";
-import IndexPage from "./pages/IndexPage";
+import { Component, createSignal, lazy, Suspense } from "solid-js";
 
 import "./App.scss";
-import ComponentsPage from "./pages/Components";
+import RouteLoading from "./components/app/RouteLoading";
+
+const HomePage = lazy(async () => import("./pages/HomePage"));
+const BoardPage = lazy(async () => import("./pages/BoardPage"));
 
 const [theme, setTheme] = createSignal("dark");
 
 const App : Component = () => (
     <div class={`theme-${theme()}`}>
         <Router base={import.meta.env.BASE_URL}>
-            <Routes>
-                <Route path="/" element={<IndexPage />} />
-                <Show when={import.meta.env.DEBUG}>
-                    <Route path="/components" element={<ComponentsPage />} />
-                </Show>
-            </Routes>
+            <Suspense fallback={<RouteLoading />}>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/b/:id" element={<BoardPage />} />
+                </Routes>
+            </Suspense>
         </Router>
     </div>
 );

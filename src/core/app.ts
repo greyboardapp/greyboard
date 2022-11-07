@@ -1,22 +1,20 @@
-import tweenjs from "@tweenjs/tween.js";
 import { startServices, stopServices } from "../utils/system/service";
-import { renderer } from "./services/renderer";
 
+import "./services/renderer";
 import "./services/viewport";
 import "./services/toolbox";
-import { input, KeyModifiers, Shortcut } from "./services/input";
+import { KeyModifiers } from "./services/input";
 import { actions } from "./services/actions";
+import { createCommand, Shortcut } from "./services/commands";
 
 class Application {
+    public undo = createCommand(new Shortcut("z", KeyModifiers.Control), () => actions.undo(), () => actions.canUndo());
+    public redo = createCommand(new Shortcut("z", KeyModifiers.Control | KeyModifiers.Shift), () => actions.redo(), () => actions.canRedo());
+
     constructor() {}
 
     start() : void {
         startServices();
-
-        renderer.onFrameUpdate.add((dt) => tweenjs.update(dt));
-
-        input.registerShortcut(new Shortcut("z", KeyModifiers.Control), () => actions.undo());
-        input.registerShortcut(new Shortcut("z", KeyModifiers.Control | KeyModifiers.Shift), () => actions.redo());
     }
 
     stop() : void {

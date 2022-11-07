@@ -1,6 +1,7 @@
 @use "sass:map";
 
 $bg: "bg";
+$fg: "fg";
 $panelBg: "panel-bg";
 $panelText: "panel-text";
 $primary: "primary";
@@ -14,10 +15,10 @@ $inputText: "input-text";
 $opaque: "opaque";
 $opaqueDark: "opaque-dark";
 $shadow: "shadow";
-
 $themes: (
     light: (
         bg: #222,
+        fg: #fff,
         panel-bg: #fff,
         panel-text: #111,
         primary: #fc8210,
@@ -34,6 +35,7 @@ $themes: (
     ),
     dark: (
         bg: #222,
+        fg: #fff,
         panel-bg: #313131,
         panel-text: #fff,
         primary: #fc8210,
@@ -51,17 +53,29 @@ $themes: (
 );
 $timingCurve: cubic-bezier(0, 1, 0.2, 1);
 
-@mixin themed ($restriction: null) {
+@mixin themed ($restriction: null, $local: false) {
     @each $theme, $map in $themes {
         @if not $restriction or $restriction == $theme {
-            :global(.theme-#{$theme}) & {
-                $themeMap: () !global !default;
+            @if $local == true {
+                .theme-#{$theme} & {
+                    $themeMap: () !global !default;
 
-                @each $key, $submap in $map {
-                    $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
-                    $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                    @each $key, $submap in $map {
+                        $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
+                        $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                    }
+                    @content;
                 }
-                @content;
+            } @else {
+                :global(.theme-#{$theme}) & {
+                    $themeMap: () !global !default;
+
+                    @each $key, $submap in $map {
+                        $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
+                        $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                    }
+                    @content;
+                }
             }
         }
     }
@@ -72,14 +86,18 @@ $timingCurve: cubic-bezier(0, 1, 0.2, 1);
 }
 
 @mixin smallUppercaseText () {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 @mixin transition () {
-    transition: background-color 0.2s $timingCurve, color 0.2s $timingCurve;
+    transition:
+        background-color 0.2s $timingCurve,
+        color 0.2s $timingCurve,
+        outline 0.2s $timingCurve,
+        box-shadow 0.2s $timingCurve;
 }
 
 @mixin centeredFlex () {

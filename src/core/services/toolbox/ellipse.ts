@@ -1,8 +1,9 @@
 import Rect from "../../data/geometry/rect";
 import Ellipse from "../../data/items/ellipse";
 import { CreatorTool } from "./tool";
-import { MouseButton, PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
+import { Shortcut } from "../commands";
 
 import ellipseIcon from "../../../assets/icons/ellipse.svg";
 import { viewport } from "../viewport";

@@ -1,8 +1,9 @@
 import Rect from "../../data/geometry/rect";
 import Rectangle from "../../data/items/rectangle";
 import { CreatorTool } from "./tool";
-import { MouseButton, PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
+import { Shortcut } from "../commands";
 
 import rectangleIcon from "../../../assets/icons/rectangle.svg";
 import { viewport } from "../viewport";

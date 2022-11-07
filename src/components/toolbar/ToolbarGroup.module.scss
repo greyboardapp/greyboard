@@ -1,0 +1,12 @@
+.toolbarGroup {
+    display: flex;
+    gap: 5px;
+
+    &.horizontal {
+        flex-direction: row;
+    }
+
+    &.vertical {
+        flex-direction: column;
+    }
+}

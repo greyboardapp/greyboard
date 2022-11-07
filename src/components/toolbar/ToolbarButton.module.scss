@@ -3,44 +3,44 @@
 .toolbarButton {
     @include transition();
 
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    border-radius: 7px;
-    border: 0;
-    outline: 0;
-    cursor: pointer;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 0;
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    outline: 2px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
 
     @include themed() {
-        color: color($fgText);
-    }
+        color: color($panelText);
 
-    // &:not(:last-child) {
-    //     margin-right: 5px;
-    // }
-
-    .tooltipRoot {
-        position: absolute;
-        inset: 0;
-    }
-
-    &:hover {
-        @include themed() {
+        &:not(:disabled):hover {
             background-color: color($opaque);
         }
-    }
 
-    &.active {
-        @include themed() {
+        &:not(:disabled):focus-visible {
+            outline: 2px solid color($opaque);
+        }
+
+        &:not(:disabled):active {
+            outline: 2px solid color($opaque);
+        }
+
+        &.active {
             background-color: color($primary);
+            color: color($primaryText);
 
             &:hover {
                 background-color: color($primaryFocus);
             }
         }
+    }
+
+    &:disabled {
+        opacity: 0.5;
     }
 }

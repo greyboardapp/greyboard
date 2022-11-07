@@ -4,7 +4,7 @@ import Slider, { SliderVariants } from "./Slider";
 
 const [value, setValue] = createSignal(0);
 
-export default makeComponentMetaFromVariants(SliderVariants, "Control/Slider");
+export default makeComponentMetaFromVariants(SliderVariants, "Controls/Slider");
 
 export const Default = makeStoryVariant(Slider, {
     model: [value, setValue],

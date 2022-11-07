@@ -13,6 +13,7 @@ import { BoxSelectTool } from "./toolbox/boxSelect";
 import { board } from "./board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import { pass } from "../../utils/system/misc";
+import { createCommand } from "./commands";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -110,7 +111,7 @@ export class Toolbox extends Service<ToolboxState> {
         input.onPointerUp.add(this.pointerUpEvent);
 
         for (const tool of this.tools)
-            input.registerShortcut(tool.shortcut, () => (this.state.selectedTool = tool));
+            createCommand(tool.shortcut, () => (this.state.selectedTool = tool));
     }
 
     copyToClipboard() : void {

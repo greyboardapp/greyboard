@@ -1,5 +1,6 @@
 {
     "board.newPlaceholder": "New Board",
+    "board.loading": "Your board is loading...",
     "tools.boxSelect": "Box Select",
     "tools.pencil": "Pencil",
     "tools.eraser": "Eraser",
@@ -13,6 +14,8 @@
     "actions.clear": "Clear",
     "actions.undo": "Undo",
     "actions.redo": "Redo",
+    "actions.zoomIn": "Zoom In",
+    "actions.zoomOut": "Zoom Out",
     "titles.strokeWeight": "Stroke Weight",
     "titles.color": "Color",
     "buttons.resetPalette": "Reset Palette"

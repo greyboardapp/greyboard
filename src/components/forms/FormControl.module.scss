@@ -1,0 +1,10 @@
+.formControl {
+    margin-bottom: 10px;
+
+    > label {
+        display: block;
+        margin-bottom: 10px;
+        opacity: 0.5;
+        user-select: none;
+    }
+}

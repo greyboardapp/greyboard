@@ -1,38 +1,46 @@
-import { Component, Match, Switch } from "solid-js";
+import { cva, VariantProps } from "class-variance-authority";
+import { Component, JSX, Show } from "solid-js";
+import { Dynamic } from "solid-js/web";
 import { LanguageTexts } from "../../languages/languages";
+import { cls } from "../../utils/dom/dom";
 import { getText } from "../../utils/system/intl";
+import { throwError } from "../../utils/system/misc";
+import { TextVariants } from "./Text";
 
-import styles from "./Typography.module.scss";
+const titleStyles = cva("", {
+    variants: TextVariants,
+    defaultVariants: {
+        size: "m",
+        uppercase: false,
+        faded: false,
+        bold: true,
+    },
+});
 
-interface TitleProps {
-    key : keyof LanguageTexts;
-    size ?: "s" | "m" | "l" | "xl";
-    uppercase ?: boolean;
-    faded ?: boolean;
-    bold ?: boolean;
+const sizes : Record<keyof typeof TextVariants.size, keyof JSX.IntrinsicElements> = {
+    xs: "h5",
+    s: "h4",
+    m: "h3",
+    l: "h2",
+    xl: "h1",
+};
+
+interface TitleProps extends VariantProps<typeof titleStyles> {
+    key ?: keyof LanguageTexts;
+    content ?: string;
     class ?: string;
 }
 
 const Title : Component<TitleProps> = (props) => {
-    const getClassList = () : {[key : string] : boolean | undefined} => ({
-        [props.class ?? ""]: true,
-        [styles.uppercase]: props.uppercase,
-        [styles.faded]: props.faded,
-        [styles.bold]: props.bold,
-    });
+    const heading = () : keyof JSX.IntrinsicElements => sizes[props.size ?? "xl"];
 
     return (
-        <Switch fallback={<h1 classList={getClassList()}>{getText(props.key)}</h1>}>
-            <Match when={props.size === "s"}>
-                <h4 classList={getClassList()}>{getText(props.key)}</h4>
-            </Match>
-            <Match when={props.size === "m"}>
-                <h3 classList={getClassList()}>{getText(props.key)}</h3>
-            </Match>
-            <Match when={props.size === "l"}>
-                <h2 classList={getClassList()}>{getText(props.key)}</h2>
-            </Match>
-        </Switch>
+        <Dynamic
+            component={heading()}
+            class={cls(titleStyles(props), props.class)}
+        >
+            {getText(props.content)}
+        </Dynamic>
     );
 };
 

@@ -1,3 +1,4 @@
+import tweenjs from "@tweenjs/tween.js";
 import { RendererLayer } from "./renderer/layer";
 import { createStatelessService, Service } from "../../utils/system/service";
 import createDelegate from "../../utils/datatypes/delegate";
@@ -37,6 +38,7 @@ class Renderer extends Service {
         for (const layer of this.layerStack)
             layer.onRender(dt);
 
+        tweenjs.update(dt);
         this.onFrameUpdate(dt);
 
         this.prevT = t;

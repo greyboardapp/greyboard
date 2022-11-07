@@ -2,11 +2,11 @@
 
 .input {
     @include centeredInlineFlex();
+    @include transition();
 
     overflow: hidden;
     box-shadow: 0 0 0 2px transparent inset;
     outline: 2px solid transparent;
-    transition: box-shadow 0.2s $timingCurve, outline 0.2s $timingCurve;
 
     @include themed() {
         color: color($inputText);

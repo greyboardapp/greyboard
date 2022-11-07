@@ -3,7 +3,8 @@ import Rectangle from "../../data/items/rectangle";
 import { toolbox } from "../toolbox";
 import { RectangleTool } from "./rectangle";
 import rectangleFilledIcon from "../../../assets/icons/rectangleFilled.svg";
-import { KeyModifiers, Shortcut } from "../input";
+import { KeyModifiers } from "../input";
+import { Shortcut } from "../commands";
 
 export class FilledRectangleTool extends RectangleTool {
     constructor() {

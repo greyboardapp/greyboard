@@ -1,19 +1,29 @@
+import { cva, VariantProps } from "class-variance-authority";
 import { Component } from "solid-js";
 import Color from "../../utils/datatypes/color";
 
 import styles from "./ColorSwatch.module.scss";
 
-interface ColorSwatchProps {
+const ColorSwatchVariants = {
+    active: {
+        true: styles.active,
+    },
+};
+
+const colorSwatchStyles = cva(styles.colorSwatch, {
+    variants: ColorSwatchVariants,
+    defaultVariants: {
+        active: false,
+    },
+});
+
+interface ColorSwatchProps extends VariantProps<typeof colorSwatchStyles> {
     model : [() => number, (v : number) => void];
-    active ?: boolean;
 }
 
 const ColorSwatch : Component<ColorSwatchProps> = (props) => (
     <div
-        classList={{
-            [styles.colorSwatch]: true,
-            [styles.active]: props.active ?? false,
-        }}
+        class={colorSwatchStyles(props)}
         style={{
             "background-color": Color.UIntToHex(props.model[0]()),
         }}

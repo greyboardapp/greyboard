@@ -1,8 +1,9 @@
 import { SVGIcon } from "../../../components/data/Icon";
 import { BoardItem } from "../../data/item";
 import { board } from "../board";
-import { PointerEventData, Shortcut } from "../input";
+import { PointerEventData } from "../input";
 import Graphics from "../renderer/graphics";
+import { Shortcut } from "../commands";
 
 export interface ToolCategory {
     name : string;

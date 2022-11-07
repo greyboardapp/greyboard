@@ -1,4 +1,4 @@
-import { createStatelessService, Service } from "../../utils/system/service";
+import { createService, Service } from "../../utils/system/service";
 
 interface Action<T> {
     (data : T) : void;
@@ -13,25 +13,31 @@ interface ActionEntry {
     backward : (data : unknown) => void;
 }
 
-class ActionStack extends Service {
+interface ActionStackState {
+    undoStack : ActionEntry[];
+    redoStack : ActionEntry[];
+}
+
+class ActionStack extends Service<ActionStackState> {
     public static readonly STACK_LIMIT = 100;
-    private readonly undoStack : ActionEntry[] = [];
-    private readonly redoStack : ActionEntry[] = [];
 
     constructor() {
-        super({});
+        super({
+            undoStack: [],
+            redoStack: [],
+        });
     }
 
     start() : void {
-        this.undoStack.clear();
-        this.redoStack.clear();
+        this.state.undoStack.clear();
+        this.state.redoStack.clear();
     }
 
     push<T>(action : Action<T>, data : T) : void {
-        if (this.undoStack.length > ActionStack.STACK_LIMIT)
-            this.undoStack.shift();
+        if (this.state.undoStack.length > ActionStack.STACK_LIMIT)
+            this.state.undoStack.shift();
 
-        this.undoStack.push({
+        this.state.undoStack.push({
             data,
             forward: action.forward as (data : unknown) => void,
             backward: action.backward as (data : unknown) => void,
@@ -39,27 +45,35 @@ class ActionStack extends Service {
 
         action.forward(data);
 
-        this.redoStack.clear();
+        this.state.redoStack.clear();
     }
 
     undo() : void {
-        const entry = this.undoStack.pop();
+        const entry = this.state.undoStack.pop();
         if (!entry)
             return;
         entry.backward(entry.data);
-        this.redoStack.push(entry);
+        this.state.redoStack.push(entry);
+    }
+
+    canUndo() : boolean {
+        return this.state.undoStack.length > 0;
     }
 
     redo() : void {
-        const entry = this.redoStack.pop();
+        const entry = this.state.redoStack.pop();
         if (!entry)
             return;
         entry.forward(entry.data);
-        this.undoStack.push(entry);
+        this.state.undoStack.push(entry);
+    }
+
+    canRedo() : boolean {
+        return this.state.redoStack.length > 0;
     }
 }
 
-export const actions = createStatelessService(ActionStack);
+export const actions = createService<ActionStackState, ActionStack>(ActionStack);
 
 export function createAction<T>(forward : (data : T) => void, backward : (data : T) => void) : Action<T> {
     const instance = ((data : T) => { instance.invoke(data); }) as Action<T>;

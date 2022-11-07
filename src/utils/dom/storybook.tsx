@@ -1,5 +1,6 @@
 import { Component, For } from "solid-js";
 import { Story, Meta } from "@storybook/html";
+import Text from "../../components/typography/Text";
 
 interface VariantOption {
     [key : string] : string | string[];
@@ -57,8 +58,8 @@ export function makeStoryVariants<T>(Comp : Component<T>, variants : VariantOpti
     return ((props : T) => (
         <For each={args}>
             {(arg) => (
-                <div style={{ "margin-bottom": "2rem" }}>
-                    <p>{Object.entries(arg).filter(([key]) => key in variants).map(([key, value]) => `${key}: ${value}`).join("; ")}</p>
+                <div style={{ "margin-bottom": "2rem", width: "100%" }}>
+                    <Text content={Object.entries(arg).filter(([key]) => key in variants).map(([key, value]) => `${key}: ${value}`).join("; ")} />
                     <Comp {...arg} />
                 </div>
             )}

@@ -1,11 +1,12 @@
 import { Component, Show } from "solid-js";
 import { cva, VariantProps } from "class-variance-authority";
-import { getText } from "../../utils/system/intl";
 import Icon, { SVGIcon } from "../data/Icon";
 import { pct } from "../../utils/dom/dom";
 
 import styles from "./Button.module.scss";
 import loadingIcon from "../../assets/icons/loading.svg";
+import Text from "../typography/Text";
+import { LanguageTexts } from "../../languages/languages";
 
 const ButtonVariants = {
     size: {
@@ -41,7 +42,7 @@ const buttonStyles = cva(styles.button, {
 });
 
 interface ButtonProps extends VariantProps<typeof buttonStyles> {
-    key : string;
+    content ?: keyof LanguageTexts | string;
     icon ?: SVGIcon;
     onClick ?: (e : MouseEvent) => void;
     loadingProgress ?: number;
@@ -53,14 +54,14 @@ const Button : Component<ButtonProps> = (props) => (
         disabled={props.disabled ?? false}
         onClick={(e) => (props.onClick && props.onClick(e))}
     >
-        <Show when={!props.loading && props.size !== "xs" && props.icon}>
+        <Show when={!props.loading && props.size !== "xs" && props.icon} keyed>
             {(icon) => <Icon icon={icon} />}
         </Show>
         <Show when={props.loading && props.size !== "xs"}>
             <div class={styles.loadingProgress} style={{ width: pct(props.loadingProgress ?? 0) }} ></div>
             <Icon icon={loadingIcon} class={styles.loadingIcon} />
         </Show>
-        <span>{getText(props.key)}</span>
+        <Text content={props.content} as="span" size="s" bold uppercase />
     </button>
 );
 

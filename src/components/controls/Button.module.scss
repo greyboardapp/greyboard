@@ -3,63 +3,54 @@
 .button {
     @include centeredInlineFlex();
     @include smallUppercaseText();
+    @include transition();
 
     position: relative;
     overflow: hidden;
     border: 0;
     outline: 0;
     border-radius: 999px;
-    transition: all 0.2s $timingCurve;
+    user-select: none;
     cursor: pointer;
 
     @include themed() {
         outline: 3px solid transparent;
 
-        &:disabled {
-            color: color($secondaryFocus);
-            background-color: color($secondary);
+        &:not(:disabled):active,
+        &:not(:disabled):focus-visible {
+            outline: 3px solid color($shadow);
+        }
 
-            &.tertiary {
-                color: color($secondary);
-                background-color: transparent;
+        &.primary {
+            color: color($primaryText);
+            background-color: color($primary);
+
+            &:not(:disabled):hover {
+                background-color: color($primaryFocus);
             }
         }
 
-        &:not(:disabled) {
-            &:active {
-                outline: 3px solid color($shadow);
+        &.secondary {
+            color: color($secondaryText);
+            background-color: color($secondary);
+
+            &:not(:disabled):hover {
+                background-color: color($secondaryFocus);
             }
+        }
 
-            &.primary {
-                color: color($primaryText);
-                background-color: color($primary);
+        &.tertiary {
+            color: color($panelText);
+            background-color: transparent;
 
-                &:hover {
-                    background-color: color($primaryFocus);
-                }
-            }
-
-            &.secondary {
-                color: color($secondaryText);
-                background-color: color($secondary);
-
-                &:hover {
-                    background-color: color($secondaryFocus);
-                }
-            }
-
-            &.tertiary {
-                color: color($panelText);
-                background-color: transparent;
-
-                &:hover {
-                    background-color: color($opaque);
-                }
+            &:not(:disabled):hover {
+                background-color: color($opaque);
             }
         }
     }
 
     &:disabled {
+        opacity: 0.7;
         cursor: not-allowed;
     }
 

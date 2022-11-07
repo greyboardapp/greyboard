@@ -1,11 +1,12 @@
 import { Component } from "solid-js";
+import Text from "../typography/Text";
 
-import styles from "./Toolbar.module.scss";
+import styles from "./ToolbarText.module.scss";
 
 interface ToolbarTextProps {
-    text : string;
+    content : string;
 }
 
-const ToolbarText : Component<ToolbarTextProps> = (props) => <p class={styles.toolbarText}>{props.text}</p>;
+const ToolbarText : Component<ToolbarTextProps> = (props) => <Text content={props.content} size="s" uppercase bold class={styles.toolbarText} />;
 
 export default ToolbarText;

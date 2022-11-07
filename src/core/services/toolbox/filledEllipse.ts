@@ -1,9 +1,10 @@
 import Rect from "../../data/geometry/rect";
 import { toolbox } from "../toolbox";
 import ellipseFilledIcon from "../../../assets/icons/ellipseFilled.svg";
-import { KeyModifiers, Shortcut } from "../input";
+import { KeyModifiers } from "../input";
 import { EllipseTool } from "./ellipse";
 import Ellipse from "../../data/items/ellipse";
+import { Shortcut } from "../commands";
 
 export class FilledEllipseTool extends EllipseTool {
     constructor() {

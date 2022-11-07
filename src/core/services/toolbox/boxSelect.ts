@@ -1,13 +1,14 @@
 import { Tool } from "./tool";
 
 import boxSelectIcon from "../../../assets/icons/boxSelect.svg";
-import { PointerEventData, Shortcut } from "../input";
+import { PointerEventData } from "../input";
 import Graphics from "../renderer/graphics";
 import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 import { board } from "../board";
 import { toolbox } from "../toolbox";
 import { viewport } from "../viewport";
+import { Shortcut } from "../commands";
 
 export class BoxSelectTool extends Tool {
     private start = new Point();

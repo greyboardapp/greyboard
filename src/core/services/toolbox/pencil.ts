@@ -1,7 +1,8 @@
 import { CreatorTool } from "./tool";
-import { MouseButton, PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
 import Path from "../../data/items/path";
+import { Shortcut } from "../commands";
 
 import pencilIcon from "../../../assets/icons/pencil.svg";
 import { viewport } from "../viewport";

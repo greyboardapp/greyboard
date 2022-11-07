@@ -5,7 +5,8 @@
     padding: 20px;
 
     @include themed() {
-        background-color: color($fg);
+        background-color: color($panelBg);
+        color: color($panelText);
         box-shadow: 0 5px 10px color($shadow);
     }
 }

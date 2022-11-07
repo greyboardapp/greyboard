@@ -1,17 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <path d="M0 0L20 0L20 20L0 20L0 0Z" id="path_1" />
-    <clipPath id="mask_1">
-      <use xlink:href="#path_1" />
-    </clipPath>
-  </defs>
-  <g id="greyboardiconspencil">
-    <g id="pencil">
-      <path d="M0 0L20 0L20 20L0 20L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-      <g clip-path="url(#mask_1)">
-        <path d="M12.7396 1.89647L14.0806 0.555465C14.8212 -0.18516 16.022 -0.18515 16.7626 0.555465L19.4446 3.23747C20.1852 3.97808 20.1852 5.17885 19.4446 5.91947L18.1036 7.26048L12.7396 1.89647ZM3.05176e-05 15.4215C3.24845e-05 14.9186 0.199829 14.4362 0.555498 14.0805L11.3985 3.23743L16.7625 8.60144L5.9195 19.4445C5.56384 19.8002 5.08148 20 4.5785 20L3.05176e-05 20L3.05176e-05 15.4215Z" id="Shape-Union" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
-      </g>
-    </g>
-  </g>
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7396 1.89656L14.0806 0.555557C14.8212 -0.185068 16.022 -0.185058 16.7626 0.555557L19.4446 3.23756C20.1852 3.97817 20.1852 5.17894 19.4446 5.91956L18.1036 7.26057L12.7396 1.89656ZM6.10352e-05 15.4216C6.30021e-05 14.9187 0.19986 14.4363 0.555529 14.0806L11.3985 3.23752L16.7625 8.60153L5.91953 19.4446C5.56387 19.8003 5.08151 20.0001 4.57853 20.0001H6.10352e-05V15.4216Z" fill="white"/>
 </svg>

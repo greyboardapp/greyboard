@@ -25,7 +25,7 @@ const ToolbarPopup : ParentComponent<ToolbarPopupProps> = (props) => {
             onMouseLeave={() => {
                 if (timer)
                     clearTimeout(timer);
-                timer = setTimeout(() => setOpen(false), 300);
+                timer = setTimeout(() => setOpen(false), 300, null);
             }}
         >
             {props.actuator}

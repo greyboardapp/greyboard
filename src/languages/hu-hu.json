@@ -1,5 +1,6 @@
 {
     "board.newPlaceholder": "Új tábla",
+    "board.loading": "A tábla töltödik...",
     "tools.boxSelect": "Dobozolt kiválasztás",
     "tools.pencil": "Ceruza",
     "tools.eraser": "Radír",
@@ -13,6 +14,8 @@
     "actions.clear": "Törlés",
     "actions.undo": "Vissza",
     "actions.redo": "Újra",
+    "actions.zoomIn": "Nagyítás",
+    "actions.zoomOut": "Kicsinyítés",
     "titles.strokeWeight": "Vastagság",
     "titles.color": "Szín",
     "buttons.resetPalette": "Paletta visszállítása"

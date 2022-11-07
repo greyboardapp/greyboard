@@ -18,5 +18,6 @@ declare interface ImportMeta {
     env : {
         BASE_URL : string;
         DEBUG ?: string;
+        LOG_LEVEL ?: number;
     }
 }

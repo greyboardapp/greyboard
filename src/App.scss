@@ -1,23 +1,9 @@
-@import "layout";
-
-// @import "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap";
 @import "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
+@import "layout";
 @import "global";
 
 html,
 input,
 button {
-    font-family: Inter, Poppins, sans-serif;
-}
-
-.ui {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    inset: 0;
-    pointer-events: none;
-
-    > .left {
-        height: 100%;
-    }
+    font-family: Inter, sans-serif;
 }

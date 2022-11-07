@@ -1,17 +1,29 @@
+import { cva, VariantProps } from "class-variance-authority";
 import { ParentComponent } from "solid-js";
-import { cls } from "../../utils/dom/dom";
 
 import styles from "./Toolbar.module.scss";
 
-interface ToolbarProps {
-    variant : "top" | "left" | "floating";
+const ToolbarVariants = {
+    variant: {
+        top: styles.top,
+        left: styles.left,
+        floating: styles.floating,
+    },
+};
+
+const toolbarStyles = cva(styles.toolbar, {
+    variants: ToolbarVariants,
+    defaultVariants: {
+        variant: "floating",
+    },
+});
+
+interface ToolbarProps extends VariantProps<typeof toolbarStyles> {
     class ?: string;
 }
 
 const Toolbar : ParentComponent<ToolbarProps> = (props) => (
-    <div
-        class={cls(styles.toolbar, styles[props.variant], props.class)}
-    >
+    <div class={toolbarStyles(props)}>
         {props.children}
     </div>
 );

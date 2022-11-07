@@ -3,6 +3,7 @@ import { distSq } from "../../utils/math/geometry";
 import createDelegate from "../../utils/datatypes/delegate";
 import { createService, Service } from "../../utils/system/service";
 import Point, { PressurePoint } from "../data/geometry/point";
+import { commands } from "./commands";
 
 export enum KeyModifiers {
     None = 0,
@@ -38,30 +39,6 @@ export interface KeyboardEventData {
     modifiers : KeyModifiers;
 }
 
-export class Shortcut {
-    constructor(
-        public key : string,
-        public modifiers : KeyModifiers = KeyModifiers.None,
-    ) {}
-
-    toString() : string {
-        const str : string[] = [];
-        if (this.modifiers & KeyModifiers.Control)
-            str.push("CTRL");
-        if (this.modifiers & KeyModifiers.Shift)
-            str.push("SHIFT");
-        if (this.modifiers & KeyModifiers.Alt)
-            str.push("ALT");
-        str.push(this.key.toUpperCase());
-        return str.join(" + ");
-    }
-}
-
-export interface ShortcutBinding {
-    shortcut : Shortcut;
-    callback : (data : KeyboardEventData, shortcut : Shortcut) => void;
-}
-
 export interface InputState {
     lastUsedPointerType : PointerType;
 }
@@ -73,13 +50,11 @@ export class Input extends Service<InputState> {
     public onZoom = createDelegate<[data : PointerEventData]>();
     public onKeyDown = createDelegate<[data : KeyboardEventData]>();
     public onKeyUp = createDelegate<[data : KeyboardEventData]>();
-    public onShortcutFired = createDelegate<[data : KeyboardEventData, shortcut : Shortcut]>();
 
     private readonly pressedMouseButtons = new Map<MouseButton, boolean>();
     private pointerPositions : Point[] = [];
     private prevPointerPositions : Point[] = [];
     private readonly pressedKeyboardButtons = new Map<string, boolean>();
-    private readonly shortcuts : ShortcutBinding[] = [];
 
     constructor() {
         super({
@@ -102,8 +77,6 @@ export class Input extends Service<InputState> {
         this.onZoom.clear();
         this.onKeyDown.clear();
         this.onKeyUp.clear();
-        this.onShortcutFired.clear();
-        this.shortcuts.clear();
     }
 
     processPointerDownEvent(e : PointerEvent | TouchEvent) : void {
@@ -156,13 +129,8 @@ export class Input extends Service<InputState> {
         this.pressedKeyboardButtons.set(data.button, true);
         this.onKeyDown(data);
 
-        for (const shortcut of this.shortcuts)
-            if (shortcut.shortcut.key.toUpperCase() === data.button.toUpperCase() && shortcut.shortcut.modifiers === data.modifiers) {
-                e.preventDefault();
-                this.onShortcutFired(data, shortcut.shortcut);
-                shortcut.callback(data, shortcut.shortcut);
-                break;
-            }
+        if (commands.triggerCommand(data))
+            e.preventDefault();
     }
 
     processKeyUpEvent(e : KeyboardEvent) : void {
@@ -173,10 +141,6 @@ export class Input extends Service<InputState> {
         const data = this.toKeyboardEventData(e);
         this.pressedKeyboardButtons.set(data.button, false);
         this.onKeyUp(data);
-    }
-
-    registerShortcut(shortcut : Shortcut, callback : (data : KeyboardEventData, shortcut : Shortcut) => void) : void {
-        this.shortcuts.push({ shortcut, callback });
     }
 
     private toPointerEventData(e : PointerEvent | WheelEvent | TouchEvent) : PointerEventData {

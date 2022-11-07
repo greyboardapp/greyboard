@@ -6,7 +6,7 @@ module.exports = {
         builder: "@storybook/builder-vite"
     },
     framework: "@storybook/html",
-    stories: ["../src/**/*.stories.tsx"],
+    stories: ["../src/**/*.stories.ts", "../src/**/*.stories.tsx"],
     addons: ["@storybook/addon-links", "@storybook/addon-essentials", '@storybook/addon-a11y'],
     async viteFinal(config, { configType }) {
         config.plugins.unshift(

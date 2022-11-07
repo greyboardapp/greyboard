@@ -6,7 +6,7 @@ import peopleIcon from "../../assets/icons/people.svg";
 
 const [text, setText] = createSignal("");
 
-export default makeComponentMetaFromVariants(InputVariants, "Control/Input");
+export default makeComponentMetaFromVariants(InputVariants, "Controls/Input");
 
 export const Default = makeStoryVariant(Input, {
     model: [text, setText],

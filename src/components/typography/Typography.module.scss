@@ -1,13 +1,13 @@
 @import "../../global";
 
 p,
+span,
 h1,
 h2,
 h3,
 h4 {
-    @include themed() {
-        color: color($fgText);
-    }
+    font-weight: normal;
+    color: currentcolor;
 
     &.uppercase {
         text-transform: uppercase;
@@ -17,10 +17,12 @@ h4 {
     &.bold { font-weight: bold; }
 }
 
-p {
+p,
+span {
     font-size: 1rem;
 
-    &.s { @include fontSize(0.8rem); }
+    &.xs { @include fontSize(0.5rem); }
+    &.s { @include fontSize(0.75rem); }
     &.m { @include fontSize(1rem); }
     &.l { @include fontSize(1.125rem); }
     &.xl { @include fontSize(1.5rem); }

@@ -1,4 +1,9 @@
+@import "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
 @import "../src/global";
+
+* {
+    font-family: Inter, sans-serif;
+}
 
 html,
 body.sb-show-main,
@@ -21,6 +26,10 @@ body.sb-show-main {
         width: 100%;
         padding: 1rem;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
         &.theme-light {
             background-color: map-get(map-get($themes, "light"), $panelBg);

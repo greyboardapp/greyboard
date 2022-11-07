@@ -1,8 +1,9 @@
 import tweenjs, { Tween } from "@tweenjs/tween.js";
 import { Tool } from "./tool";
-import { MouseButton, PointerEventData, Shortcut } from "../input";
+import { MouseButton, PointerEventData } from "../input";
 import { toolbox } from "../toolbox";
 import { viewport, ViewportState } from "../viewport";
+import { Shortcut } from "../commands";
 
 import handIcon from "../../../assets/icons/hand.svg";
 
