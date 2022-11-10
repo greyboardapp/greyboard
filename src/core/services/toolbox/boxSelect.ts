@@ -6,9 +6,9 @@ import Graphics from "../renderer/graphics";
 import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 import { board } from "../board";
-import { toolbox } from "../toolbox";
 import { viewport } from "../viewport";
 import { Shortcut } from "../commands";
+import { selection } from "../selection";
 
 export class BoxSelectTool extends Tool {
     private start = new Point();
@@ -34,13 +34,16 @@ export class BoxSelectTool extends Tool {
         [this.end] = data.positions;
 
         if (this.start.x === this.end.x && this.start.y === this.end.y) {
-            const items = board.getItemsAtPoint(this.end);
+            const items = board.getItemsAtPoint(viewport.screenToBoard(this.end));
             const item = items.sort((a, b) => b.zIndex - a.zIndex).last();
-            toolbox.state.selectedItemIds = item ? [item.id] : [];
+            selection.state.ids = item ? [item.id] : [];
         } else {
-            const rect = Rect.fromTwoPoints(viewport.screenToViewport(this.start), viewport.screenToViewport(this.end));
+            const rect = viewport.screenToBoardRect(this.start, this.end);
             const items = board.getItemsWithinRect(rect);
-            toolbox.state.selectedItemIds = items.filter((item) => !item.locked && item.isInRect(rect)).map((item) => item.id);
+            // BUG: isInRect not working when zooming
+            const ids = items.filter((item) => item.isInRect(rect)).map((item) => item.id).sort();
+            if (!ids.shallowEquals(selection.state.ids))
+                selection.state.ids = ids;
         }
     }
 

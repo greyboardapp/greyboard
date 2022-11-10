@@ -3,7 +3,7 @@ import { floor } from "../../utils/math/math";
 import { createService, Service } from "../../utils/system/service";
 import Point, { PressurePoint } from "../data/geometry/point";
 import Rect from "../data/geometry/rect";
-import { BoardItem, BoardItemType } from "../data/item";
+import { BoardItem, BoardItemType, BoardShapeItem } from "../data/item";
 import Ellipse from "../data/items/ellipse";
 import Path from "../data/items/path";
 import Rectangle from "../data/items/rectangle";
@@ -30,6 +30,21 @@ export class Board extends Service<BoardState> {
     public readonly removeAction = createAction(
         (items : Iterable<BoardItem>) => this.remove(items),
         (items : Iterable<BoardItem>) => this.add(items),
+    );
+
+    public readonly bringForwardAction = createAction(
+        (items : Iterable<BoardItem>) => this.bringForward(items),
+        (items : Iterable<BoardItem>) => this.sendBackward(items),
+    );
+
+    public readonly sendBackwardAction = createAction(
+        (items : Iterable<BoardItem>) => this.sendBackward(items),
+        (items : Iterable<BoardItem>) => this.bringForward(items),
+    );
+
+    public readonly setLockStateAction = createAction(
+        (data : { items : Iterable<BoardItem>; state : boolean}) => this.setLockState(data.items, data.state),
+        (data : { items : Iterable<BoardItem>; state : boolean}) => this.setLockState(data.items, !data.state),
     );
 
     constructor() {
@@ -66,6 +81,44 @@ export class Board extends Service<BoardState> {
         }
 
         this.removeFromChunk(items);
+    }
+
+    bringForward(items : Iterable<BoardItem>) : void {
+        for (const item of items)
+            if (item.zIndex < 255)
+                item.zIndex++;
+    }
+
+    sendBackward(items : Iterable<BoardItem>) : void {
+        for (const item of items)
+            if (item.zIndex > 0)
+                item.zIndex--;
+    }
+
+    setLockState(items : Iterable<BoardItem>, state : boolean) : void {
+        for (const item of items)
+            item.locked = state;
+    }
+
+    setLabel(items : Iterable<BoardItem>, label : string | null) : void {
+        for (const item of items)
+            item.label = label;
+    }
+
+    setColor(items : Iterable<BoardItem>, color : number) : void {
+        for (const item of items)
+            if (item instanceof BoardShapeItem)
+                item.color = color;
+        // NOTE: Filter items based on if they are BoardShapeItems. It could reduce the region that needs to be updated.
+        this.updateItems(items);
+    }
+
+    setWeight(items : Iterable<BoardItem>, weight : number) : void {
+        for (const item of items)
+            if (item instanceof BoardShapeItem)
+                item.weight = weight;
+        // NOTE: Filter items based on if they are BoardShapeItems. It could reduce the region that needs to be updated.
+        this.updateItems(items);
     }
 
     rebuild() : void {
@@ -166,6 +219,23 @@ export class Board extends Service<BoardState> {
                     // HACK: For now this works but in the future let's implement this so that the deleteMany function can be used effectively
                     if (chunk)
                         chunk.deleteMany([item]);
+                }
+        }
+    }
+
+    private updateItems(items : Iterable<BoardItem>) : void {
+        const bb = Rect.invertedInfinite();
+        for (const item of items)
+            bb.append(item.rect);
+
+        for (const item of items) {
+            const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
+            for (let { x } = region.min; x <= region.max.x; ++x)
+                for (let { y } = region.min; y <= region.max.y; ++y) {
+                    const key = this.hash(x, y);
+                    const chunk = this.chunks.get(key);
+                    if (chunk)
+                        chunk.updateRegion(bb);
                 }
         }
     }

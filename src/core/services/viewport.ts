@@ -2,9 +2,10 @@ import Point from "../data/geometry/point";
 import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
 import { input, KeyModifiers } from "./input";
-import { isInRange, pass } from "../../utils/system/misc";
+import { isInRange } from "../../utils/system/misc";
 import createDelegate from "../../utils/datatypes/delegate";
 import { createCommand, Shortcut } from "./commands";
+import { track } from "../../utils/dom/solid";
 
 export interface ViewportState {
     offsetX : number;
@@ -50,7 +51,7 @@ export class Viewport extends Service<ViewportState> {
 
     @reactive
     private zoomEvent() : void {
-        pass(this.state.scale);
+        track(this.state.scale);
         this.onZoom();
     }
 
@@ -99,7 +100,7 @@ export class Viewport extends Service<ViewportState> {
     }
 
     getScreenRect() : Rect {
-        return new Rect(-this.state.offsetX, -this.state.offsetY, window.innerWidth / this.state.scale, window.innerHeight / this.state.scale);
+        return this.screenToBoardRect(new Point(0, 0), new Point(window.innerWidth, window.innerHeight));
     }
 }
 

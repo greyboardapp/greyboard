@@ -6,7 +6,6 @@ import Point from "../../data/geometry/point";
 import { BoardItem } from "../../data/item";
 import Graphics from "../renderer/graphics";
 import { board } from "../board";
-import Rect from "../../data/geometry/rect";
 import { viewport } from "../viewport";
 import { Shortcut } from "../commands";
 

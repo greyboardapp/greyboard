@@ -140,10 +140,14 @@ export class Chunk extends QuadTree {
             bb.append(item.rect);
         }
 
-        bb.inflate(15);
+        this.updateRegion(bb);
+    }
 
-        this.graphics.scissor(bb.x, bb.y, bb.w, bb.h, () => {
-            for (const item of board.getItemsWithinRect(viewport.viewportToBoardRect(bb)))
+    updateRegion(rect : Rect) : void {
+        rect.inflate(15);
+
+        this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, () => {
+            for (const item of board.getItemsWithinRect(viewport.viewportToBoardRect(rect)))
                 item.render(this.graphics, false);
         });
     }

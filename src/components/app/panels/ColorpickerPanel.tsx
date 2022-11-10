@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { Component, For, Show } from "solid-js";
 import { toolbox } from "../../../core/services/toolbox";
 import Button from "../../controls/Button";
 import Slider from "../../controls/Slider";
@@ -8,10 +8,17 @@ import FormControl from "../../forms/FormControl";
 import Grid from "../../layout/Grid";
 import Panel from "../../surfaces/Panel";
 
-const ColorPickerPanelContent : Component = () => (
+interface ColorPickerPanelContentProps {
+    showColorPicker ?: boolean;
+    activeColor : number;
+    sliderModel : [() => number, (v : number) => void];
+    colorPicked : (color : number, index : number) => void;
+}
+
+const ColorPickerPanelContent : Component<ColorPickerPanelContentProps> = (props) => (
     <>
         <FormControl name="titles.strokeWeight">
-            {(id) => <Slider id={id} min={1} max={10} model={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]} showValue />}
+            {(id) => <Slider id={id} min={1} max={10} model={props.sliderModel} showValue />}
         </FormControl>
 
         <FormControl name="titles.color">
@@ -23,24 +30,32 @@ const ColorPickerPanelContent : Component = () => (
                                 <ColorSwatch
                                     // Disabled since we know for a fact that the order of the colors will not change
                                     // eslint-disable-next-line solid/reactivity
-                                    model={[() => color, (v) => (toolbox.state.selectedColorIndex = index())]}
-                                    active={toolbox.state.selectedColorIndex === index()}
+                                    model={[() => color, (v) => props.colorPicked(color, index())]}
+                                    active={color === props.activeColor}
                                 />
                             )}
                         </For>
                     </Grid>
-                    <ColorPicker model={[toolbox.state.selectedColor, toolbox.updateSelectedColorValue]} />
+                    <Show when={props.showColorPicker}>
+                        <ColorPicker model={[toolbox.state.selectedColor, toolbox.updateSelectedColorValue]} />
+                    </Show>
                 </>
             )}
         </FormControl>
 
-        <Button content="buttons.resetPalette" size="s" variant="tertiary" fluent onClick={() => toolbox.resetColorPalette()} />
+        <Show when={props.showColorPicker}>
+            <Button content="buttons.resetPalette" size="s" variant="tertiary" fluent onClick={() => toolbox.resetColorPalette()} />
+        </Show>
     </>
 );
 
 const ColorPickerPanel : Component = () => (
     <Panel>
-        <ColorPickerPanelContent />
+        <ColorPickerPanelContent
+            activeColor={toolbox.state.selectedColor()}
+            sliderModel={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]}
+            colorPicked={(color, index) => (toolbox.state.selectedColorIndex = index)}
+        />
     </Panel>
 );
 

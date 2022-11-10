@@ -8,6 +8,7 @@ const ToolbarVariants = {
         top: styles.top,
         left: styles.left,
         floating: styles.floating,
+        transparent: styles.transparent,
     },
 };
 

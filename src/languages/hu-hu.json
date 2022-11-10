@@ -1,7 +1,7 @@
 {
     "board.newPlaceholder": "Új tábla",
-    "board.loading": "A tábla töltödik...",
-    "tools.boxSelect": "Dobozolt kiválasztás",
+    "board.loading": "A táblád töltödik...",
+    "tools.boxSelect": "Dobozolt kijelölés",
     "tools.pencil": "Ceruza",
     "tools.eraser": "Radír",
     "tools.view": "Nézet",
@@ -12,11 +12,20 @@
     "actions.save": "Mentés",
     "actions.export": "Exportálás",
     "actions.clear": "Törlés",
-    "actions.undo": "Vissza",
-    "actions.redo": "Újra",
+    "actions.undo": "Visszavonás",
+    "actions.redo": "Ismétlés",
     "actions.zoomIn": "Nagyítás",
     "actions.zoomOut": "Kicsinyítés",
+    "actions.bringForward": "Előbbre hozás",
+    "actions.sendBackward": "Hátrébb küldés",
+    "actions.copy": "Másolás",
+    "actions.delete": "Törlés",
+    "actions.lock": "Zárolás",
+    "actions.unlock": "Zárolás feloldása",
+    "actions.addLabel": "Címke hozzáadása",
+    "actions.removeLabel": "Címke eltávolítása",
     "titles.strokeWeight": "Vastagság",
     "titles.color": "Szín",
-    "buttons.resetPalette": "Paletta visszállítása"
+    "buttons.resetPalette": "Paletta visszállítása",
+    "placeholder.typeSomething": "Írj valamit..."
 }

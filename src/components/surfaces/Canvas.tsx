@@ -33,8 +33,7 @@ const Canvas : Component = () => {
     });
 
     const getCursor = () : string => {
-        // BUG: actionStarted is not tracked by reactivity. When the View tool is selected and used with primary button, cursor gets stuck on "grabbing"
-        if (toolbox.state.selectedTool === toolbox.getTool(ViewTool) && toolbox.state.selectedTool.actionStarted)
+        if (toolbox.state.selectedTool === toolbox.getTool(ViewTool) && toolbox.state.isToolInAction)
             return "grabbing";
         if (input.state.lastUsedPointerType === PointerType.Pen)
             return "crosshair";

@@ -5,3 +5,5 @@ export function model(element : HTMLInputElement, value : Accessor<Signal<string
     createRenderEffect(() => { element.value = field(); });
     element.addEventListener("input", (e) => setField((e.target as HTMLInputElement).value));
 }
+
+export function track<T>(v : T) : T { return v; }

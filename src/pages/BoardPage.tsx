@@ -28,6 +28,7 @@ import { viewport } from "../core/services/viewport";
 import ToolbarInput from "../components/toolbar/ToolbarInput";
 import { board } from "../core/services/board";
 import logger from "../utils/system/logger";
+import SelectionBox from "../components/app/SelectionBox";
 
 interface BoardPageParams extends Params {
     id : string;
@@ -44,6 +45,7 @@ const BoardPage : Component = () => {
         <>
             <Canvas />
             <div class={styles.ui}>
+                <SelectionBox />
                 <div class="flex h h-spaced">
                     <Toolbar variant="top">
                         <ToolbarButton icon={menuIcon} />

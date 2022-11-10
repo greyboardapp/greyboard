@@ -12,6 +12,8 @@ declare global {
         first() : T | undefined;
         last() : T | undefined;
 
+        shallowEquals(other : T[]) : boolean;
+
         min<V>(key : (t : T) => V) : T | null;
         max<V>(key : (t : T) => V) : T | null;
 
@@ -34,6 +36,17 @@ Array.prototype.first = function<T> (this : T[]) : T | undefined {
 
 Array.prototype.last = function<T> (this : T[]) : T | undefined {
     return this[this.length - 1];
+};
+
+Array.prototype.shallowEquals = function<T> (this : T[], other : T[]) : boolean {
+    if (this.length !== other.length)
+        return false;
+
+    for (let i = 0; i < this.length; i++)
+        if (this[i] !== other[i])
+            return false;
+
+    return true;
 };
 
 Array.prototype.min = function<T, V> (this : T[], key ?: (t : T) => V) : T | null {

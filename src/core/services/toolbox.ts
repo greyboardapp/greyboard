@@ -14,6 +14,7 @@ import { board } from "./board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import { pass } from "../../utils/system/misc";
 import { createCommand } from "./commands";
+import { selection } from "./selection";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -21,7 +22,7 @@ export interface ToolboxState {
     selectedColorIndex : number;
     selectedTool ?: Tool;
     selectedWeight : number;
-    selectedItemIds : number[];
+    isToolInAction : boolean;
 
     selectedColor : () => number;
     selectedHexColor : () => string;
@@ -47,7 +48,7 @@ export class Toolbox extends Service<ToolboxState> {
             colorPalette: [],
             selectedColorIndex: 0,
             selectedWeight: 2,
-            selectedItemIds: [],
+            isToolInAction: false,
             selectedColor: () => this.state.colorPalette[this.state.selectedColorIndex],
             selectedHexColor: () => Color.UIntToHex(this.state.selectedColor()),
         });
@@ -61,8 +62,8 @@ export class Toolbox extends Service<ToolboxState> {
     onSelectedToolChanged(prev ?: Tool) : Tool | undefined {
         if (prev)
             prev.onDeselected();
-        if (!this.state.selectedTool?.name.includes("Select"))
-            this.state.selectedItemIds = [];
+        if (!this.state.selectedTool?.name.match(/(select|view)/i))
+            selection.state.ids = [];
         this.state.selectedTool?.onSelected(prev);
         return this.state.selectedTool;
     }
@@ -114,12 +115,6 @@ export class Toolbox extends Service<ToolboxState> {
             createCommand(tool.shortcut, () => (this.state.selectedTool = tool));
     }
 
-    copyToClipboard() : void {
-        const items = this.state.selectedItemIds.flatMap((id) => board.items.get(id) ?? []);
-        const buffer = board.serialize(items);
-        window.navigator.clipboard.writeText(buffer.encode());
-    }
-
     pasteFromClipboard(data : DataTransfer) : void {
         try {
             if (data.items.length === 0)
@@ -150,10 +145,13 @@ export class Toolbox extends Service<ToolboxState> {
             if (this.state.selectedTool !== viewTool)
                 this.state.selectedTool = viewTool;
             this.state.selectedTool.actionStarted = true;
+            this.state.isToolInAction = true;
         }
 
-        if (this.state.selectedTool.onActionStart(data))
+        if (this.state.selectedTool.onActionStart(data)) {
             this.state.selectedTool.actionStarted = true;
+            this.state.isToolInAction = true;
+        }
     }
 
     private pointerMoveEvent(data : PointerEventData) : void {
@@ -168,6 +166,7 @@ export class Toolbox extends Service<ToolboxState> {
             return;
 
         this.state.selectedTool.actionStarted = false;
+        this.state.isToolInAction = false;
         this.state.selectedTool.onActionEnd(data);
     }
 }

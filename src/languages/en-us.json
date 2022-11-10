@@ -16,7 +16,16 @@
     "actions.redo": "Redo",
     "actions.zoomIn": "Zoom In",
     "actions.zoomOut": "Zoom Out",
+    "actions.bringForward": "Bring Forward",
+    "actions.sendBackward": "Send Backward",
+    "actions.copy": "Copy",
+    "actions.delete": "Delete",
+    "actions.lock": "Lock",
+    "actions.unlock": "Unlock",
+    "actions.addLabel": "Add Label",
+    "actions.removeLabel": "Remove Label",
     "titles.strokeWeight": "Stroke Weight",
     "titles.color": "Color",
-    "buttons.resetPalette": "Reset Palette"
+    "buttons.resetPalette": "Reset Palette",
+    "placeholder.typeSomething": "Type something..."
 }

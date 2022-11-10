@@ -181,4 +181,4 @@ export class Input extends Service<InputState> {
     }
 }
 
-export const input = createService(Input);
+export const input = createService<InputState, Input>(Input);

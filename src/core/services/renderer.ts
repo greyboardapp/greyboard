@@ -38,7 +38,7 @@ class Renderer extends Service {
         for (const layer of this.layerStack)
             layer.onRender(dt);
 
-        tweenjs.update(dt);
+        tweenjs.update(t);
         this.onFrameUpdate(dt);
 
         this.prevT = t;

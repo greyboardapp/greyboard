@@ -1,16 +1,23 @@
 import { Component, createSignal, Show } from "solid-js";
+import { getText } from "../../utils/system/intl";
 import Text from "../typography/Text";
 
 import styles from "./ToolbarInput.module.scss";
 
 interface ToolbarInputProps {
     model : [() => string, (v : string) => void];
+    placeholder ?: string;
     onChange ?: (e : Event) => void;
 }
 
 const ToolbarInput : Component<ToolbarInputProps> = (props) => {
     const [focused, setFocused] = createSignal(false);
     let input : HTMLInputElement | undefined;
+
+    const previewValue = () : string => {
+        const v = props.model[0]();
+        return (v.trim() === "" ? props.placeholder : v) ?? v;
+    };
 
     return (
         <div
@@ -21,10 +28,11 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
                     input.focus();
             }}
         >
-            <Show when={focused()} fallback={<Text content={props.model[0]()} />}>
+            <Show when={focused()} fallback={<Text content={previewValue()} />}>
                 <input
                     ref={input}
                     value={props.model[0]()}
+                    placeholder={getText(props.placeholder)}
                     onInput={(e) => { props.model[1]((e.target as HTMLInputElement).value); }}
                     onKeyUp={(e) => {
                         if (e.key === "Enter")
