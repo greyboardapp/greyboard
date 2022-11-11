@@ -1,13 +1,28 @@
 import { createSignal, JSX, ParentComponent, Show } from "solid-js";
 import { Motion, Presence } from "@motionone/solid";
-
-import styles from "./ToolbarPopup.module.scss";
+import { cva, VariantProps } from "class-variance-authority";
 import { quickEaseOutTransition, quickEaseInTransition } from "../../utils/dom/motion";
 
-interface ToolbarPopupProps {
+import styles from "./ToolbarPopup.module.scss";
+
+const ToolbarPopupVariants = {
+    alignment: {
+        top: styles.top,
+        center: styles.center,
+        bottom: styles.bottom,
+    },
+};
+
+const toolbarPopupStyles = cva(styles.toolbarPopup, {
+    variants: ToolbarPopupVariants,
+    defaultVariants: {
+        alignment: "top",
+    },
+});
+
+interface ToolbarPopupProps extends VariantProps<typeof toolbarPopupStyles> {
     actuator : JSX.Element;
     active ?: boolean;
-    origin ?: "corner" | "center";
 }
 
 const ToolbarPopup : ParentComponent<ToolbarPopupProps> = (props) => {
@@ -32,10 +47,7 @@ const ToolbarPopup : ParentComponent<ToolbarPopupProps> = (props) => {
             <Presence>
                 <Show when={(props.active ?? true) && open()}>
                     <Motion.div
-                        class={styles.toolbarPopup}
-                        style={{
-                            "transform-origin": props.origin === "center" ? "left center" : "left top",
-                        }}
+                        class={toolbarPopupStyles(props)}
                         initial={{ scale: 0.75, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: quickEaseInTransition }}
                         exit={{ scale: 0.75, opacity: 0, transition: quickEaseOutTransition }}

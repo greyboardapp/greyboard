@@ -21,7 +21,6 @@ import lockIcon from "../../assets/icons/lockOpen.svg";
 import unlockIcon from "../../assets/icons/lock.svg";
 import labelIcon from "../../assets/icons/label.svg";
 import { quickEaseInTransition } from "../../utils/dom/motion";
-import Rect from "../../core/data/geometry/rect";
 import { toolbox } from "../../core/services/toolbox";
 import { viewport } from "../../core/services/viewport";
 import Tooltip from "../feedback/Tooltip";
@@ -33,7 +32,7 @@ import { selection } from "../../core/services/selection";
 import { track } from "../../utils/dom/solid";
 import Panel from "../surfaces/Panel";
 import { ColorPickerPanelContent } from "./panels/ColorpickerPanel";
-import { BoardShapeItem } from "../../core/data/item";
+import { ManipulationMode, ManipulationTool } from "../../core/services/toolbox/tool";
 
 interface SelectionBoundingBox {
     x : number;
@@ -53,21 +52,17 @@ const SelectionBox : Component = () => {
         .easing(tweenjs.Easing.Cubic.Out)
         .onComplete(() => (transitionTween = null));
 
-    const getBoundingBox = () : Rect => {
-        const bb = Rect.invertedInfinite();
-        for (const item of selection.state.items())
-            bb.append(item.rect);
-        return viewport.viewportToBoardRect(bb);
-    };
-
     createEffect((prev ?: number[]) => {
         const prevCount = prev?.length ?? 0;
         const currCount = selection.state.ids.length;
         if (currCount > 0)
             untrack(() => {
-                const bb = getBoundingBox();
+                let bb = selection.state.rect();
+                if (!bb)
+                    return;
+                bb = viewport.viewportToBoardRect(bb);
                 transitionTween?.pause();
-                if (prevCount === 0 && currCount > 0) {
+                if ((prevCount === 0 && currCount > 0) || (toolbox.state.selectedTool instanceof ManipulationTool && toolbox.state.selectedTool.mode !== ManipulationMode.Select)) {
                     rect.x = bb.x;
                     rect.y = bb.y;
                     rect.width = bb.w;
@@ -76,6 +71,8 @@ const SelectionBox : Component = () => {
                     transitionTween = createTransition({ x: bb.x, y: bb.y, width: bb.w, height: bb.h }, 200).start();
                 }
             });
+        else
+            setPaletteOpen(false);
 
         return selection.state.ids;
     });
@@ -84,7 +81,10 @@ const SelectionBox : Component = () => {
         track(viewport.state.scale);
         transitionTween?.pause();
         untrack(() => {
-            const bb = getBoundingBox();
+            let bb = selection.state.rect();
+            if (!bb)
+                return;
+            bb = viewport.viewportToBoardRect(bb);
             rect.x = bb.x;
             rect.y = bb.y;
             rect.width = bb.w;
@@ -115,7 +115,7 @@ const SelectionBox : Component = () => {
                     >
                         <Panel size="s" class={styles.toolbar}>
                             <Show when={paletteOpen()}>
-                                <div class="p3">
+                                <div class="p3 pb0">
                                     <ColorPickerPanelContent
                                         showColorPicker={false}
                                         activeColor={selection.state.color()}

@@ -22,6 +22,7 @@ import plusIcon from "../assets/icons/plus.svg";
 import minusIcon from "../assets/icons/minus.svg";
 import undoIcon from "../assets/icons/undo.svg";
 import redoIcon from "../assets/icons/redo.svg";
+import layerIcon from "../assets/icons/layer.svg";
 import ToolbarText from "../components/toolbar/ToolbarText";
 import { pct } from "../utils/dom/dom";
 import { viewport } from "../core/services/viewport";
@@ -29,6 +30,7 @@ import ToolbarInput from "../components/toolbar/ToolbarInput";
 import { board } from "../core/services/board";
 import logger from "../utils/system/logger";
 import SelectionBox from "../components/app/SelectionBox";
+import LabelPanel from "../components/app/panels/LabelPanel";
 
 interface BoardPageParams extends Params {
     id : string;
@@ -70,7 +72,7 @@ const BoardPage : Component = () => {
                                     );
                                 return (
                                     <ToolbarPopup
-                                        origin="center"
+                                        alignment="center"
                                         active={!!toolbox.state.selectedTool && entry.tools.includes(toolbox.state.selectedTool)}
                                         actuator={
                                             <Show when={entry.lastUsedTool} keyed>
@@ -95,7 +97,7 @@ const BoardPage : Component = () => {
                         </For>
                         <ToolbarDivider />
                         <ToolbarPopup
-                            origin="corner"
+                            alignment="top"
                             actuator={<ToolbarButton icon={paletteIcon} />}
                         >
                             <ColorPickerPanel />
@@ -109,6 +111,15 @@ const BoardPage : Component = () => {
                         <Tooltip content={<><Text content="actions.zoomOut" size="s" uppercase bold as="span" /> <Shortcut shortcut={viewport.zoomOut.shortcut} /></>} orientation="horizontal" variant="panel" offset={5}>
                             <ToolbarButton icon={minusIcon} onClick={viewport.zoomOut} />
                         </Tooltip>
+                        <ToolbarDivider />
+                        <ToolbarPopup
+                            alignment="bottom"
+                            actuator={
+                                <ToolbarButton icon={layerIcon} />
+                            }
+                        >
+                            <LabelPanel />
+                        </ToolbarPopup>
                     </ToolbarGroup>
                 </Toolbar>
                 <svg class={styles.innerCorner} width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">

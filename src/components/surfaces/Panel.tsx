@@ -1,6 +1,7 @@
 import { cva, VariantProps } from "class-variance-authority";
-import { ParentComponent } from "solid-js";
+import { ParentComponent, Show } from "solid-js";
 import { cls } from "../../utils/dom/dom";
+import Title from "../typography/Title";
 
 import styles from "./Panel.module.scss";
 
@@ -25,7 +26,9 @@ interface PanelProps extends VariantProps<typeof panelStyles> {
 
 const Panel : ParentComponent<PanelProps> = (props) => (
     <div class={cls(panelStyles(props), props.class)}>
-        <h2>{props.title}</h2>
+        <Show when={props.title} keyed>
+            {(title) => <Title content={title} size="s" />}
+        </Show>
         {props.children}
     </div>
 );

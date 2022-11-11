@@ -87,12 +87,14 @@ export class Board extends Service<BoardState> {
         for (const item of items)
             if (item.zIndex < 255)
                 item.zIndex++;
+        this.updateItems(items);
     }
 
     sendBackward(items : Iterable<BoardItem>) : void {
         for (const item of items)
             if (item.zIndex > 0)
                 item.zIndex--;
+        this.updateItems(items);
     }
 
     setLockState(items : Iterable<BoardItem>, state : boolean) : void {
@@ -193,7 +195,7 @@ export class Board extends Service<BoardState> {
     }
 
     // TODO: Find a better name since items are not necessarily added to a single chunk
-    private addToChunk(items : Iterable<BoardItem>) : void {
+    addToChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
             const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
             for (let { x } = region.min; x <= region.max.x; ++x)
@@ -209,7 +211,7 @@ export class Board extends Service<BoardState> {
         }
     }
 
-    private removeFromChunk(items : Iterable<BoardItem>) : void {
+    removeFromChunk(items : Iterable<BoardItem>) : void {
         for (const item of items) {
             const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
             for (let { x } = region.min; x <= region.max.x; ++x)

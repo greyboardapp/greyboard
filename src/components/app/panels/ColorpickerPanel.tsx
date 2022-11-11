@@ -52,6 +52,7 @@ const ColorPickerPanelContent : Component<ColorPickerPanelContentProps> = (props
 const ColorPickerPanel : Component = () => (
     <Panel>
         <ColorPickerPanelContent
+            showColorPicker={true}
             activeColor={toolbox.state.selectedColor()}
             sliderModel={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]}
             colorPicked={(color, index) => (toolbox.state.selectedColorIndex = index)}

@@ -1,15 +1,19 @@
 import { Accessor, createMemo } from "solid-js";
 import { track } from "../../utils/dom/solid";
 import { createService, Service } from "../../utils/system/service";
+import Rect from "../data/geometry/rect";
 import { BoardItem, BoardShapeItem } from "../data/item";
 import { board } from "./board";
 import { createCommand, Shortcut } from "./commands";
 import { KeyModifiers } from "./input";
+import { viewport } from "./viewport";
 
 interface SelectionState {
     ids : number[];
 
     items : Accessor<BoardItem[]>;
+    rect : Accessor<Rect | null>;
+    screenRect : Accessor<Rect | null>;
     hasUnlockedItem : Accessor<boolean>;
     hasLabel : Accessor<boolean>;
     label : Accessor<string | null>;
@@ -18,9 +22,18 @@ interface SelectionState {
 }
 
 class Selection extends Service<SelectionState> {
-    public readonly bringForward = createCommand(new Shortcut("["), () => board.bringForwardAction(this.state.items()));
-    public readonly sendBackward = createCommand(new Shortcut("]"), () => board.sendBackwardAction(this.state.items()));
+    public readonly bringForward = createCommand(new Shortcut("["), () => {
+        this.removeLockedItems();
+        board.bringForwardAction(this.state.items());
+    });
+
+    public readonly sendBackward = createCommand(new Shortcut("]"), () => {
+        this.removeLockedItems();
+        board.sendBackwardAction(this.state.items());
+    });
+
     public readonly delete = createCommand(new Shortcut("Delete"), () => {
+        this.removeLockedItems();
         board.removeAction(this.state.items());
         this.clear();
     });
@@ -44,6 +57,8 @@ class Selection extends Service<SelectionState> {
         super({
             ids: [],
             items: () => [],
+            rect: () => new Rect(),
+            screenRect: () => new Rect(),
             hasUnlockedItem: () => false,
             hasLabel: () => false,
             label: () => "",
@@ -52,6 +67,23 @@ class Selection extends Service<SelectionState> {
         });
 
         this.state.items = createMemo(() => (this.state?.ids.flatMap((id) => board.items.get(id) ?? []) ?? null));
+        this.state.rect = createMemo(() => {
+            if (this.state.ids.length === 0)
+                return null;
+
+            const rect = Rect.invertedInfinite();
+            for (const item of this.state.items())
+                rect.append(item.rect);
+
+            return rect;
+        });
+        this.state.screenRect = createMemo(() => {
+            const rect = this.state.rect();
+            if (!rect)
+                return null;
+            const screenRect = viewport.viewportToBoardRect(rect);
+            return new Rect(screenRect.x + viewport.state.offsetX, screenRect.y + viewport.state.offsetY, screenRect.w, screenRect.h);
+        });
         this.state.hasUnlockedItem = createMemo(() => this.state.items().some((item) => !item.locked));
         this.state.hasLabel = createMemo(() => ((this.state.ids.length !== 1) ? false : this.state.items()[0]?.label !== null));
         this.state.label = createMemo(() => this.state.items()[0]?.label ?? null);
@@ -83,13 +115,19 @@ class Selection extends Service<SelectionState> {
     }
 
     setColor(color : number) : void {
+        this.removeLockedItems();
         board.setColor(this.state.items(), color);
         this.state.ids = track(this.state.ids.copy());
     }
 
     setWeight(weight : number) : void {
+        this.removeLockedItems();
         board.setWeight(this.state.items(), weight);
         this.state.ids = track(this.state.ids.copy());
+    }
+
+    removeLockedItems() : void {
+        this.state.ids = this.state.items().filter((item) => !item.locked).map((item) => item.id);
     }
 }
 

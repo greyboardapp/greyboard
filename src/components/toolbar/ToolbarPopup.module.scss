@@ -5,8 +5,23 @@
 
     .toolbarPopup {
         position: absolute;
-        top: 0;
         left: 100%;
         padding-left: 10px;
+
+        &.top {
+            top: 0;
+            transform-origin: left top;
+        }
+
+        &.center {
+            top: 50%;
+            transform-origin: left center;
+            translate: 0 -50%;
+        }
+
+        &.bottom {
+            bottom: 0;
+            transform-origin: left bottom;
+        }
     }
 }

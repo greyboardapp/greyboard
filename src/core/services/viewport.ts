@@ -1,3 +1,4 @@
+import tweenjs, { Tween } from "@tweenjs/tween.js";
 import Point from "../data/geometry/point";
 import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
@@ -37,6 +38,14 @@ export class Viewport extends Service<ViewportState> {
     panTo(p : Point) : void {
         this.state.offsetX = p.x;
         this.state.offsetY = p.y;
+    }
+
+    @batched
+    centerOnPoint(p : Point) : void {
+        new Tween(this.state).to({
+            offsetX: -p.x + window.innerWidth / 2,
+            offsetY: -p.y + window.innerHeight / 2,
+        }, 200).easing(tweenjs.Easing.Cubic.Out).start();
     }
 
     @batched
@@ -97,6 +106,10 @@ export class Viewport extends Service<ViewportState> {
 
     pixelsToViewport(pixels : number) : number {
         return pixels * this.state.scale;
+    }
+
+    viewportToScreenPixels(pixels : number) : number {
+        return pixels / this.state.scale;
     }
 
     getScreenRect() : Rect {

@@ -24,8 +24,12 @@
     "actions.unlock": "Unlock",
     "actions.addLabel": "Add Label",
     "actions.removeLabel": "Remove Label",
+    "actions.jump": "Jump",
     "titles.strokeWeight": "Stroke Weight",
     "titles.color": "Color",
     "buttons.resetPalette": "Reset Palette",
-    "placeholder.typeSomething": "Type something..."
+    "placeholder.typeSomething": "Type something...",
+    "titles.labels": "Labels",
+    "texts.noLabels": "There are no labels in this board. Add one and you will jump to it from here...",
+    "texts.unknown": "Unknown"
 }
