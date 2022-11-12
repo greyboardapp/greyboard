@@ -37,6 +37,7 @@ export interface PointerEventData {
 export interface KeyboardEventData {
     button : string;
     modifiers : KeyModifiers;
+    repeatCount : number;
 }
 
 export interface InputState {
@@ -54,7 +55,7 @@ export class Input extends Service<InputState> {
     private readonly pressedMouseButtons = new Map<MouseButton, boolean>();
     private pointerPositions : Point[] = [];
     private prevPointerPositions : Point[] = [];
-    private readonly pressedKeyboardButtons = new Map<string, boolean>();
+    private readonly pressedKeyboardButtons = new Map<string, number>();
 
     constructor() {
         super({
@@ -126,7 +127,8 @@ export class Input extends Service<InputState> {
         if ((e.target as HTMLElement).tagName === "INPUT")
             return;
         const data = this.toKeyboardEventData(e);
-        this.pressedKeyboardButtons.set(data.button, true);
+        data.repeatCount = e.repeat ? (this.pressedKeyboardButtons.get(data.button) ?? 0) + 1 : 1;
+        this.pressedKeyboardButtons.set(data.button, data.repeatCount);
         this.onKeyDown(data);
 
         if (commands.triggerCommand(data))
@@ -139,8 +141,27 @@ export class Input extends Service<InputState> {
         if (e.key.startsWith("F") && e.key.length > 1)
             return;
         const data = this.toKeyboardEventData(e);
-        this.pressedKeyboardButtons.set(data.button, false);
+        this.pressedKeyboardButtons.set(data.button, 0);
         this.onKeyUp(data);
+    }
+
+    isKeyPressed(button : string) : boolean {
+        return (this.pressedKeyboardButtons.get(button) ?? 0) > 0;
+    }
+
+    isKeyModifierPressed(modifier : KeyModifiers) : boolean {
+        switch (modifier) {
+            case KeyModifiers.Alt:
+                return this.isKeyPressed("Alt");
+            case KeyModifiers.Control:
+                return this.isKeyPressed("Control");
+            case KeyModifiers.Meta:
+                return this.isKeyPressed("OS");
+            case KeyModifiers.Shift:
+                return this.isKeyPressed("Shift");
+            default:
+                return false;
+        }
     }
 
     private toPointerEventData(e : PointerEvent | WheelEvent | TouchEvent) : PointerEventData {
@@ -164,6 +185,7 @@ export class Input extends Service<InputState> {
         return {
             button: e.key,
             modifiers: this.getKeyModifiers(e),
+            repeatCount: 0,
         };
     }
 

@@ -243,12 +243,14 @@ export class Board extends Service<BoardState> {
     }
 
     private truncateRegion(r : Rect) : Rect {
-        return new Rect(
+        const rect = new Rect(
             floor(r.x / Chunk.maxChunkSize),
             floor(r.y / Chunk.maxChunkSize),
-            floor(r.w / Chunk.maxChunkSize),
-            floor(r.h / Chunk.maxChunkSize),
+            0, 0,
         );
+        rect.x2 = floor(r.x2 / Chunk.maxChunkSize);
+        rect.y2 = floor(r.y2 / Chunk.maxChunkSize);
+        return rect;
     }
 
     private hash(x : number, y : number) : string {

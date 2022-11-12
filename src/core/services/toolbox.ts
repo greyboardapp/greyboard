@@ -130,6 +130,7 @@ export class Toolbox extends Service<ToolboxState> {
                     i.rect.y2 += 10;
                 }
                 board.addAction(items);
+                selection.state.ids = items.map((i) => i.id);
             }
         } catch (e) { pass(e); }
     }

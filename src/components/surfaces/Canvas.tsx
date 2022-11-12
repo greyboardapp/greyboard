@@ -8,6 +8,7 @@ import { px } from "../../utils/dom/dom";
 import { setWindowHeight, setWindowWidth } from "../../core/services/renderer/layer";
 import { toolbox } from "../../core/services/toolbox";
 import { ViewTool } from "../../core/services/toolbox/view";
+import { selection } from "../../core/services/selection";
 
 const Canvas : Component = () => {
     createWindowListener("resize", () => {
@@ -23,7 +24,7 @@ const Canvas : Component = () => {
         input.processKeyUpEvent(e as KeyboardEvent);
     });
 
-    createWindowListener("copy", toolbox.copyToClipboard);
+    createWindowListener("copy", selection.copyToClipboard);
 
     createWindowListener("paste", (e) => {
         const data = (e as ClipboardEvent).clipboardData;

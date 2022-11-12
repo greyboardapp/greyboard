@@ -3,7 +3,6 @@ import { generateId } from "../../../utils/datatypes/id";
 import { getOperatingSystem, OperatingSystem } from "../../../utils/system/system";
 import Rect from "../../data/geometry/rect";
 import { BoardItem } from "../../data/item";
-import { board } from "../board";
 import Graphics from "../renderer/graphics";
 import { viewport } from "../viewport";
 
@@ -147,9 +146,7 @@ export class Chunk extends QuadTree {
         rect.inflate(15);
 
         this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, () => {
-            const items = board
-                .getItemsWithinRect(viewport.viewportToBoardRect(rect))
-                .sort((a, b) => a.zIndex - b.zIndex);
+            const items = Array.from(this.get(viewport.viewportToBoardRect(rect))).sort((a, b) => a.zIndex - b.zIndex);
             for (const item of items)
                 item.render(this.graphics, false);
         });

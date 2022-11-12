@@ -94,12 +94,17 @@ export enum ResizeDirection {
     ResizeE = 1 << 3,
 }
 
+export enum Orientation {
+    None,
+    Horizontal,
+    Vertical,
+}
+
 export abstract class ManipulationTool extends Tool {
     public mode = ManipulationMode.None;
     public resizeDirection = ResizeDirection.None;
     protected start = new Point();
     protected end = new Point();
-    protected itemsManipulating : BoardItem[] = [];
 
     constructor(description : ToolDescription) {
         super(description);
@@ -121,10 +126,10 @@ export abstract class ManipulationTool extends Tool {
 
             if (this.resizeDirection !== ResizeDirection.None) {
                 this.mode = ManipulationMode.Resize;
-                this.onMoveAndResizeActionStart(data);
+                this.onMoveAndResizeActionStart();
             } else if (isPointInRect(rect, this.start)) {
                 this.mode = ManipulationMode.Move;
-                this.onMoveAndResizeActionStart(data);
+                this.onMoveAndResizeActionStart();
             } else {
                 this.mode = ManipulationMode.Select;
             }
@@ -135,9 +140,9 @@ export abstract class ManipulationTool extends Tool {
         return true;
     }
 
-    onMoveAndResizeActionStart(data : PointerEventData) : boolean {
-        this.itemsManipulating = selection.state.items();
-        board.removeFromChunk(this.itemsManipulating);
+    onMoveAndResizeActionStart() : boolean {
+        selection.removeLockedItems();
+        board.removeFromChunk(selection.state.items());
         return true;
     }
 
@@ -145,14 +150,17 @@ export abstract class ManipulationTool extends Tool {
         [this.end] = data.positions;
 
         if (this.mode === ManipulationMode.Select)
-            this.onSelectActionMove(data);
+            this.onSelectActionMove();
         else if (this.mode === ManipulationMode.Resize)
             this.onResizeActionMove(data);
         else
-            this.onMoveActionMove(data);
+            this.onMoveActionMove(
+                viewport.viewportToScreenPixels(data.movement[0].x),
+                viewport.viewportToScreenPixels(data.movement[0].y),
+            );
     }
 
-    onSelectActionMove(data : PointerEventData) : void {
+    onSelectActionMove() : void {
         if (this.start.x === this.end.x && this.start.y === this.end.y) {
             const items = board.getItemsAtPoint(viewport.screenToBoard(this.end));
             const item = items.sort((a, b) => b.zIndex - a.zIndex).last();
@@ -162,10 +170,8 @@ export abstract class ManipulationTool extends Tool {
         }
     }
 
-    onMoveActionMove(data : PointerEventData) : void {
-        const dx = viewport.viewportToScreenPixels(data.movement[0].x);
-        const dy = viewport.viewportToScreenPixels(data.movement[0].y);
-        for (const item of this.itemsManipulating) {
+    onMoveActionMove(dx : number, dy : number) : void {
+        for (const item of selection.state.items()) {
             item.rect.x += dx;
             item.rect.y += dy;
             item.rect.x2 += dx;
@@ -210,7 +216,7 @@ export abstract class ManipulationTool extends Tool {
         if (newBb.h < 10)
             newBb.h = 10;
 
-        for (const item of this.itemsManipulating) {
+        for (const item of selection.state.items()) {
             item.rect.x = newBb.x + ((item.rect.x - oldBb.x) / oldBb.w) * newBb.w;
             item.rect.y = newBb.y + ((item.rect.y - oldBb.y) / oldBb.h) * newBb.h;
             item.rect.x2 = newBb.x + ((item.rect.x2 - oldBb.x) / oldBb.w) * newBb.w;
@@ -224,7 +230,7 @@ export abstract class ManipulationTool extends Tool {
         if (this.mode === ManipulationMode.Select)
             this.onSelectActionEnd(data);
         else
-            this.onMoveAndResizeActionEnd(data);
+            this.onMoveAndResizeActionEnd();
         this.mode = ManipulationMode.None;
     }
 
@@ -232,8 +238,8 @@ export abstract class ManipulationTool extends Tool {
         this.onActionMove(data);
     }
 
-    onMoveAndResizeActionEnd(data : PointerEventData) : void {
-        board.addToChunk(this.itemsManipulating);
+    onMoveAndResizeActionEnd() : void {
+        board.addToChunk(selection.state.items());
     }
 
     onRender(graphics : Graphics, dt : number) : void {
@@ -244,6 +250,10 @@ export abstract class ManipulationTool extends Tool {
             this.onSelectRender(graphics, dt);
         else
             this.onMoveRender(graphics, dt);
+    }
+
+    private getMouseDragOrientation(dx : number, dy : number) : Orientation {
+        return ((dx > dy && -dx > dy) || (dx < dy && -dx < dy)) ? Orientation.Vertical : Orientation.Horizontal;
     }
 
     abstract getSelectedItems() : void;

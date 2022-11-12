@@ -31,7 +31,10 @@ export class BoxSelectTool extends ManipulationTool {
     }
 
     onMoveRender(graphics : Graphics, dt : number) : void {
-        for (const item of this.itemsManipulating)
+        graphics.origin(-viewport.state.offsetX, -viewport.state.offsetY);
+        graphics.zoom(viewport.state.scale);
+        for (const item of selection.state.items())
             item.render(graphics, false);
+        graphics.reset();
     }
 }
