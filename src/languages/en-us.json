@@ -31,5 +31,6 @@
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
     "texts.noLabels": "There are no labels in this board. Add one and you will jump to it from here...",
-    "texts.unknown": "Unknown"
+    "texts.unknown": "Unknown",
+    "texts.signInWith": "Sign in with..."
 }

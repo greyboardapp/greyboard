@@ -6,6 +6,9 @@ import RouteLoading from "./components/app/RouteLoading";
 
 const HomePage = lazy(async () => import("./pages/HomePage"));
 const BoardPage = lazy(async () => import("./pages/BoardPage"));
+const SignInPage = lazy(async () => import("./pages/SignInPage"));
+const AuthPage = lazy(async () => import("./pages/AuthPage"));
+const DashboardPage = lazy(async () => import("./pages/DashboardPage"));
 
 const [theme, setTheme] = createSignal("dark");
 
@@ -15,6 +18,9 @@ const App : Component = () => (
             <Suspense fallback={<RouteLoading />}>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/sign-in" element={<SignInPage />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/b/:id" element={<BoardPage />} />
                 </Routes>
             </Suspense>

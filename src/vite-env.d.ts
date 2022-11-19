@@ -17,6 +17,7 @@ declare module "*.svg" {
 declare interface ImportMeta {
     env : {
         BASE_URL : string;
+        BACKEND_URL : string;
         DEBUG ?: string;
         LOG_LEVEL ?: number;
     }

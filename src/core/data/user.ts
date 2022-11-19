@@ -1,5 +1,5 @@
-export interface User {
-    id : number;
-    name : string;
-    avatarUrl ?: string;
+export interface User extends Record<string, string> {
+    username : string;
+    email : string;
+    avatar : string;
 }

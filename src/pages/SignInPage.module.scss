@@ -1,0 +1,43 @@
+@import "../global";
+
+.container {
+    width: 100vw;
+    min-height: 100vh;
+
+    @include themed() {
+        background-color: color($bg);
+    }
+}
+
+.content {
+    width: 40%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    @include themed() {
+        color: color($panelText);
+        background-color: color($panelBg);
+    }
+}
+
+.providerList {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.wave {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 40%;
+    height: 100vh;
+
+    @include themed() {
+        color: color($panelBg);
+    }
+}

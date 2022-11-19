@@ -31,5 +31,6 @@
     "placeholder.typeSomething": "Írj valamit...",
     "titles.labels": "Címkék",
     "texts.noLabels": "Nincs még címke ebben a táblában. Addj hozzá egyet és hozzá fogsz tudni ugrani innen...",
-    "texts.unknown": "Ismeretlen"
+    "texts.unknown": "Ismeretlen",
+    "texts.signInWith": "Jelentkezz be a következőkkel..."
 }
