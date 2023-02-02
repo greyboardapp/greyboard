@@ -20,5 +20,6 @@ declare interface ImportMeta {
         BACKEND_URL : string;
         DEBUG ?: string;
         LOG_LEVEL ?: number;
+        BOARD_SAVE_INTERVAL : number;
     }
 }

@@ -30,7 +30,10 @@
     "buttons.resetPalette": "Reset Palette",
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
-    "texts.noLabels": "There are no labels in this board. Add one and you will jump to it from here...",
+    "texts.noLabels": "There are no labels in this board. Add one and you will be able to jump to it from here...",
     "texts.unknown": "Unknown",
-    "texts.signInWith": "Sign in with..."
+    "texts.signInWith": "Sign in with...",
+    "texts.loading": "Loading...",
+    "texts.boardsLoadFailed": "Unable to load the boards",
+    "texts.noBoardsHint": "You don't have any boards yet! How about creating one?"
 }

@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => {
         },
         build: {
             target: "esnext",
+            emptyOutDir: true,
+            assetsDir: "."
         },
         define: fromEnv({ mode }),
     };

@@ -1,5 +1,7 @@
-export interface User extends Record<string, string> {
-    username : string;
+export interface User {
+    id : string;
+    name : string;
     email : string;
     avatar : string;
+    type : string;
 }

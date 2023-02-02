@@ -1,0 +1,23 @@
+@import "../../global";
+
+.card {
+    @include transition();
+
+    border-radius: 10px;
+    height: 250px;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    cursor: pointer;
+    outline: 3px solid transparent;
+
+    @include themed() {
+        background-color: color($panelBg);
+    }
+
+    &:hover {
+        @include themed() {
+            outline: 3px solid color($shadow);
+        }
+    }
+}

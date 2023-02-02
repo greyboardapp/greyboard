@@ -32,5 +32,8 @@
     "titles.labels": "Címkék",
     "texts.noLabels": "Nincs még címke ebben a táblában. Addj hozzá egyet és hozzá fogsz tudni ugrani innen...",
     "texts.unknown": "Ismeretlen",
-    "texts.signInWith": "Jelentkezz be a következőkkel..."
+    "texts.signInWith": "Jelentkezz be a következőkkel...",
+    "texts.loading": "Töltődik...",
+    "texts.boardsLoadFailed": "A táblák betöltése meghiúsult",
+    "texts.noBoardsHint": "Még nincs egy táblád sem! Addj hozzá egyet itt."
 }

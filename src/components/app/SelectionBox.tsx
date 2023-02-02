@@ -3,7 +3,7 @@
 /* eslint-disable solid/reactivity */
 
 import { Component, createEffect, createSignal, Show } from "solid-js";
-import { Motion } from "@motionone/solid";
+import { Motion, Presence } from "@motionone/solid";
 import tweenjs, { Tween } from "@tweenjs/tween.js";
 import { createMutable } from "solid-js/store";
 import { untrack } from "solid-js/web";
@@ -114,16 +114,22 @@ const SelectionBox : Component = () => {
                         animate={{ y: 0, opacity: 1, transition: quickEaseInTransition }}
                     >
                         <Panel size="s" class={styles.toolbar}>
-                            <Show when={paletteOpen()}>
-                                <div class="p3 pb0">
-                                    <ColorPickerPanelContent
-                                        showColorPicker={false}
-                                        activeColor={selection.state.color()}
-                                        sliderModel={[selection.state.weight, (v) => selection.setWeight(v)]}
-                                        colorPicked={(color) => selection.setColor(color)}
-                                    />
-                                </div>
-                            </Show>
+                            <Presence>
+                                <Show when={paletteOpen()}>
+                                    <Motion.div
+                                        class="p3 pb0"
+                                        initial={{ height: 0 }}
+                                        animate={{ height: 100 }}
+                                    >
+                                        <ColorPickerPanelContent
+                                            showColorPicker={false}
+                                            activeColor={selection.state.color()}
+                                            sliderModel={[selection.state.weight, (v) => selection.setWeight(v)]}
+                                            colorPicked={(color) => selection.setColor(color)}
+                                        />
+                                    </Motion.div>
+                                </Show>
+                            </Presence>
                             <Toolbar variant="transparent">
                                 <ToolbarButton icon={paletteIcon} onClick={() => setPaletteOpen(!paletteOpen())} />
                                 <Tooltip content={<><Text content="actions.bringForward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.bringForward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>

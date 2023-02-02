@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - develop
+  workflow_dispatch:
+    
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: yarn lint
+  
+  build:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node Environment
+        uses: actions/setup-node@v2.5.1
+        with:
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install --ignore-scripts --frozen-lockfile
+
+      - name: Build
+        run: yarn build

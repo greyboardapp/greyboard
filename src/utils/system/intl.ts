@@ -30,4 +30,32 @@ export const getText = (key ?: keyof LanguageTexts) : string | undefined => {
 
     return language().texts[key];
 };
+
+export const formattedTime = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.DateTimeFormat(locale(), {
+    timeStyle: "medium",
+    ...options,
+}).format((typeof date === "number") ? new Date(date * 1000) : date);
+
+export const formattedDate = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.DateTimeFormat(locale(), {
+    dateStyle: "medium",
+    ...options,
+}).format((typeof date === "number") ? new Date(date * 1000) : date);
+
+export const formattedRelativeDateTime = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.RelativeTimeFormat(locale(), {
+    dateStyle: "medium",
+    ...options,
+}).format(-(new Date().getTime() - ((typeof date === "number") ? date * 1000 : date.getTime())), "day");
+
+export const formattedList = (values : Iterable<string>, options ?: Intl.ListFormatOptions) : string => new Intl.ListFormat(locale(), {
+    style: "long",
+    type: "conjunction",
+    ...options,
+}).format(values);
+
+export const formattedNumber = (value : number | bigint, options ?: Intl.NumberFormatOptions) : string => new Intl.NumberFormat(locale(), {
+    compactDisplay: "short",
+    notation: "standard",
+    ...options,
+}).format(value);
+
 export { language, locale, setLocale };

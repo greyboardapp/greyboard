@@ -1,10 +1,9 @@
 import { cva, VariantProps } from "class-variance-authority";
-import { Component, JSX, Show } from "solid-js";
+import { Component, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { LanguageTexts } from "../../languages/languages";
 import { cls } from "../../utils/dom/dom";
 import { getText } from "../../utils/system/intl";
-import { throwError } from "../../utils/system/misc";
 
 import styles from "./Typography.module.scss";
 

@@ -1,3 +1,5 @@
+import { batch } from "solid-js";
+import { BoardData } from "../../models/board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import { floor } from "../../utils/math/math";
 import { createService, Service } from "../../utils/system/service";
@@ -12,7 +14,10 @@ import { Chunk } from "./board/chunk";
 import { viewport } from "./viewport";
 
 interface BoardState {
+    id : number;
     name : string;
+    author : string;
+    slug : string;
 
     // NOTE: properties in this state will change once collaboration will be implemented.
     isPublic : boolean;
@@ -49,7 +54,10 @@ export class Board extends Service<BoardState> {
 
     constructor() {
         super({
+            id: 0,
             name: "New Board",
+            author: "",
+            slug: "",
             isPublic: false,
         });
     }
@@ -57,6 +65,19 @@ export class Board extends Service<BoardState> {
     start() : void {
         // HACK: For now this solution works, but to increase performance move only affected items between chunks
         viewport.onZoom.add(this.rebuild);
+    }
+
+    loadFromBoardData(data : BoardData) : void {
+        batch(() => {
+            this.state.id = data.id;
+            this.state.name = data.name;
+            this.state.author = data.author;
+            this.state.slug = data.slug;
+            this.state.isPublic = data.isPublic;
+        });
+        const buffer = ByteBuffer.fromArrayBuffer(data.contents);
+        const items = this.deserialize(buffer);
+        this.add(items);
     }
 
     add(items : Iterable<BoardItem>) : void {

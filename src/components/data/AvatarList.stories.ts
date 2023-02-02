@@ -6,15 +6,17 @@ export default makeComponentMetaFromVariants({}, "Data/AvatarList");
 export const Default = makeStoryVariant(AvatarList, {
     users: [
         {
-            id: 0,
+            id: "0",
             name: "John Doe",
+            email: "",
+            avatar: "",
         },
         {
-            id: 1,
+            id: "1",
             name: "Philip Gonzalez",
         },
         {
-            id: 2,
+            id: "2",
             name: "Samantha Green",
         },
     ],
@@ -24,15 +26,15 @@ export const Default = makeStoryVariant(AvatarList, {
 export const WithMe = makeStoryVariant(AvatarList, {
     users: [
         {
-            id: 0,
+            id: "0",
             name: "John Doe",
         },
         {
-            id: 1,
+            id: "1",
             name: "Philip Gonzalez",
         },
         {
-            id: 2,
+            id: "2",
             name: "Samantha Green",
         },
     ],
@@ -43,17 +45,17 @@ export const WithMe = makeStoryVariant(AvatarList, {
 export const WithImages = makeStoryVariant(AvatarList, {
     users: [
         {
-            id: 0,
+            id: "0",
             name: "John Doe",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=male",
         },
         {
-            id: 1,
+            id: "1",
             name: "Philip Gonzalez",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=male",
         },
         {
-            id: 2,
+            id: "2",
             name: "Samantha Green",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=female",
         },
@@ -64,17 +66,17 @@ export const WithImages = makeStoryVariant(AvatarList, {
 export const WithImagesAndMe = makeStoryVariant(AvatarList, {
     users: [
         {
-            id: 0,
+            id: "0",
             name: "John Doe",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=male",
         },
         {
-            id: 1,
+            id: "1",
             name: "Philip Gonzalez",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=male",
         },
         {
-            id: 2,
+            id: "2",
             name: "Samantha Green",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=female",
         },
@@ -86,16 +88,16 @@ export const WithImagesAndMe = makeStoryVariant(AvatarList, {
 export const Mixed = makeStoryVariant(AvatarList, {
     users: [
         {
-            id: 0,
+            id: "0",
             name: "John Doe",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=male",
         },
         {
-            id: 1,
+            id: "1",
             name: "Philip Gonzalez",
         },
         {
-            id: 2,
+            id: "2",
             name: "Samantha Green",
             avatarUrl: "https://xsgames.co/randomusers/avatar.php?g=female",
         },

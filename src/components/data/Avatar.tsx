@@ -32,7 +32,7 @@ interface AvatarProps extends VariantProps<typeof avatarStyles> {
 const Avatar : Component<AvatarProps> = (props) => (
     <div class={avatarStyles(props)}>
         <Text content={(props.size === "xs" ? props.user.name[0] : getInitials(props.user.name))} size={props.size} />
-        <Show when={props.user.avatarUrl} keyed>
+        <Show when={props.user.avatar} keyed>
             {(img) => <img src={img} />}
         </Show>
     </div>

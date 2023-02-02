@@ -1,0 +1,12 @@
+name: Setup
+description: Setup Node environment and install packages
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v2.5.1
+      with:
+        cache: yarn
+
+    - name: Install Dependencies
+      run: yarn install --ignore-scripts --frozen-lockfile
+      shell: bash

@@ -17,3 +17,10 @@ export function isInRange(v : number, min : number, max : number) : boolean {
 export function getInitials(str : string) : string {
     return str.replace(/[a-z ]/g, "");
 }
+
+export type ObjectRecord<T> = Record<keyof T, T[keyof T]>
+
+export function omitProperty<T extends {[key : PropertyKey] : unknown}, K extends PropertyKey>(obj : T, prop : K) : Omit<T, K> {
+    const { [prop]: removed, ...result } = obj;
+    return result;
+}

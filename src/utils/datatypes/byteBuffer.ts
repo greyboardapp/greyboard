@@ -11,6 +11,18 @@ export class ByteBuffer extends Uint8Array {
         return this.head >= this.length;
     }
 
+    static from(data : Uint8Array) : ByteBuffer {
+        const buffer = new ByteBuffer(data.length);
+        buffer.set(data);
+        return buffer;
+    }
+
+    static fromArrayBuffer(data : ArrayBuffer) : ByteBuffer {
+        const buffer = new ByteBuffer(data.byteLength);
+        buffer.set(new Uint8Array(data));
+        return buffer;
+    }
+
     static decode(str : string) : ByteBuffer {
         const data = Base64.toByteArray(str);
         const buffer = new ByteBuffer(data.length);
@@ -79,7 +91,7 @@ export class ByteBuffer extends Uint8Array {
 
         const v = (this[this.head] << 24) + (this[this.head + 1] << 16) + (this[this.head + 2] << 8) + this[this.head + 3];
         this.head += 4;
-        return v;
+        return v >>> 0;
     }
 
     writeFloat(v : number) : number {

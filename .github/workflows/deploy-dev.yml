@@ -1,0 +1,71 @@
+name: Deploy Development
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: yarn lint
+
+  build:
+    needs: lint
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node Environment
+        uses: actions/setup-node@v2.5.1
+        with:
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install --ignore-scripts --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
+          BACKEND_URL: ${{ env.DEV_BACKEND_URL }}
+          DEBUG: ${{ env.DEBUG }}
+          LOG_LEVEL: ${{ env.LOG_LEVEL }}
+          BOARD_SAVE_INTERVAL: ${{ env.DEV_BOARD_SAVE_INTERVAL }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: greyboard-frontend-${{ github.sha }}
+          path: dist
+  
+  deploy:
+    needs: build
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: greyboard-frontend-${{ github.sha }}
+
+      - name: Setup Node Environment
+        uses: actions/setup-node@v2.5.1
+
+      - name: Install NPM Packages
+        run: yarn global add wrangler
+        
+      - name: Publish Build to Cloudflare Pages
+        run: npx wrangler pages publish . --project-name greyboard --branch ${{ github.ref_name }} --commit-message ${{ github.sha }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
