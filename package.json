@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "sb": "start-storybook"
+    "sb": "start-storybook",
+    "lint": "eslint 'src/**/*'"
   },
   "license": "MIT",
   "devDependencies": {

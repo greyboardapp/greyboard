@@ -6,5 +6,6 @@
     "rules": {
         "no-extend-native": "off",
         "no-return-assign": "off"
-    }
+    },
+    "ignorePatterns": ["*.svg"]
 }

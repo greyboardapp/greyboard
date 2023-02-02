@@ -1,4 +1,4 @@
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 import Title from "../components/typography/Title";
 import Text from "../components/typography/Text";
 

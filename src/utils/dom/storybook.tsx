@@ -1,4 +1,6 @@
-import { Component, For } from "solid-js";
+// Disabled since jsx requires components to begin with Uppercase letters.
+/* eslint-disable @typescript-eslint/naming-convention */
+import { Component, For, JSX } from "solid-js";
 import { Story, Meta } from "@storybook/html";
 import Text from "../../components/typography/Text";
 
@@ -27,8 +29,8 @@ export function makeComponentMetaFromVariants(variants : VariantOptions, path : 
     };
 }
 
-export function makeStoryVariant<T>(Comp : Component<T>, args : Partial<T>) : Story<T> {
-    const variant : Story<T> = ((props : T) => <Comp {...props}/>);
+export function makeStoryVariant<T extends JSX.IntrinsicAttributes>(Comp : Component<T>, args : Partial<T>) : Story<T> {
+    const variant : Story<T> = ((props : T) => <Comp {...props}/>) as Story<T>;
     variant.args = args;
     return variant;
 }
