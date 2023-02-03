@@ -9,6 +9,7 @@ $duration: 2s;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    z-index: 999;
 
     @include themed(null, true) {
         background-color: color($bg);

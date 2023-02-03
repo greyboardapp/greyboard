@@ -32,7 +32,7 @@ import { board } from "../core/services/board";
 import SelectionBox from "../components/app/SelectionBox";
 import LabelPanel from "../components/app/panels/LabelPanel";
 import { getBoardData, saveBoard } from "../api/boards";
-import RouteLoading from "../components/app/RouteLoading";
+import BoardLoading from "../components/app/BoardLoading";
 import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
 
@@ -83,7 +83,7 @@ const BoardPage : Component = () => {
     return (
         <>
             <Canvas />
-            <ApiSuspense query={boardDataQuery} loadingFallback={<RouteLoading />}>
+            <ApiSuspense query={boardDataQuery} loadingFallback={<BoardLoading />}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
                     <div class="flex h h-spaced">

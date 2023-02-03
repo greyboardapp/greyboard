@@ -3,11 +3,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { Component, createSignal, lazy, Suspense } from "solid-js";
 
 import "./App.scss";
-import RouteLoading from "./components/app/RouteLoading";
-import AuthPage from "./pages/AuthPage";
+import BoardLoading from "./components/app/BoardLoading";
 import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";
-import SignInPage from "./pages/SignInPage";
+import AuthPage from "./pages/AuthPage";
 
 const BoardPage = lazy(async () => import("./pages/BoardPage"));
 
@@ -19,13 +18,14 @@ const App : Component = () => (
     <div class={`theme-${theme()}`}>
         <QueryClientProvider client={queryClient}>
             <Router base={import.meta.env.BASE_URL}>
-                <Suspense fallback={<RouteLoading />}>
+                <Suspense fallback={<BoardLoading />}>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/sign-in" element={<SignInPage />} />
-                        <Route path="/auth" element={<AuthPage />} />
                         <Route path="/dashboard" element={<DashboardPage />} />
                         <Route path="/b/:slug" element={<BoardPage />} />
+
+                        <Route path="/auth/google" element={<AuthPage />} />
+                        <Route path="/auth/github" element={<AuthPage />} />
                     </Routes>
                 </Suspense>
             </Router>

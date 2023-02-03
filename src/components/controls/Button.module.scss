@@ -11,6 +11,7 @@
     outline: 0;
     border-radius: 999px;
     user-select: none;
+    text-decoration: none;
     cursor: pointer;
 
     @include themed() {

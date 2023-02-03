@@ -1,5 +1,6 @@
-import { Component, Show } from "solid-js";
+import { Component, JSX, Show } from "solid-js";
 import { cva, VariantProps } from "class-variance-authority";
+import { Link } from "@solidjs/router";
 import Icon, { SVGIcon } from "../data/Icon";
 import { pct } from "../../utils/dom/dom";
 
@@ -45,15 +46,13 @@ interface ButtonProps extends VariantProps<typeof buttonStyles> {
     content : keyof LanguageTexts | string;
     icon ?: SVGIcon;
     onClick ?: (e : MouseEvent) => void;
+    to ?: string;
     loadingProgress ?: number;
 }
 
-const Button : Component<ButtonProps> = (props) => (
-    <button
-        class={buttonStyles(props)}
-        disabled={props.disabled ?? false}
-        onClick={(e) => (props.onClick && props.onClick(e))}
-    >
+const Button : Component<ButtonProps> = (props) => {
+    const content = () : JSX.Element => (
+        <>
         <Show when={!props.loading && props.size !== "xs" && props.icon} keyed>
             {(icon) => <Icon icon={icon} />}
         </Show>
@@ -62,8 +61,30 @@ const Button : Component<ButtonProps> = (props) => (
             <Icon icon={loadingIcon} class={styles.loadingIcon} />
         </Show>
         <Text content={props.content} as="span" size="s" bold uppercase />
-    </button>
-);
+        </>
+    );
+
+    return (
+        <Show when={props.to} keyed fallback={() => (
+            <button
+                class={buttonStyles(props)}
+                disabled={props.disabled ?? false}
+                onClick={(e) => (props.onClick && props.onClick(e))}
+            >
+                {content()}
+            </button>
+        )}>
+            {(href) => (
+                <Link
+                    href={props.disabled ? "#" : href}
+                    class={buttonStyles(props)}
+                >
+                    {content()}
+                </Link>
+            )}
+        </Show>
+    );
+};
 
 export default Button;
 export { ButtonVariants };

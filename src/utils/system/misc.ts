@@ -24,3 +24,7 @@ export function omitProperty<T extends {[key : PropertyKey] : unknown}, K extend
     const { [prop]: removed, ...result } = obj;
     return result;
 }
+
+export function queryString(obj : {[key : string] : unknown}) : string {
+    return Object.entries(obj).map(([key, value]) => `${key}=${value}`).join("&");
+}
