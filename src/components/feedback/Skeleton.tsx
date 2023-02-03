@@ -1,11 +1,13 @@
 import { cva, VariantProps } from "class-variance-authority";
 import { For, ParentComponent, Show } from "solid-js";
 import { cls, px } from "../../utils/dom/dom";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 import { omitProperty } from "../../utils/system/misc";
 
 import styles from "./Skeleton.module.scss";
 
 const SkeletonVariants = {
+    ...getGenericVariants({}),
     circle: {
         true: styles.circle,
     },
@@ -22,8 +24,7 @@ const skeletonStyles = cva(styles.skeleton, {
     },
 });
 
-interface SkeletonProps extends VariantProps<typeof skeletonStyles> {
-    class ?: string;
+interface SkeletonProps extends GenericProps<HTMLDivElement>, VariantProps<typeof skeletonStyles> {
     loaded ?: true;
     width ?: number;
     height ?: number;
@@ -40,6 +41,7 @@ const Skeleton : ParentComponent<SkeletonProps> = (props) => (
             </div>
         ) : (
             <div
+                {...getGenericProps(props)}
                 class={cls(skeletonStyles(props), props.class)}
                 style={{
                     width: props.width ? px(props.width) : undefined,

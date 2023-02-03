@@ -12,6 +12,7 @@
     outline: 3px solid transparent;
 
     @include themed() {
+        color: color($panelText);
         background-color: color($panelBg);
     }
 

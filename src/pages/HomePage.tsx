@@ -1,4 +1,5 @@
 import { Component, Show } from "solid-js";
+import { Link } from "@solidjs/router";
 import Title from "../components/typography/Title";
 import Text from "../components/typography/Text";
 
@@ -9,6 +10,7 @@ import GithubLogo from "../assets/branding/github.svg";
 import { getGoogleAuthUrl, getGithubAuthUrl, logout } from "../api/auth";
 import { setUser, user } from "../utils/system/auth";
 import Button from "../components/controls/Button";
+import Avatar from "../components/data/Avatar";
 
 const HomePage : Component = () => (
     <div class={styles.container}>
@@ -17,6 +19,7 @@ const HomePage : Component = () => (
             <Title content="Greyboard" size="l" class="mt3" />
             <Show when={user()} keyed fallback={() => (
                 <>
+                    <Text content="texts.welcome" centered class="mt5 w8" />
                     <Text content="texts.signInWith" class="mt5" />
                     <div class={styles.providerList}>
                         <a href={getGoogleAuthUrl()}><GoogleLogo /></a>
@@ -26,13 +29,16 @@ const HomePage : Component = () => (
             )}>
                 {(loggedInUser) => (
                     <>
-                        <Text content="texts.signedInWith" class="mt5" />
-                        <Text content={loggedInUser.name} size="l" class="my3" />
-                        <Button content="buttons.goToMyDashboard" variant="primary" to="/dashboard" />
+                        <Text content="texts.signedInWith" marginTop={4} />
+                        <div class="flex h v-center my4">
+                            <Avatar user={loggedInUser} />
+                            <Text content={loggedInUser.name} size="l" class="ml2" />
+                        </div>
+                        <Link href="/dashboard"><Button content="buttons.goToMyDashboard" variant="primary" /></Link>
                         <Button content="buttons.logout" onClick={async () => {
                             logout();
                             setUser(null);
-                        }} />
+                        }} marginTop={3} />
                     </>
                 )}
             </Show>

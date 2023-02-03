@@ -32,9 +32,9 @@ import { board } from "../core/services/board";
 import SelectionBox from "../components/app/SelectionBox";
 import LabelPanel from "../components/app/panels/LabelPanel";
 import { getBoardData, saveBoard } from "../api/boards";
-import BoardLoading from "../components/app/BoardLoading";
 import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
+import { hideLoadingOverlay } from "../components/app/LoadingOverlay";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -78,12 +78,14 @@ const BoardPage : Component = () => {
             board.loadFromBoardData(data.result);
             setSavingEnabled(true);
         });
+
+        hideLoadingOverlay();
     });
 
     return (
         <>
             <Canvas />
-            <ApiSuspense query={boardDataQuery} loadingFallback={<BoardLoading />}>
+            <ApiSuspense query={boardDataQuery}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
                     <div class="flex h h-spaced">

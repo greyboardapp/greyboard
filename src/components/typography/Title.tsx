@@ -3,6 +3,7 @@ import { Component, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { LanguageTexts } from "../../languages/languages";
 import { cls } from "../../utils/dom/dom";
+import { GenericProps, getGenericProps } from "../../utils/dom/props";
 import { getText } from "../../utils/system/intl";
 import { TextVariants } from "./Text";
 
@@ -24,7 +25,7 @@ const sizes : Record<keyof typeof TextVariants.size, keyof JSX.IntrinsicElements
     xl: "h1",
 };
 
-interface TitleProps extends VariantProps<typeof titleStyles> {
+interface TitleProps extends GenericProps<HTMLHeadingElement>, VariantProps<typeof titleStyles> {
     key ?: keyof LanguageTexts;
     content ?: string;
     class ?: string;
@@ -35,6 +36,7 @@ const Title : Component<TitleProps> = (props) => {
 
     return (
         <Dynamic
+            {...getGenericProps(props)}
             component={heading()}
             class={cls(titleStyles(props), props.class)}
         >

@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "@solidjs/router";
-import { Component, createSignal, For, Show } from "solid-js";
+import { Component, For, Show } from "solid-js";
 import { createMutation, createQuery } from "@tanstack/solid-query";
 import Button from "../components/controls/Button";
 import Avatar from "../components/data/Avatar";
 import Text from "../components/typography/Text";
-import { isLoggedIn, user } from "../utils/system/auth";
+import { isLoggedIn, setUser, user } from "../utils/system/auth";
 
 import styles from "./DashboardPage.module.scss";
 import CarretIcon from "../assets/icons/carret.svg";
@@ -25,7 +25,8 @@ import { BoardCreation } from "../models/board";
 import { getText } from "../utils/system/intl";
 import Skeleton from "../components/feedback/Skeleton";
 import IconButton from "../components/controls/IconButton";
-import BoardLoading from "../components/app/BoardLoading";
+import { hideLoadingOverlay, showLoadingOverlay } from "../components/app/LoadingOverlay";
+import { logout } from "../api/auth";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
@@ -36,7 +37,6 @@ const DashboardPage : Component = () => {
     const createBoardMutation = createMutation({
         mutationFn: async (data : BoardCreation) => createBoard(data),
     });
-    const [isLoading, setLoading] = createSignal(false);
 
     return (
         <>
@@ -56,18 +56,26 @@ const DashboardPage : Component = () => {
                                         <List>
                                             <ListItem><PeopleIcon /><Text content="Profile" /></ListItem>
                                             <ListItem><SettingsIcon /><Text content="Settings" /></ListItem>
-                                            <ListItem><LogoutIcon /><Text content="Logout" /></ListItem>
+                                            <ListItem onClick={async () => {
+                                                logout();
+                                                setUser(null);
+                                                navigate("/");
+                                            }}><LogoutIcon /><Text content="Logout" /></ListItem>
                                         </List>
                                     </Panel>
                                 </Popover>
                                 <div class="flex">
-                                    <IconButton icon={ReloadIcon} variant="tertiary" onClick={async () => boardQuery.refetch()} loading={boardQuery.isLoading} />
+                                    <IconButton icon={ReloadIcon} variant="tertiary" onClick={async () => boardQuery.refetch()} loading={boardQuery.isLoading} marginRight={2} />
                                     <Button content="board.newPlaceholder" icon={PlusIcon} variant="primary" size="m" onClick={async () => {
+                                        showLoadingOverlay("board.creating");
+
                                         const board = await createBoardMutation.mutateAsync({ name: getText("board.newPlaceholder") ?? "New Board" });
                                         if (board.error)
                                             console.error(board.error);
                                         if (board.result)
                                             navigate(`/b/${board.result.slug}`);
+
+                                        hideLoadingOverlay();
                                     }} />
                                 </div>
                             </div>
@@ -93,7 +101,7 @@ const DashboardPage : Component = () => {
                                         )}>
                                             {(board) => (
                                                 <Link href={`/b/${board.slug}`} class="col">
-                                                    <BoardCard board={board} onClicked={() => setLoading(true)} />
+                                                    <BoardCard board={board} onClicked={() => showLoadingOverlay("board.loading")} />
                                                 </Link>
                                             )}
                                         </For>
@@ -103,9 +111,6 @@ const DashboardPage : Component = () => {
                         </div>
                     </div>
                 )}
-            </Show>
-            <Show when={isLoading()} keyed>
-                <BoardLoading force />
             </Show>
         </>
     );

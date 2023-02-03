@@ -3,11 +3,13 @@ import { Component, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { LanguageTexts } from "../../languages/languages";
 import { cls } from "../../utils/dom/dom";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 import { getText } from "../../utils/system/intl";
 
 import styles from "./Typography.module.scss";
 
 const TextVariants = {
+    ...getGenericVariants({}),
     size: {
         xs: styles.xs,
         s: styles.s,
@@ -24,6 +26,9 @@ const TextVariants = {
     bold: {
         true: styles.bold,
     },
+    centered: {
+        true: styles.centered,
+    },
 };
 
 const textStyles = cva("", {
@@ -36,7 +41,7 @@ const textStyles = cva("", {
     },
 });
 
-interface TextProps extends VariantProps<typeof textStyles> {
+interface TextProps extends GenericProps<HTMLParagraphElement>, VariantProps<typeof textStyles> {
     content : keyof LanguageTexts | string;
     as ?: keyof JSX.IntrinsicElements;
     class ?: string;
@@ -44,6 +49,7 @@ interface TextProps extends VariantProps<typeof textStyles> {
 
 const Text : Component<TextProps> = (props) => (
     <Dynamic
+        {...getGenericProps(props)}
         component={props.as ?? "p"}
         class={cls(textStyles(props), props.class)}
     >

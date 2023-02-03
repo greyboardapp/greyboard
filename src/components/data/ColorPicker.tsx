@@ -1,4 +1,5 @@
 import { Component, createEffect, createMemo, createSignal } from "solid-js";
+import { cva, VariantProps } from "class-variance-authority";
 import Point from "../../core/data/geometry/point";
 import { cls, pct, rgba } from "../../utils/dom/dom";
 import { createWindowListener } from "../../utils/dom/hooks";
@@ -6,6 +7,7 @@ import Color from "../../utils/datatypes/color";
 import { clamp } from "../../utils/math/math";
 
 import styles from "./ColorPicker.module.scss";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 
 enum Interaction {
     None,
@@ -13,7 +15,12 @@ enum Interaction {
     Hue,
 }
 
-interface ColorPickerProps {
+const ColorPickerVariants = { ...getGenericVariants({}) };
+const colorPickerStyles = cva(styles.colorPicker, {
+    variants: ColorPickerVariants,
+});
+
+interface ColorPickerProps extends GenericProps<HTMLDivElement>, VariantProps<typeof colorPickerStyles> {
     model : [() => number, (v : number) => void];
 }
 
@@ -77,7 +84,7 @@ const ColorPicker : Component<ColorPickerProps> = (props) => {
     createWindowListener("mouseup", handlePointerUp);
 
     return (
-        <div class={styles.colorPicker}>
+        <div {...getGenericProps(props)} class={cls(colorPickerStyles(props), props.class)}>
             <div
                 class={styles.saturation}
                 style={{

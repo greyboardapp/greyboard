@@ -1,11 +1,14 @@
 import { cva, VariantProps } from "class-variance-authority";
 import { Component, Show } from "solid-js";
+import { cls } from "../../utils/dom/dom";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 import { clamp, floor } from "../../utils/math/math";
 import Input from "./Input";
 
 import styles from "./Slider.module.scss";
 
 const SliderVariants = {
+    ...getGenericVariants({}),
     showValue: {
         true: styles.showValue,
     },
@@ -22,7 +25,7 @@ const sliderStyles = cva(styles.slider, {
     },
 });
 
-interface SliderProps extends VariantProps<typeof sliderStyles> {
+interface SliderProps extends GenericProps<HTMLDivElement>, VariantProps<typeof sliderStyles> {
     id ?: string;
     model : [() => number, (v : number) => void];
     min ?: number;
@@ -32,7 +35,10 @@ interface SliderProps extends VariantProps<typeof sliderStyles> {
 }
 
 const Slider : Component<SliderProps> = (props) => (
-    <div class={sliderStyles(props)}>
+    <div
+        {...getGenericProps(props)}
+        class={cls(sliderStyles(props), props.class)}
+    >
         <input
             id={props.id}
             type="range"

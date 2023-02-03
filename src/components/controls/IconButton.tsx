@@ -4,8 +4,11 @@ import Icon, { SVGIcon } from "../data/Icon";
 
 import styles from "./IconButton.module.scss";
 import loadingIcon from "../../assets/icons/loading.svg";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
+import { cls } from "../../utils/dom/dom";
 
 const ButtonVariants = {
+    ...getGenericVariants({}),
     size: {
         xs: styles.xs,
         s: styles.s,
@@ -34,14 +37,15 @@ const buttonStyles = cva(styles.button, {
     },
 });
 
-interface ButtonProps extends VariantProps<typeof buttonStyles> {
+interface ButtonProps extends GenericProps<HTMLButtonElement>, VariantProps<typeof buttonStyles> {
     icon : SVGIcon;
     onClick ?: (e : MouseEvent) => void;
 }
 
 const IconButton : Component<ButtonProps> = (props) => (
     <button
-        class={buttonStyles(props)}
+        {...getGenericProps(props)}
+        class={cls(buttonStyles(props), props.class)}
         disabled={props.disabled ?? false}
         onClick={(e) => (props.onClick && props.onClick(e))}
     >

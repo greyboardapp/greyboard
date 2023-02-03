@@ -8,6 +8,7 @@ h3,
 h4 {
     font-weight: normal;
     color: currentcolor;
+    text-decoration: none;
 
     &.uppercase {
         text-transform: uppercase;
@@ -15,11 +16,13 @@ h4 {
     }
     &.faded { opacity: 0.5; }
     &.bold { font-weight: bold; }
+    &.centered { text-align: center; }
 }
 
 p,
 span {
     font-size: 1rem;
+    text-decoration: none;
 
     &.xs { @include fontSize(0.5rem); }
     &.s { @include fontSize(0.75rem); }
