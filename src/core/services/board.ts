@@ -11,6 +11,8 @@ import Path from "../data/items/path";
 import Rectangle from "../data/items/rectangle";
 import { createAction } from "./actions";
 import { Chunk } from "./board/chunk";
+import { QuadTree } from "./board/quadTree";
+import { builder } from "./builder";
 import { viewport } from "./viewport";
 
 interface BoardState {
@@ -21,6 +23,8 @@ interface BoardState {
 
     // NOTE: properties in this state will change once collaboration will be implemented.
     isPublic : boolean;
+    lastBuildScale : number;
+    temporaryScale : number;
 }
 
 export class Board extends Service<BoardState> {
@@ -59,12 +63,23 @@ export class Board extends Service<BoardState> {
             author: "",
             slug: "",
             isPublic: false,
+            lastBuildScale: 1,
+            temporaryScale: 1,
         });
     }
 
     start() : void {
-        // HACK: For now this solution works, but to increase performance move only affected items between chunks
-        viewport.onZoom.add(this.rebuild);
+        this.stop();
+        viewport.onZoom.add(this.rebuildAsync);
+        builder.onBuildFinished.add(this.rebuildFinished);
+    }
+
+    stop() : void {
+        this.items.clear();
+        this.chunks.forEach((chunk) => chunk.dispose());
+        this.chunks.clear();
+
+        viewport.onZoom.clear();
     }
 
     loadFromBoardData(data : BoardData) : void {
@@ -147,9 +162,17 @@ export class Board extends Service<BoardState> {
     rebuild() : void {
         for (const chunk of this.chunks.values()) {
             chunk.resetGraphics();
-            chunk.deleteAll();
+            chunk.qt.deleteAll();
         }
         this.addToChunk(this.items.values());
+    }
+
+    rebuildAsync() : void {
+        if (builder.isRunning)
+            builder.cancel();
+
+        this.state.temporaryScale = viewport.state.scale / this.state.lastBuildScale;
+        builder.queueBuild(Array.from(this.items.values()));
     }
 
     getItemsWithinRect(rect : Rect) : BoardItem[] {
@@ -160,7 +183,7 @@ export class Board extends Service<BoardState> {
                 const key = this.hash(x, y);
                 const chunk = this.chunks.get(key);
                 if (chunk)
-                    items.push(...chunk.get(rect));
+                    items.push(...chunk.qt.get(rect));
             }
         return items;
     }
@@ -179,39 +202,43 @@ export class Board extends Service<BoardState> {
 
     deserialize(buffer : ByteBuffer) : BoardItem[] {
         const items : BoardItem[] = [];
-        while (!buffer.eod) {
-            const [type, locked, zIndex] = buffer.readFormatted("bbb");
-            const label = buffer.readString();
-            const rect = new Rect(...buffer.readFormatted("ffff"));
-            let item : BoardItem;
+        while (!buffer.eod)
+            try {
+                const [type, locked, zIndex] = buffer.readFormatted("bbb");
+                const label = buffer.readString();
+                const rect = new Rect(...buffer.readFormatted("ffff"));
+                let item : BoardItem;
 
-            if (type === BoardItemType.Path) {
-                const [color, weight] = buffer.readFormatted("ib");
-                const count = buffer.readUInt();
-                const points : PressurePoint[] = [];
-                for (let i = 0; i < count; i++)
-                    points.push(new PressurePoint(...buffer.readFormatted("fff")));
-                item = new Path(points, color, weight);
-                item.rect = rect;
-            } else if (type === BoardItemType.Rectangle) {
-                const [color, weight] = buffer.readFormatted("ib");
-                const filled = buffer.readByte();
-                item = new Rectangle(rect, color, weight, filled === 1);
-            } else if (type === BoardItemType.Ellipse) {
-                const [color, weight] = buffer.readFormatted("ib");
-                const filled = buffer.readByte();
-                item = new Ellipse(rect, color, weight, filled === 1);
-            } else {
-                continue;
+                if (type === BoardItemType.Path) {
+                    const [color, weight] = buffer.readFormatted("ib");
+                    const count = buffer.readUInt();
+                    const points : PressurePoint[] = [];
+                    for (let i = 0; i < count; i++)
+                        points.push(new PressurePoint(...buffer.readFormatted("fff")));
+                    item = new Path(points, color, weight);
+                    item.rect = rect;
+                } else if (type === BoardItemType.Rectangle) {
+                    const [color, weight] = buffer.readFormatted("ib");
+                    const filled = buffer.readByte();
+                    item = new Rectangle(rect, color, weight, filled === 1);
+                } else if (type === BoardItemType.Ellipse) {
+                    const [color, weight] = buffer.readFormatted("ib");
+                    const filled = buffer.readByte();
+                    item = new Ellipse(rect, color, weight, filled === 1);
+                } else {
+                    continue;
+                }
+
+                if (item) {
+                    item.locked = locked === 1;
+                    item.zIndex = zIndex;
+                    item.label = label;
+                    items.push(item);
+                }
+            } catch (e) {
+                console.log(e);
             }
 
-            if (item) {
-                item.locked = locked === 1;
-                item.zIndex = zIndex;
-                item.label = label;
-                items.push(item);
-            }
-        }
         return items;
     }
 
@@ -244,6 +271,30 @@ export class Board extends Service<BoardState> {
                         chunk.deleteMany([item]);
                 }
         }
+    }
+
+    private rebuildFinished(chunks : Map<string, QuadTree>) : void {
+        for (const chunk of this.chunks.values()) {
+            chunk.resetGraphics();
+            chunk.qt.deleteAll();
+        }
+
+        for (const [key, qt] of chunks) {
+            let chunk = this.chunks.get(key);
+            if (chunk) {
+                chunk.qt = qt;
+            } else {
+                const [x, y] = key.split("_").map((part) => parseInt(part));
+                chunk = Chunk.fromQuadTree(x, y, qt);
+                this.chunks.set(key, chunk);
+            }
+            chunk.rerender();
+        }
+
+        batch(() => {
+            this.state.temporaryScale = 1;
+            this.state.lastBuildScale = viewport.state.scale;
+        });
     }
 
     private updateItems(items : Iterable<BoardItem>) : void {

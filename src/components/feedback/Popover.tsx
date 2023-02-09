@@ -1,11 +1,29 @@
 import { Motion, Presence } from "@motionone/solid";
+import { cva, VariantProps } from "class-variance-authority";
 import { createSignal, JSX, ParentComponent, Show } from "solid-js";
+import { cls } from "../../utils/dom/dom";
 import { createDocumentListener } from "../../utils/dom/hooks";
 import { quickEaseInTransition, quickEaseOutTransition } from "../../utils/dom/motion";
+import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 
 import styles from "./Popover.module.scss";
 
-interface PopoverProps {
+const PopoverVariants = {
+    ...getGenericVariants({}),
+    orientation: {
+        left: styles.left,
+        right: styles.right,
+    },
+};
+
+const popoverStyles = cva(styles.popoverRoot, {
+    variants: PopoverVariants,
+    defaultVariants: {
+        orientation: "left",
+    },
+});
+
+interface PopoverProps extends GenericProps<HTMLDivElement>, VariantProps<typeof popoverStyles> {
     actuator : JSX.Element;
 }
 
@@ -22,8 +40,9 @@ const Popover : ParentComponent<PopoverProps> = (props) => {
 
     return (
         <div
+            {...getGenericProps(props)}
             ref={root}
-            class={styles.popoverRoot}
+            class={cls(popoverStyles(props), props.class)}
         >
             <div
                 class={styles.popoverActuator}
@@ -36,7 +55,7 @@ const Popover : ParentComponent<PopoverProps> = (props) => {
                         initial={{ scale: 0.75, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: quickEaseInTransition }}
                         exit={{ scale: 0.75, opacity: 0, transition: quickEaseOutTransition }}
-                        style={{ "transform-origin": "top left" }}
+                        style={{ "transform-origin": `top ${props.orientation}` }}
                     >
                         {props.children}
                     </Motion.div>

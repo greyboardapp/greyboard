@@ -6,9 +6,17 @@ import Text from "../typography/Text";
 
 import styles from "./FormControl.module.scss";
 
-const FormControlVariants = { ...getGenericVariants({}) };
+const FormControlVariants = {
+    ...getGenericVariants({}),
+    inline: {
+        true: styles.inline,
+    },
+};
 const formControlStyles = cva(styles.formControl, {
     variants: FormControlVariants,
+    defaultVariants: {
+        inline: false,
+    },
 });
 
 interface FormControlProps<T extends JSX.Element> extends GenericProps<HTMLDivElement>, VariantProps<typeof formControlStyles> {
@@ -21,7 +29,7 @@ function FormControl<T extends JSX.Element>(props : FormControlProps<T>) : JSX.E
     const id = createUniqueId();
 
     return (
-        <div {...getGenericProps(props)} class={cls(styles.formControl, props.class)}>
+        <div {...getGenericProps(props)} class={cls(formControlStyles(props), props.class)}>
             <label for={id}><Text content={props.name} size="s" uppercase bold /></label>
             {props.children(id)}
         </div>

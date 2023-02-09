@@ -24,8 +24,9 @@ import minusIcon from "../assets/icons/minus.svg";
 import undoIcon from "../assets/icons/undo.svg";
 import redoIcon from "../assets/icons/redo.svg";
 import layerIcon from "../assets/icons/layer.svg";
+import peopleIcon from "../assets/icons/people.svg";
 import ToolbarText from "../components/toolbar/ToolbarText";
-import { pct } from "../utils/dom/dom";
+import { cls, pct } from "../utils/dom/dom";
 import { viewport } from "../core/services/viewport";
 import ToolbarInput from "../components/toolbar/ToolbarInput";
 import { board } from "../core/services/board";
@@ -35,6 +36,11 @@ import { getBoardData, saveBoard } from "../api/boards";
 import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
 import { hideLoadingOverlay } from "../components/app/LoadingOverlay";
+import Button from "../components/controls/Button";
+import AvatarList from "../components/data/AvatarList";
+import { user } from "../utils/system/auth";
+import Popover from "../components/feedback/Popover";
+import SharePanel from "../components/app/panels/SharePanel";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -76,7 +82,7 @@ const BoardPage : Component = () => {
             }
 
             board.loadFromBoardData(data.result);
-            setSavingEnabled(true);
+            // setSavingEnabled(true);
         });
 
         hideLoadingOverlay();
@@ -88,7 +94,7 @@ const BoardPage : Component = () => {
             <ApiSuspense query={boardDataQuery}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
-                    <div class="flex h h-spaced">
+                    <div class={cls(styles.interactable, "flex h h-spaced v-center")}>
                         <Toolbar variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
                             <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} />
@@ -99,6 +105,14 @@ const BoardPage : Component = () => {
                                 <ToolbarButton icon={redoIcon} onClick={app.redo} disabled={!app.redo.when()} />
                             </Tooltip>
                         </Toolbar>
+                        <div class="flex h pr2">
+                            <Show when={user()} keyed>
+                                {(loggedInUser) => <AvatarList users={[loggedInUser]} me={loggedInUser.id} paddingRight={2} />}
+                            </Show>
+                            <Popover actuator={<Button icon={peopleIcon} content="buttons.share" variant="primary" size="m" />} orientation="right">
+                                <SharePanel />
+                            </Popover>
+                        </div>
                     </div>
                     <Toolbar variant="left">
                         <ToolbarGroup variant="vertical">

@@ -1,0 +1,66 @@
+@import "../../global";
+
+.switch {
+    > input {
+        @include transition();
+
+        appearance: none;
+        border-radius: 999px;
+        position: relative;
+        padding: 2px;
+        cursor: pointer;
+
+        @include themed() {
+            background-color: color($inputBg);
+
+            &:checked {
+                background-color: color($primary);
+            }
+
+            &::after {
+                background-color: color($secondary);
+            }
+
+            &:checked::after {
+                background-color: color($primaryText);
+            }
+
+            &:hover::after {
+                background-color: color($secondaryFocus);
+            }
+
+            &:checked:hover::after {
+                background-color: color($primaryText);
+            }
+        }
+
+        &::after {
+            @include transition();
+
+            content: "";
+            position: absolute;
+            height: calc(100% - 4px);
+            aspect-ratio: 1;
+            border-radius: 999px;
+        }
+
+        &:checked::after {
+            right: 2px;
+        }
+    }
+
+    &.xs > input {
+        width: 32px;
+        height: 16px;
+    }
+
+    &.s > input {
+        width: 48px;
+        height: 24px;
+    }
+
+    &.m > input {
+        width: 64px;
+        height: 32px;
+    }
+}

@@ -223,6 +223,9 @@ export interface GenericVariants {
         bottom : string;
         spaced : string;
     };
+    fluid : {
+        true : string;
+    };
 }
 
 export const getGenericVariants = <T extends Variant>(base : T) : GenericVariants & T => ({
@@ -416,6 +419,9 @@ export const getGenericVariants = <T extends Variant>(base : T) : GenericVariant
         center: "v-center",
         bottom: "v-bottom",
         spaced: "v-spaced",
+    },
+    fluid: {
+        true: "fluid",
     },
     ...base,
 });

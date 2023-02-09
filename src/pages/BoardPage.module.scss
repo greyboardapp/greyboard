@@ -20,4 +20,8 @@
             color: color($panelBg);
         }
     }
+
+    .interactable {
+        pointer-events: all;
+    }
 }

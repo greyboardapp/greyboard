@@ -31,6 +31,8 @@
     "buttons.resetPalette": "Paletta visszállítása",
     "buttons.goToMyDashboard": "Belépés",
     "buttons.logout": "Kijelentkezés",
+    "buttons.share": "Megosztás",
+    "buttons.cancel": "Mégse",
     "placeholder.typeSomething": "Írj valamit...",
     "titles.labels": "Címkék",
     "texts.welcome": "Egy egyszerű online kollaboratív rajztábla tervezésre, probléma oldásra és firkantásra.",
@@ -41,5 +43,8 @@
     "texts.signedInWith": "Be vagy jelentkezve mint:",
     "texts.loading": "Töltődik...",
     "texts.boardsLoadFailed": "A táblák betöltése meghiúsult",
-    "texts.noBoardsHint": "Még nincs egy táblád sem! Addj hozzá egyet itt."
+    "texts.noBoardsHint": "Még nincs egy táblád sem! Addj hozzá egyet itt.",
+    "texts.publicBoard": "Nyilványos tábla",
+    "texts.accessibleOnWhenYouAreIn": "Elérhető, csak akkor ha bent vagy",
+    "texts.modifiableOnWhenYouAreIn": "Módosítható, csak akkor ha bent vagy"
 }

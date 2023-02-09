@@ -4,11 +4,12 @@ import { createWindowListener } from "../../utils/dom/hooks";
 
 import styles from "./Canvas.module.scss";
 import { viewport } from "../../core/services/viewport";
-import { px } from "../../utils/dom/dom";
+import { pct, px } from "../../utils/dom/dom";
 import { setWindowHeight, setWindowWidth } from "../../core/services/renderer/layer";
 import { toolbox } from "../../core/services/toolbox";
 import { ViewTool } from "../../core/services/toolbox/view";
 import { selection } from "../../core/services/selection";
+import { board } from "../../core/services/board";
 
 const Canvas : Component = () => {
     createWindowListener("resize", () => {
@@ -63,6 +64,7 @@ const Canvas : Component = () => {
                 <div id="staticCanvasContainer" class={styles.staticCanvasContainer} style={{
                     left: px(viewport.state.offsetX),
                     top: px(viewport.state.offsetY),
+                    scale: pct(board.state.temporaryScale),
                 }}></div>
                 <div id="canvasOverlayContainer" class={styles.canvasOverlayContainer}></div>
             </div>

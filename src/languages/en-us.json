@@ -31,6 +31,8 @@
     "buttons.resetPalette": "Reset Palette",
     "buttons.goToMyDashboard": "Go to my Dashboard",
     "buttons.logout": "Log out",
+    "buttons.share": "Share",
+    "buttons.cancel": "Cancel",
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
     "texts.welcome": "A small online collaborative whiteboard application for mocking, wireframing, solving problems and sketching.",
@@ -41,5 +43,8 @@
     "texts.signedInWith": "You are signed in as:",
     "texts.loading": "Loading...",
     "texts.boardsLoadFailed": "Unable to load the boards",
-    "texts.noBoardsHint": "You don't have any boards yet! How about creating one?"
+    "texts.noBoardsHint": "You don't have any boards yet! How about creating one?",
+    "texts.publicBoard": "Public board",
+    "texts.accessibleOnWhenYouAreIn": "Accessible only when you are in",
+    "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in"
 }
