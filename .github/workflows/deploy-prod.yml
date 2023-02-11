@@ -28,6 +28,8 @@ jobs:
           DEBUG: ${{ env.DEBUG }}
           LOG_LEVEL: ${{ env.LOG_LEVEL }}
           BOARD_SAVE_INTERVAL: ${{ env.PROD_BOARD_SAVE_INTERVAL }}
+          GOOGLE_AUTH_CLIENT_ID: ${{ env.DEV_GOOGLE_AUTH_CLIENT_ID }}
+          GITHUB_AUTH_CLIENT_ID: ${{ env.DEV_GITHUB_AUTH_CLIENT_ID }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
