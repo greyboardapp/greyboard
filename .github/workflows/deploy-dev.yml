@@ -36,11 +36,11 @@ jobs:
       - name: Build
         run: yarn build
         env:
-          BASE_URL: ${{ env.BASE_URL }}
-          BACKEND_URL: ${{ env.DEV_BACKEND_URL }}
-          DEBUG: ${{ env.DEBUG }}
-          LOG_LEVEL: ${{ env.LOG_LEVEL }}
-          BOARD_SAVE_INTERVAL: ${{ env.DEV_BOARD_SAVE_INTERVAL }}
+          BASE_URL: ${{ vars.BASE_URL }}
+          BACKEND_URL: ${{ vars.DEV_BACKEND_URL }}
+          DEBUG: ${{ vars.DEBUG }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          BOARD_SAVE_INTERVAL: ${{ vars.DEV_BOARD_SAVE_INTERVAL }}
           GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
           GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
 
