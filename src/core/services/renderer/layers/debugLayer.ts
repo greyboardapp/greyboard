@@ -1,7 +1,7 @@
 import { isPointInRect } from "../../../../utils/math/intersections";
 import Rect from "../../../data/geometry/rect";
 import { board } from "../../board";
-import { QuadTree } from "../../board/chunk";
+import { QuadTree } from "../../board/quadTree";
 import { input } from "../../input";
 import { RendererLayer } from "../../renderer/layer";
 import { viewport } from "../../viewport";
@@ -11,7 +11,7 @@ export class DebugLayer extends RendererLayer {
         this.graphics.clear();
 
         for (const chunk of board.chunks.values())
-            this.renderQuadTree(chunk);
+            this.renderQuadTree(chunk.qt);
             // this.renderRect(chunk.boundary, 0x00FF00FF, 3);
 
         for (const item of board.items.values()) {

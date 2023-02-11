@@ -1,13 +1,9 @@
-import { Component, createEffect, createMemo, createSignal } from "solid-js";
-import { board } from "../../../core/services/board";
-import { viewport } from "../../../core/services/viewport";
+import { Component, createEffect, createSignal } from "solid-js";
 import Button from "../../controls/Button";
 import Input from "../../controls/Input";
 import Switch from "../../controls/Switch";
-import { List, ListItem } from "../../data/List";
 import FormControl from "../../forms/FormControl";
 import Panel from "../../surfaces/Panel";
-import Text from "../../typography/Text";
 
 const [asd, setAsd] = createSignal(false);
 
