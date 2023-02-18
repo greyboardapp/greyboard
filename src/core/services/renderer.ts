@@ -18,6 +18,7 @@ class Renderer extends Service {
     }
 
     start() : void {
+        this.enabled = true;
         for (const layer of this.layerStack)
             layer.start();
 

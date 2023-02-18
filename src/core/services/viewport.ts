@@ -1,4 +1,6 @@
 import tweenjs, { Tween } from "@tweenjs/tween.js";
+import { untrack } from "solid-js/web";
+import { batch } from "solid-js";
 import Point from "../data/geometry/point";
 import { batched, createService, reactive, Service } from "../../utils/system/service";
 import Rect from "../data/geometry/rect";
@@ -20,6 +22,8 @@ export class Viewport extends Service<ViewportState> {
     public zoomIn = createCommand(new Shortcut("=", KeyModifiers.Control), () => this.zoom(this.getScreenRect().center, -0.1));
     public zoomOut = createCommand(new Shortcut("-", KeyModifiers.Control), () => this.zoom(this.getScreenRect().center, 0.1));
 
+    private inertiaTween : Tween<ViewportState> | null = null;
+
     constructor() {
         super({
             offsetX: 0,
@@ -30,14 +34,29 @@ export class Viewport extends Service<ViewportState> {
 
     @batched
     pan(d : Point) : void {
+        if (this.inertiaTween)
+            tweenjs.remove(this.inertiaTween);
+
         this.state.offsetX += d.x;
         this.state.offsetY += d.y;
     }
 
     @batched
     panTo(p : Point) : void {
+        if (this.inertiaTween)
+            tweenjs.remove(this.inertiaTween);
+
         this.state.offsetX = p.x;
         this.state.offsetY = p.y;
+    }
+
+    @batched
+    panRollOff(d : Point) : void {
+        this.inertiaTween = new tweenjs.Tween(this.state)
+            .to({ offsetX: this.state.offsetX + d.x * 5, offsetY: this.state.offsetY + d.y * 5 }, 500)
+            .easing(tweenjs.Easing.Cubic.Out)
+            .start()
+            .onComplete(() => { this.inertiaTween = null; });
     }
 
     @batched
@@ -52,6 +71,10 @@ export class Viewport extends Service<ViewportState> {
     zoom(c : Point, d : number) : void {
         if (!isInRange(this.state.scale - d, 0.1, 4))
             return;
+
+        if (this.inertiaTween)
+            tweenjs.remove(this.inertiaTween);
+
         const newScale = this.state.scale - d;
         this.state.offsetX += c.x * this.state.scale - c.x * newScale;
         this.state.offsetY += c.y * this.state.scale - c.y * newScale;
@@ -61,15 +84,29 @@ export class Viewport extends Service<ViewportState> {
     @reactive
     private zoomEvent() : void {
         track(this.state.scale);
-        this.onZoom();
+        untrack(() => this.onZoom());
     }
 
     start() : void {
+        batch(() => {
+            this.state.offsetX = this.state.offsetY = 0;
+            this.state.scale = 1;
+        });
         input.onZoom.add((data) => this.zoom(this.screenToViewport(data.positions[0]), Math.sign(data.delta) * 0.1));
+    }
+
+    stop() : void {
+        this.onZoom.clear();
     }
 
     screenToViewport(p : Point) : Point {
         return new Point((p.x - this.state.offsetX) / this.state.scale, (p.y - this.state.offsetY) / this.state.scale);
+    }
+
+    screenToViewportRect(a : Point, b : Point) : Rect {
+        const x = (Math.min(a.x, b.x) - this.state.offsetX) / this.state.scale;
+        const y = (Math.min(a.y, b.y) - this.state.offsetY) / this.state.scale;
+        return new Rect(x, y, (Math.max(a.x, b.x) - this.state.offsetX) / this.state.scale - x, (Math.max(a.y, b.y) - this.state.offsetY) / this.state.scale - y);
     }
 
     screenToBoard(p : Point) : Point {

@@ -17,7 +17,7 @@ export class PencilTool extends CreatorTool<Path> {
     }
 
     new() : Path {
-        return new Path([], toolbox.state.selectedColor(), viewport.pixelsToViewport(toolbox.state.selectedWeight), true);
+        return new Path([], toolbox.state.selectedColor(), viewport.pixelsToViewport(toolbox.state.selectedWeight));
     }
 
     onActionStart(data : PointerEventData) : boolean {

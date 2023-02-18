@@ -6,8 +6,10 @@ import { createCommand, Shortcut } from "./services/commands";
 import "./services/renderer";
 import "./services/viewport";
 import "./services/toolbox";
+import { board } from "./services/board";
 
 class Application {
+    public save = createCommand(new Shortcut("s", KeyModifiers.Control), board.save);
     public undo = createCommand(new Shortcut("z", KeyModifiers.Control), actions.undo, actions.canUndo);
     public redo = createCommand(new Shortcut("z", KeyModifiers.Control | KeyModifiers.Shift), actions.redo, actions.canRedo);
 

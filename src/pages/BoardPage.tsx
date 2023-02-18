@@ -1,6 +1,6 @@
-import { Component, onCleanup, onMount, For, Show, createEffect, createSignal, untrack } from "solid-js";
+import { Component, onCleanup, onMount, For, Show, createEffect, untrack } from "solid-js";
 import { Link, Params, useParams } from "@solidjs/router";
-import { createQuery } from "@tanstack/solid-query";
+import { createMutation, createQuery } from "@tanstack/solid-query";
 import Canvas from "../components/surfaces/Canvas";
 import Toolbar from "../components/toolbar/Toolbar";
 import ToolbarButton from "../components/toolbar/ToolbarButton";
@@ -21,6 +21,7 @@ import menuIcon from "../assets/icons/menu.svg";
 import paletteIcon from "../assets/icons/palette.svg";
 import plusIcon from "../assets/icons/plus.svg";
 import minusIcon from "../assets/icons/minus.svg";
+import saveIcon from "../assets/icons/save.svg";
 import undoIcon from "../assets/icons/undo.svg";
 import redoIcon from "../assets/icons/redo.svg";
 import layerIcon from "../assets/icons/layer.svg";
@@ -52,24 +53,17 @@ const BoardPage : Component = () => {
         refetchOnWindowFocus: false,
     });
 
-    const [isSavingEnabled, setSavingEnabled] = createSignal(false);
-    createQuery(() => ["boardSave"], async () : Promise<ApiResponse<null>> => saveBoard({
+    const saveMutation = createMutation(async () : Promise<ApiResponse<null>> => saveBoard({
         id: board.state.id,
         name: board.state.name,
         contents: board.serialize(),
-    }), {
-        get enabled() {
-            return isSavingEnabled();
-        },
-        refetchOnWindowFocus: true,
-        refetchInterval: (import.meta.env.BOARD_SAVE_INTERVAL ?? 10) * 1000,
-    });
+    }));
 
-    onMount(() => app.start());
-    onCleanup(() => {
-        app.stop();
-        setSavingEnabled(false);
+    onMount(() => {
+        app.start();
+        board.onBoardReadyToSave.add(() => saveMutation.mutate());
     });
+    onCleanup(() => app.stop());
 
     createEffect(() => {
         if (boardDataQuery.isLoading || !boardDataQuery.data)
@@ -82,7 +76,7 @@ const BoardPage : Component = () => {
             }
 
             board.loadFromBoardData(data.result);
-            // setSavingEnabled(true);
+            // board.startPeriodicSave();
         });
 
         hideLoadingOverlay();
@@ -98,6 +92,9 @@ const BoardPage : Component = () => {
                         <Toolbar variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
                             <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} />
+                            <Tooltip content={<><Text content="actions.save" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.save.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                <ToolbarButton icon={saveIcon} onClick={app.save} disabled={!app.save.when()} />
+                            </Tooltip>
                             <Tooltip content={<><Text content="actions.undo" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.undo.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                 <ToolbarButton icon={undoIcon} onClick={app.undo} disabled={!app.undo.when()} />
                             </Tooltip>

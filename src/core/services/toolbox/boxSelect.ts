@@ -19,9 +19,9 @@ export class BoxSelectTool extends ManipulationTool {
 
     getSelectedItems() : void {
         const rect = viewport.screenToBoardRect(this.start, this.end);
+        const vRect = viewport.screenToViewportRect(this.start, this.end);
         const items = board.getItemsWithinRect(rect);
-        // BUG: isInRect not working when zooming
-        const ids = items.filter((item) => item.isInRect(rect)).map((item) => item.id).sort();
+        const ids = items.filter((item) => item.isInRect(vRect)).map((item) => item.id).sort();
         if (!ids.shallowEquals(selection.state.ids))
             selection.state.ids = ids;
     }

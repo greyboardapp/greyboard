@@ -1,6 +1,7 @@
 import { batch } from "solid-js";
-import { BoardData } from "../../models/board";
+import { BoardData, BoardSaveData } from "../../models/board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
+import createDelegate from "../../utils/datatypes/delegate";
 import { floor } from "../../utils/math/math";
 import { createService, Service } from "../../utils/system/service";
 import Point, { PressurePoint } from "../data/geometry/point";
@@ -25,6 +26,7 @@ interface BoardState {
     isPublic : boolean;
     lastBuildScale : number;
     temporaryScale : number;
+    savingEnabled : boolean;
 }
 
 export class Board extends Service<BoardState> {
@@ -56,6 +58,10 @@ export class Board extends Service<BoardState> {
         (data : { items : Iterable<BoardItem>; state : boolean}) => this.setLockState(data.items, !data.state),
     );
 
+    public readonly onBoardReadyToSave = createDelegate<[data : BoardSaveData]>();
+
+    private saveTimer : number | null = null;
+
     constructor() {
         super({
             id: 0,
@@ -65,6 +71,7 @@ export class Board extends Service<BoardState> {
             isPublic: false,
             lastBuildScale: 1,
             temporaryScale: 1,
+            savingEnabled: false,
         });
     }
 
@@ -78,8 +85,29 @@ export class Board extends Service<BoardState> {
         this.items.clear();
         this.chunks.forEach((chunk) => chunk.dispose());
         this.chunks.clear();
+        if (this.saveTimer)
+            clearInterval(this.saveTimer);
+        batch(() => {
+            this.state.savingEnabled = false;
+            this.state.temporaryScale = this.state.lastBuildScale = 1;
+        });
+    }
 
-        viewport.onZoom.clear();
+    save() : BoardSaveData {
+        const data : BoardSaveData = {
+            id: this.state.id,
+            name: this.state.name,
+            contents: this.serialize(),
+        };
+        this.onBoardReadyToSave(data);
+        return data;
+    }
+
+    startPeriodicSave() : void {
+        this.state.savingEnabled = true;
+        if (this.saveTimer)
+            clearInterval(this.saveTimer);
+        this.saveTimer = setInterval(() => this.save(), (import.meta.env.BOARD_SAVE_INTERVAL ?? 10) * 1000, null);
     }
 
     loadFromBoardData(data : BoardData) : void {
@@ -99,6 +127,22 @@ export class Board extends Service<BoardState> {
         for (const item of items)
             this.items.set(item.id, item);
         this.addToChunk(items);
+    }
+
+    addFromObject(items : Iterable<BoardItem>) : void {
+        this.add(Array.from(items).map((item) : (BoardItem | null) => {
+            if (item.type === BoardItemType.Path) {
+                const path = new Path((item as Path).points.map((point) => new Point(point.x, point.y)), (item as Path).color, (item as Path).weight);
+                path.rect = new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y));
+                return path;
+            }
+            if (item.type === BoardItemType.Rectangle)
+                return new Rectangle(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Rectangle).color, (item as Rectangle).weight, (item as Rectangle).filled);
+            if (item.type === BoardItemType.Ellipse)
+                return new Ellipse(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Ellipse).color, (item as Ellipse).weight, (item as Ellipse).filled);
+
+            return null;
+        }).filter((item) => item !== null) as Iterable<BoardItem>);
     }
 
     remove(items : Iterable<BoardItem>) : void {
@@ -232,11 +276,11 @@ export class Board extends Service<BoardState> {
                 if (item) {
                     item.locked = locked === 1;
                     item.zIndex = zIndex;
-                    item.label = label;
+                    item.label = label.length === 0 ? null : label;
                     items.push(item);
                 }
             } catch (e) {
-                console.log(e);
+                console.error(e);
             }
 
         return items;

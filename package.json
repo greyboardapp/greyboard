@@ -31,6 +31,7 @@
     "vite-plugin-solid-svg": "^0.4.1"
   },
   "dependencies": {
+    "@microsoft/signalr": "^7.0.2",
     "@motionone/solid": "^10.14.2",
     "@solidjs/router": "^0.4.2",
     "@storybook/html": "^6.1.21",
