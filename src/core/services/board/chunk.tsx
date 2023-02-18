@@ -60,7 +60,7 @@ export class Chunk {
     }
 
     updateRegion(rect : Rect) : void {
-        rect.inflate(15);
+        rect.inflate(45);
 
         this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, () => {
             const items = Array.from(this.qt.get(viewport.viewportToBoardRect(rect))).sort((a, b) => a.zIndex - b.zIndex);

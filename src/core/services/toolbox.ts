@@ -15,6 +15,7 @@ import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import { pass } from "../../utils/system/misc";
 import { createCommand } from "./commands";
 import { selection } from "./selection";
+import { MarkerTool } from "./toolbox/marker";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -36,7 +37,10 @@ export class Toolbox extends Service<ToolboxState> {
             toolHierarchy: [
                 makeToolCategory("Selections",
                     new BoxSelectTool()),
-                new PencilTool(),
+                // new PencilTool(),
+                makeToolCategory("Writing",
+                    new PencilTool(),
+                    new MarkerTool()),
                 new EraserTool(),
                 new ViewTool(),
                 makeToolCategory("Shapes",

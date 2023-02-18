@@ -117,9 +117,10 @@ const SelectionBox : Component = () => {
                             <Presence>
                                 <Show when={paletteOpen()}>
                                     <Motion.div
-                                        class="p3 pb0"
-                                        initial={{ height: 0 }}
-                                        animate={{ height: 100 }}
+                                        class="px3"
+                                        initial={{ height: "0px", opacity: 0, paddingTop: "0px", overflow: "hidden" }}
+                                        animate={{ height: "215px", opacity: 1, paddingTop: "16px" }}
+                                        exit={{ height: "0px", opacity: 0, paddingTop: "0px" }}
                                     >
                                         <ColorPickerPanelContent
                                             showColorPicker={false}
