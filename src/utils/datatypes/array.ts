@@ -8,6 +8,7 @@ declare global {
     interface Array<T> {
         clear() : void;
         copy() : Array<T>;
+        unique() : Array<T>;
 
         first() : T | undefined;
         last() : T | undefined;
@@ -28,6 +29,10 @@ Array.prototype.clear = function<T> (this : T[]) : void {
 
 Array.prototype.copy = function<T> (this : T[]) : Array<T> {
     return [...this];
+};
+
+Array.prototype.unique = function<T> (this : T[]) : Array<T> {
+    return [...new Set(this)];
 };
 
 Array.prototype.first = function<T> (this : T[]) : T | undefined {

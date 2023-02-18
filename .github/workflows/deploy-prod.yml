@@ -48,7 +48,7 @@ jobs:
           name: greyboard-frontend-${{ github.sha }}
 
       - name: Setup Node Environment
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
 
       - name: Install NPM Packages
         run: yarn global add wrangler

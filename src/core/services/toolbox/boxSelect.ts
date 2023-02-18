@@ -21,7 +21,7 @@ export class BoxSelectTool extends ManipulationTool {
         const rect = viewport.screenToBoardRect(this.start, this.end);
         const vRect = viewport.screenToViewportRect(this.start, this.end);
         const items = board.getItemsWithinRect(rect);
-        const ids = items.filter((item) => item.isInRect(vRect)).map((item) => item.id).sort();
+        const ids = items.filter((item) => item.isInRect(vRect)).map((item) => item.id).unique().sort();
         if (!ids.shallowEquals(selection.state.ids))
             selection.state.ids = ids;
     }
