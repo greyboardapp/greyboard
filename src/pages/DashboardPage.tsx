@@ -70,12 +70,12 @@ const DashboardPage : Component = () => {
                                         showLoadingOverlay("board.creating");
 
                                         const board = await createBoardMutation.mutateAsync({ name: getText("board.newPlaceholder") ?? "New Board" });
-                                        if (board.error)
+                                        if (board.error) {
                                             console.error(board.error);
+                                            hideLoadingOverlay();
+                                        }
                                         if (board.result)
                                             navigate(`/b/${board.result.slug}`);
-
-                                        hideLoadingOverlay();
                                     }} />
                                 </div>
                             </div>

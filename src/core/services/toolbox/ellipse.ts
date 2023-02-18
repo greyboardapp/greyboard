@@ -25,8 +25,8 @@ export class EllipseTool extends CreatorTool<Ellipse> {
         if (data.button !== MouseButton.Primary)
             return false;
         this.item = this.new();
-        this.item.rect.x = data.positions[0].x;
-        this.item.rect.y = data.positions[0].y;
+        this.item.rect.x = this.item.rect.x2 = data.positions[0].x;
+        this.item.rect.y = this.item.rect.y2 = data.positions[0].y;
         return true;
     }
 

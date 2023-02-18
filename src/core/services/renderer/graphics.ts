@@ -68,7 +68,7 @@ export default class Graphics {
 
     ellipse(rect : Rect, color : number, weight : number, filled = false) : void {
         this.ctx.beginPath();
-        this.ctx.ellipse(rect.x + rect.w / 2, rect.y + rect.h / 2, Math.abs(rect.w / 2), Math.abs(rect.h / 2), 0, 0, 360);
+        this.ctx.ellipse(Math.min(rect.x, rect.x2) + rect.w / 2, Math.min(rect.y, rect.y2) + rect.h / 2, Math.abs(rect.w / 2), Math.abs(rect.h / 2), 0, 0, 360);
         if (filled) {
             this.ctx.fillStyle = Color.UIntToHex(color);
             this.ctx.fill();

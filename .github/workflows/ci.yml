@@ -11,7 +11,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Node and Install Dependencies
         uses: ./.github/actions/setup
@@ -23,10 +23,10 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       
       - name: Setup Node Environment
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
           cache: yarn
 
