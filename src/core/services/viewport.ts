@@ -99,6 +99,10 @@ export class Viewport extends Service<ViewportState> {
         this.onZoom.clear();
     }
 
+    screenCenterToViewport() : Point {
+        return new Point(((window.innerWidth / 2) - this.state.offsetX) / this.state.scale, ((window.innerHeight / 2) - this.state.offsetY) / this.state.scale);
+    }
+
     screenToViewport(p : Point) : Point {
         return new Point((p.x - this.state.offsetX) / this.state.scale, (p.y - this.state.offsetY) / this.state.scale);
     }

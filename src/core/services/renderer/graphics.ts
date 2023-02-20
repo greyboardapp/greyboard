@@ -111,4 +111,8 @@ export default class Graphics {
 
         this.ctx.closePath();
     }
+
+    image(rect : Rect, img : CanvasImageSource) : void {
+        this.ctx.drawImage(img, rect.x, rect.y, rect.w, rect.h);
+    }
 }

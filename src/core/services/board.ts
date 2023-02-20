@@ -3,11 +3,13 @@ import { BoardData, BoardSaveData } from "../../models/board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import createDelegate from "../../utils/datatypes/delegate";
 import { floor } from "../../utils/math/math";
+import { loadImage } from "../../utils/system/image";
 import { createService, Service } from "../../utils/system/service";
 import Point, { PressurePoint } from "../data/geometry/point";
 import Rect from "../data/geometry/rect";
 import { BoardItem, BoardItemType, BoardShapeItem } from "../data/item";
 import Ellipse from "../data/items/ellipse";
+import Image from "../data/items/image";
 import Path from "../data/items/path";
 import Rectangle from "../data/items/rectangle";
 import { createAction } from "./actions";
@@ -112,7 +114,7 @@ export class Board extends Service<BoardState> {
         this.saveTimer = setInterval(() => this.save(), (import.meta.env.BOARD_SAVE_INTERVAL ?? 10) * 1000, null);
     }
 
-    loadFromBoardData(data : BoardData) : void {
+    async loadFromBoardData(data : BoardData) : Promise<void> {
         batch(() => {
             this.state.id = data.id;
             this.state.name = data.name;
@@ -121,7 +123,7 @@ export class Board extends Service<BoardState> {
             this.state.isPublic = data.isPublic;
         });
         const buffer = ByteBuffer.fromArrayBuffer(data.contents);
-        const items = this.deserialize(buffer);
+        const items = await this.deserialize(buffer);
         this.add(items);
     }
 
@@ -246,7 +248,7 @@ export class Board extends Service<BoardState> {
         return buffer;
     }
 
-    deserialize(buffer : ByteBuffer) : BoardItem[] {
+    async deserialize(buffer : ByteBuffer) : Promise<BoardItem[]> {
         const items : BoardItem[] = [];
         while (!buffer.eod)
             try {
@@ -271,6 +273,10 @@ export class Board extends Service<BoardState> {
                     const [color, weight] = buffer.readFormatted("ib");
                     const filled = buffer.readByte();
                     item = new Ellipse(rect, color, weight, filled === 1);
+                } else if (type === BoardItemType.Image) {
+                    const src = buffer.readString();
+                    const image = await loadImage(src);
+                    item = new Image(rect, image);
                 } else {
                     continue;
                 }

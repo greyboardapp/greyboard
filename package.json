@@ -39,6 +39,7 @@
     "@tweenjs/tween.js": "^18.6.4",
     "auto-bind": "^5.0.1",
     "base64-js": "^1.5.1",
+    "browser-image-compression": "^2.0.0",
     "class-variance-authority": "^0.2.4",
     "comlink": "^4.4.1",
     "light-date": "^1.2.0",

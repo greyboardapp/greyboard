@@ -9,6 +9,7 @@ export enum BoardItemType {
     Path,
     Rectangle,
     Ellipse,
+    Image,
 }
 
 export abstract class BoardItem {

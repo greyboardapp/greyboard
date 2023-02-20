@@ -1,7 +1,8 @@
+import imageCompression from "browser-image-compression";
 import Color from "../../utils/datatypes/color";
 import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
 import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
-import { input, MouseButton, PointerEventData } from "./input";
+import { input, KeyboardEventData, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
 import { RectangleTool } from "./toolbox/rectangle";
@@ -16,12 +17,17 @@ import { pass } from "../../utils/system/misc";
 import { createCommand } from "./commands";
 import { selection } from "./selection";
 import { MarkerTool } from "./toolbox/marker";
+import { loadImage, toDataUrl } from "../../utils/system/image";
+import Image from "../data/items/image";
+import { viewport } from "./viewport";
+import Rect from "../data/geometry/rect";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
     colorPalette : number[];
     selectedColorIndex : number;
     selectedTool ?: Tool;
+    previousSelectedTool ?: Tool;
     selectedWeight : number;
     isToolInAction : boolean;
 
@@ -64,8 +70,10 @@ export class Toolbox extends Service<ToolboxState> {
     @reactive
     @batched
     onSelectedToolChanged(prev ?: Tool) : Tool | undefined {
-        if (prev)
+        if (prev) {
             prev.onDeselected();
+            this.state.previousSelectedTool = prev;
+        }
         if (!this.state.selectedTool?.name.match(/(select|view)/i))
             selection.state.ids = [];
         this.state.selectedTool?.onSelected(prev);
@@ -114,19 +122,21 @@ export class Toolbox extends Service<ToolboxState> {
         input.onPointerDown.add(this.pointerDownEvent);
         input.onPointerMove.add(this.pointerMoveEvent);
         input.onPointerUp.add(this.pointerUpEvent);
+        input.onKeyDown.add(this.keyDownEvent);
+        input.onKeyUp.add(this.keyUpEvent);
 
         for (const tool of this.tools)
             createCommand(tool.shortcut, () => (this.state.selectedTool = tool));
     }
 
-    pasteFromClipboard(data : DataTransfer) : void {
+    async pasteFromClipboard(data : DataTransfer) : Promise<void> {
         try {
             if (data.items.length === 0)
                 return;
             const [item] = data.items;
             if (item.type.startsWith("text")) {
                 const buffer = ByteBuffer.decode(data.getData("text"));
-                const items = board.deserialize(buffer);
+                const items = await board.deserialize(buffer);
                 for (const i of items) {
                     i.rect.x += 10;
                     i.rect.y += 10;
@@ -135,6 +145,21 @@ export class Toolbox extends Service<ToolboxState> {
                 }
                 board.addAction(items);
                 selection.state.ids = items.map((i) => i.id);
+            } else if (item.type.startsWith("image")) {
+                const blob = item.getAsFile();
+                if (!blob)
+                    return;
+                const compressedBlob = await imageCompression(blob, {
+                    alwaysKeepResolution: true,
+                    maxSizeMB: 1,
+                });
+                const blobData = await toDataUrl(URL.createObjectURL(compressedBlob));
+                if (!blobData)
+                    return;
+                const imageData = await loadImage(blobData as string);
+                const center = viewport.screenCenterToViewport();
+                const image = new Image(new Rect(center.x - imageData.width / 2, center.y - imageData.height / 2, imageData.width, imageData.height), imageData);
+                board.addAction([image]);
             }
         } catch (e) { pass(e); }
     }
@@ -173,6 +198,23 @@ export class Toolbox extends Service<ToolboxState> {
         this.state.selectedTool.actionStarted = false;
         this.state.isToolInAction = false;
         this.state.selectedTool.onActionEnd(data);
+    }
+
+    private keyDownEvent(data : KeyboardEventData) : void {
+        if (data.button !== " " || data.repeatCount > 1)
+            return;
+
+        const viewTool = this.getTool(ViewTool);
+        if (!viewTool)
+            return;
+        this.state.selectedTool = viewTool;
+    }
+
+    private keyUpEvent(data : KeyboardEventData) : void {
+        if (!this.state.previousSelectedTool || data.button !== " ")
+            return;
+
+        this.state.selectedTool = this.state.previousSelectedTool;
     }
 }
 
