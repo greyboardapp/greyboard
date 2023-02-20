@@ -22,5 +22,7 @@ export default class Point {
 export class PressurePoint extends Point {
     constructor(public x : number = 0, public y : number = 0, public pressure ?: number) {
         super(x, y);
+        if (this.pressure === 0)
+            this.pressure = undefined;
     }
 }

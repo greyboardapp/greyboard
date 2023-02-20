@@ -34,10 +34,13 @@
     "buttons.logout": "Kijelentkezés",
     "buttons.share": "Megosztás",
     "buttons.cancel": "Mégse",
+    "buttons.backToSafeZone": "Vissza a főoldalra",
+    "buttons.ok": "Ok",
     "placeholder.typeSomething": "Írj valamit...",
     "titles.labels": "Címkék",
+    "titles.somethingWentWrong": "Hoppá, valami nem sikerült!",
     "texts.welcome": "Egy egyszerű online kollaboratív rajztábla tervezésre, probléma oldásra és firkantásra.",
-    "texts.noLabels": "Nincs még címke ebben a táblában. Addj hozzá egyet és hozzá fogsz tudni ugrani innen...",
+    "texts.noLabels": "Nincs még címke ebben a táblában. Adj hozzá egyet és hozzá fogsz tudni ugrani innen...",
     "texts.unknown": "Ismeretlen",
     "texts.signInWith": "Jelentkezz be a következőkkel...",
     "texts.signingIn": "Bejelentkezés folyamatban...",
@@ -47,5 +50,10 @@
     "texts.noBoardsHint": "Még nincs egy táblád sem! Addj hozzá egyet itt.",
     "texts.publicBoard": "Nyilványos tábla",
     "texts.accessibleOnWhenYouAreIn": "Elérhető, csak akkor ha bent vagy",
-    "texts.modifiableOnWhenYouAreIn": "Módosítható, csak akkor ha bent vagy"
+    "texts.modifiableOnWhenYouAreIn": "Módosítható, csak akkor ha bent vagy",
+    "errors.unknown": "A kérést nem sikerült feldolgozni. Probáld meg később.",
+    "errors.pageNotFound": "Az oldal amit megprobáltál elérni nem létezik.",
+    "errors.apiNotAvailable": "Úgy tűnik, hogy a szervereink nem érhetőek el jelenleg.",
+    "errors.boardNameMaxLength": "A tábla neve túl hosszú. Legfeljebb 32 karakter lehet.",
+    "errors.boardNameInvalidCharacter": "A tábla neve nem megfelelő. Csak betűket, szóközöket és számokat tartalmazhat."
 }

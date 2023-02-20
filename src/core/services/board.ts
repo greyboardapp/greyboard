@@ -27,6 +27,7 @@ interface BoardState {
     lastBuildScale : number;
     temporaryScale : number;
     savingEnabled : boolean;
+    lastSaveDate ?: Date;
 }
 
 export class Board extends Service<BoardState> {
@@ -91,6 +92,7 @@ export class Board extends Service<BoardState> {
             this.state.savingEnabled = false;
             this.state.temporaryScale = this.state.lastBuildScale = 1;
         });
+        this.onBoardReadyToSave.clear();
     }
 
     save() : BoardSaveData {

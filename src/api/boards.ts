@@ -57,15 +57,14 @@ export async function createBoard(data : BoardCreation) : Promise<ApiResponse<Bo
     }
 }
 
-export async function saveBoard(data : BoardSaveData) : Promise<ApiResponse<null>> {
+export async function saveBoard(data : BoardSaveData) : Promise<ApiResponse<string>> {
     try {
         console.log(data.contents);
-        await fetch(`${import.meta.env.BACKEND_URL}/api/boards/${data.id}/contents`, {
+        return (await (await fetch(`${import.meta.env.BACKEND_URL}/api/boards/${data.id}/contents`, {
             method: "PUT",
             body: data.contents,
             credentials: "include",
-        });
-        return { status: 200, result: null };
+        })).json() as ApiResponse<string>);
     } catch (e) {
         return { status: 500, error: "errors.apiNotAvailable" };
     }

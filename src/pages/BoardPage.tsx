@@ -1,4 +1,4 @@
-import { Component, onCleanup, onMount, For, Show, createEffect, untrack } from "solid-js";
+import { Component, onCleanup, onMount, For, Show, untrack } from "solid-js";
 import { Link, Params, useParams } from "@solidjs/router";
 import { createMutation, createQuery } from "@tanstack/solid-query";
 import Canvas from "../components/surfaces/Canvas";
@@ -42,6 +42,7 @@ import AvatarList from "../components/data/AvatarList";
 import { user } from "../utils/system/auth";
 import Popover from "../components/feedback/Popover";
 import SharePanel from "../components/app/panels/SharePanel";
+import { showModal } from "../components/surfaces/Modal";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -49,37 +50,57 @@ interface BoardPageParams extends Params {
 
 const BoardPage : Component = () => {
     const params = useParams<BoardPageParams>();
-    const boardDataQuery = createQuery(() => ["board"], async () => getBoardData(params.slug), {
-        refetchOnWindowFocus: false,
+
+    const showErrorModal = (error ?: string) : void => showModal({
+        title: "titles.somethingWentWrong",
+        content: <>
+            <Text content={error ?? "errors.unknown"} />
+        </>,
+        buttons: [
+            (close) => <Button content="buttons.ok" variant="primary" onClick={close} />,
+        ],
+        size: "s",
     });
 
-    const saveMutation = createMutation(async () : Promise<ApiResponse<null>> => saveBoard({
+    const boardDataQuery = createQuery(() => ["board"], async () => getBoardData(params.slug), {
+        refetchOnWindowFocus: false,
+        onSuccess: (data) => {
+            untrack(() => {
+                if (!data || data.error || !data.result) {
+                    showErrorModal(data.error);
+                    return;
+                }
+
+                board.loadFromBoardData(data.result);
+                board.startPeriodicSave();
+            });
+
+            hideLoadingOverlay();
+        },
+        onError: (err) => showErrorModal(),
+    });
+
+    const saveMutation = createMutation(async () : Promise<ApiResponse<string>> => saveBoard({
         id: board.state.id,
         name: board.state.name,
         contents: board.serialize(),
-    }));
+    }), {
+        onSettled: (data, error) => {
+            if (!data || data.error || !data.result) {
+                showErrorModal(data?.error);
+                return;
+            }
+
+            board.state.lastSaveDate = new Date(data.result);
+        },
+    });
 
     onMount(() => {
         app.start();
         board.onBoardReadyToSave.add(() => saveMutation.mutate());
     });
-    onCleanup(() => app.stop());
-
-    createEffect(() => {
-        if (boardDataQuery.isLoading || !boardDataQuery.data)
-            return;
-        untrack(() => {
-            const { data } = boardDataQuery;
-            if (!data || data.error || !data.result) {
-                console.error(data.error);
-                return; // TODO: handle error
-            }
-
-            board.loadFromBoardData(data.result);
-            // board.startPeriodicSave();
-        });
-
-        hideLoadingOverlay();
+    onCleanup(() => {
+        app.stop();
     });
 
     return (
@@ -88,8 +109,8 @@ const BoardPage : Component = () => {
             <ApiSuspense query={boardDataQuery}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
-                    <div class={cls(styles.interactable, "flex h h-spaced v-center")}>
-                        <Toolbar variant="top">
+                    <div class="flex h h-spaced v-center">
+                        <Toolbar class={styles.interactable} variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
                             <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} />
                             <Tooltip content={<><Text content="actions.save" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.save.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
@@ -102,7 +123,7 @@ const BoardPage : Component = () => {
                                 <ToolbarButton icon={redoIcon} onClick={app.redo} disabled={!app.redo.when()} />
                             </Tooltip>
                         </Toolbar>
-                        <div class="flex h pr2">
+                        <div class={cls(styles.interactable, "flex h pr2")}>
                             <Show when={user()} keyed>
                                 {(loggedInUser) => <AvatarList users={[loggedInUser]} me={loggedInUser.id} paddingRight={2} />}
                             </Show>

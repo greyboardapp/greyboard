@@ -7,6 +7,8 @@ import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 import LoadingOverlay from "./components/app/LoadingOverlay";
+import ModalProvider from "./components/surfaces/Modal";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const BoardPage = lazy(async () => import("./pages/BoardPage"));
 
@@ -25,9 +27,11 @@ const App : Component = () => (
 
                     <Route path="/auth/google" element={<AuthPage />} />
                     <Route path="/auth/github" element={<AuthPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Router>
             <LoadingOverlay />
+            <ModalProvider />
         </QueryClientProvider>
     </div>
 );

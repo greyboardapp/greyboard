@@ -27,15 +27,46 @@ import Skeleton from "../components/feedback/Skeleton";
 import IconButton from "../components/controls/IconButton";
 import { hideLoadingOverlay, showLoadingOverlay } from "../components/app/LoadingOverlay";
 import { logout } from "../api/auth";
+import { showModal } from "../components/surfaces/Modal";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
     if (!isLoggedIn())
         navigate("/");
 
-    const boardQuery = createQuery(() => ["boards"], getUserBoards, { refetchOnWindowFocus: false });
+    const showErrorModal = (error ?: string) : void => showModal({
+        title: "titles.somethingWentWrong",
+        content: <>
+            <Text content={error ?? "errors.unknown"} />
+        </>,
+        buttons: [
+            (close) => <Button content="buttons.ok" variant="primary" onClick={close} />,
+        ],
+        size: "s",
+    });
+
+    const loadingSkeleton = (
+        <>
+            <div class="col"><Skeleton height={250} /></div>
+            <div class="col"><Skeleton height={250} /></div>
+            <div class="col"><Skeleton height={250} /></div>
+            <div class="col"><Skeleton height={250} /></div>
+        </>
+    );
+
+    const boardQuery = createQuery(() => ["boards"], getUserBoards, {
+        refetchOnWindowFocus: false,
+        onSettled: (data, error) => {
+            if (!data || data.error || data.result === undefined)
+                showErrorModal(data?.error);
+        },
+    });
     const createBoardMutation = createMutation({
         mutationFn: async (data : BoardCreation) => createBoard(data),
+        onSettled: (data, error) => {
+            if (!data || data.error || data.result === undefined)
+                showErrorModal(data?.error);
+        },
     });
 
     return (
@@ -82,15 +113,8 @@ const DashboardPage : Component = () => {
                             <div class={cls(styles.content, "row c1 m:c2 l:c3 xl:c4 g3 pb4")}>
                                 <ApiSuspense
                                     query={boardQuery}
-                                    loadingFallback={
-                                        <>
-                                            <div class="col"><Skeleton height={250} /></div>
-                                            <div class="col"><Skeleton height={250} /></div>
-                                            <div class="col"><Skeleton height={250} /></div>
-                                            <div class="col"><Skeleton height={250} /></div>
-                                        </>
-                                    }
-                                    errorFallback={(error) => error}
+                                    loadingFallback={loadingSkeleton}
+                                    errorFallback={(error) => loadingSkeleton}
                                 >
                                     {(boards) => (
                                         <For each={boards} fallback={(

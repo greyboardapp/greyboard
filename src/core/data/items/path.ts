@@ -31,8 +31,13 @@ export default class Path extends BoardShapeItem {
     }
 
     render(graphics : Graphics, isTemporary : boolean) : void {
-        const points = this.generateStroke(isTemporary);
-        graphics.path(new Path2D(this.getSvgPathFromStroke(points)), this.color);
+        if (this.points.length === 1) {
+            const r = (this.points[0].pressure || 1) * this.weight;
+            graphics.ellipse(new Rect(this.rect.x + this.points[0].x - r, this.rect.y + this.points[0].y - r, r * 2, r * 2), this.color, this.weight, true);
+        } else {
+            const points = this.generateStroke(isTemporary);
+            graphics.path(new Path2D(this.getSvgPathFromStroke(points)), this.color);
+        }
     }
 
     isInLine(a : Point, b : Point) : boolean {
@@ -74,10 +79,16 @@ export default class Path extends BoardShapeItem {
     }
 
     private normalize() : void {
-        for (const point of this.points) {
-            point.x = (point.x - this.rect.x) / this.rect.w;
-            point.y = (point.y - this.rect.y) / this.rect.h;
-        }
+        if (this.rect.w === 0 || this.rect.h === 0)
+            for (const point of this.points) {
+                point.x = 0;
+                point.y = 0;
+            }
+        else
+            for (const point of this.points) {
+                point.x = (point.x - this.rect.x) / this.rect.w;
+                point.y = (point.y - this.rect.y) / this.rect.h;
+            }
     }
 
     private destabilize() : PressurePoint[] {
@@ -119,7 +130,7 @@ export default class Path extends BoardShapeItem {
         if (this.points.length === 2 && this.points[0].x === this.points[1].x && this.points[0].y === this.points[1].y)
             this.points = [this.points[0]];
 
-        logger.debug(`Optimized from ${count} to ${this.points.length}. ${this.points.length / count}`);
+        logger.debug(`Optimized from ${count} to ${this.points.length}. ${this.points.length / count}`, this.points);
     }
 
     private generateStroke(isTemporary : boolean) : Point[] {

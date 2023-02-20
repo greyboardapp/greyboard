@@ -33,9 +33,12 @@
     "buttons.goToMyDashboard": "Go to my Dashboard",
     "buttons.logout": "Log out",
     "buttons.share": "Share",
+    "buttons.ok": "Ok",
     "buttons.cancel": "Cancel",
+    "buttons.backToSafeZone": "Back to safe zone",
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
+    "titles.somethingWentWrong": "Oops, something went wrong...",
     "texts.welcome": "A small online collaborative whiteboard application for mocking, wireframing, solving problems and sketching.",
     "texts.noLabels": "There are no labels in this board. Add one and you will be able to jump to it from here...",
     "texts.unknown": "Unknown",
@@ -47,5 +50,10 @@
     "texts.noBoardsHint": "You don't have any boards yet! How about creating one?",
     "texts.publicBoard": "Public board",
     "texts.accessibleOnWhenYouAreIn": "Accessible only when you are in",
-    "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in"
+    "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in",
+    "errors.unknown": "Your request was not able to be processed. Try again later.",
+    "errors.pageNotFound": "The page you tried to access does not exist.",
+    "errors.apiNotAvailable": "It seems that our servers are unavailable right now.",
+    "errors.boardNameMaxLength": "The name of the board is too long. It can be at maximum 32 character.",
+    "errors.boardNameInvalidCharacter": "The name of the board is not correct. It can only contain letters, spaces and numbers."
 }
