@@ -40,6 +40,9 @@ jobs:
           GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
           GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
 
+      - name: Copy Common to Build
+        run: cp -r common dist/common
+
       - name: Copy Functions to Build
         run: cp -r functions dist/functions
 
