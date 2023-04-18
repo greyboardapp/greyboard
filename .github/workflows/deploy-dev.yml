@@ -15,7 +15,7 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  build:
+  deploy:
     needs: lint
     if: "!failure()"
     runs-on: ubuntu-latest
@@ -36,37 +36,9 @@ jobs:
           GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
 
       - name: Bundle Build Artifacts
-        run: |
-          cp -r common dist/common
-          cp -r functions dist/functions
-          cp package.json dist/package.json
-          cp yarn.lock dist/yarn.lock
+        run: cp -r functions dist/functions
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: greyboard-frontend-${{ github.sha }}
-          path: dist
-  
-  deploy:
-    needs: build
-    if: "!failure()"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: greyboard-frontend-${{ github.sha }}
-
-      - uses: actions/setup-node@v2.5.1
-        with:
-          cache: yarn
-
-      - name: Install Dependencies
-        run: yarn install --ignore-scripts --frozen-lockfile
-        shell: bash
-        
-      - name: Replace Tokens
+      - name: Prepare Provisioning
         uses: cschleiden/replace-tokens@v1
         with:
           files: "wrangler.toml"
@@ -78,7 +50,7 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Publish Build to Cloudflare Pages
-        run: npx wrangler pages publish . --project-name greyboard --branch ${{ github.ref_name }} --commit-message ${{ github.sha }}
+        run: npx wrangler pages publish dist --project-name greyboard --branch ${{ github.ref_name }} --commit-message ${{ github.sha }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
