@@ -7,7 +7,7 @@ export async function getUserBoards() : Promise<ApiResponse<Board[]>> {
         const loggedInUser = user();
         if (!loggedInUser)
             return { status: 403, error: "errors.notLoggedIn" };
-        return (await (await fetch(`/api/boards/author/${loggedInUser.id}`, { credentials: "include" })).json()) as ApiResponse<Board[]>;
+        return (await (await fetch(`/api/boards/author/${loggedInUser.id}`, { credentials: "include" })).json());
     } catch (e) {
         return { status: 500, error: "errors.apiNotAvailable" };
     }
@@ -15,7 +15,7 @@ export async function getUserBoards() : Promise<ApiResponse<Board[]>> {
 
 export async function getBoardData(slug : string) : Promise<ApiResponse<BoardData>> {
     try {
-        const board = (await (await fetch(`/api/boards/slug/${slug}`, { credentials: "include" })).json()) as ApiResponse<Board>;
+        const board : ApiResponse<Board> = (await (await fetch(`/api/boards/slug/${slug}`, { credentials: "include" })).json());
         if (board.status !== 200 || board.error || !board.result)
             return { status: board.status, error: board.error };
 
@@ -51,7 +51,7 @@ export async function createBoard(data : BoardCreation) : Promise<ApiResponse<Bo
             method: "POST",
             body: JSON.stringify(data),
             credentials: "include",
-        })).json()) as ApiResponse<Board>;
+        })).json());
     } catch (e) {
         return { status: 500, error: "errors.apiNotAvailable" };
     }
@@ -64,7 +64,7 @@ export async function saveBoard(data : BoardSaveData) : Promise<ApiResponse<stri
             method: "PUT",
             body: data.contents,
             credentials: "include",
-        })).json() as ApiResponse<string>);
+        })).json());
     } catch (e) {
         return { status: 500, error: "errors.apiNotAvailable" };
     }

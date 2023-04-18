@@ -24,7 +24,7 @@
     "dev": "vite & wrangler pages dev . --ip=localhost --persist",
     "build": "vite build",
     "sb": "start-storybook",
-    "lint": "eslint 'src/**/*'",
+    "lint": "eslint 'client/**/*' 'functions/**/*' 'common/**/*'",
     "deploy": "wrangler pages publish . --project-name=greyboard"
   },
   "devDependencies": {
