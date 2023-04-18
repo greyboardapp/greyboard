@@ -22,7 +22,7 @@ interface GoogleAuthCallbackParams extends Record<string, string> {
     redirectUrl : string;
 }
 
-export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => signIn(env.db, AuthType.GitHub, async () => {
+export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => signIn(env.db, AuthType.Google, async () => {
     try {
         const body = await request.json<GoogleAuthCallbackParams>();
 
