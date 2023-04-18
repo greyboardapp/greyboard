@@ -57,8 +57,13 @@ jobs:
         with:
           name: greyboard-frontend-${{ github.sha }}
 
-      - name: Setup Node and Install Dependencies
-        uses: ./.github/actions/setup
+      - uses: actions/setup-node@v2.5.1
+        with:
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install --ignore-scripts --frozen-lockfile
+        shell: bash
         
       - name: Replace Tokens
         uses: cschleiden/replace-tokens@v1
