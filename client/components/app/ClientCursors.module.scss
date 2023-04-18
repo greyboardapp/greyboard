@@ -1,0 +1,30 @@
+@import "../../global";
+
+.cursors {
+    pointer-events: none;
+
+    .cursor {
+        position: fixed;
+        display: flex;
+        transition: all 0.2s cubic-bezier(0.27, 0.52, 0.52, 0.77);
+        z-index: 1;
+
+        @include themed() {
+            color: color($fg);
+        }
+
+        &.inactive {
+            opacity: 0.5;
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+            margin-left: -3px;
+        }
+
+        span {
+            margin-top: 10px;
+        }
+    }
+}

@@ -2,12 +2,10 @@ import { defineConfig } from "vite";
 import { fromEnv } from "@gergoszaszvaradi/vite-env";
 import solidPlugin from "vite-plugin-solid";
 import solidSvg from "vite-plugin-solid-svg";
-import { comlink } from "vite-plugin-comlink";
 
 export default defineConfig(({ mode }) => {
     return {
         plugins: [
-            comlink(),
             solidPlugin(),
             solidSvg({
                 defaultExport: "component",
@@ -20,13 +18,11 @@ export default defineConfig(({ mode }) => {
                 }
             }),
         ],
-        worker: {
-            plugins: [
-                comlink(),
-            ],
-        },
         server: {
             port: 3000,
+            proxy: {
+                "/api": "http://localhost:8788"
+            }
         },
         build: {
             target: "esnext",

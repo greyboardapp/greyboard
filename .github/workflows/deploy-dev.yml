@@ -37,12 +37,14 @@ jobs:
         run: yarn build
         env:
           BASE_URL: ${{ vars.BASE_URL }}
-          BACKEND_URL: ${{ vars.DEV_BACKEND_URL }}
           DEBUG: ${{ vars.DEBUG }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
           BOARD_SAVE_INTERVAL: ${{ vars.DEV_BOARD_SAVE_INTERVAL }}
           GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
           GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
+
+      - name: Copy Functions to Build
+        run: cp -r functions dist/functions
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -66,8 +68,25 @@ jobs:
       - name: Install NPM Packages
         run: yarn global add wrangler
         
+      - name: Replace Tokens
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: "wrangler.toml"
+        env:
+          GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
+          GOOGLE_AUTH_CLIENT_SECRET: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_SECRET }}
+          GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
+          GITHUB_AUTH_CLIENT_SECRET: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
       - name: Publish Build to Cloudflare Pages
         run: npx wrangler pages publish . --project-name greyboard --branch ${{ github.ref_name }} --commit-message ${{ github.sha }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Run Database Migrations
+        run: npx wrangler d1 migrations apply -e dev greyboard-db-dev
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
