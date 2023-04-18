@@ -22,13 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup Node Environment
-        uses: actions/setup-node@v3
-        with:
-          cache: yarn
-
-      - name: Install Dependencies
-        run: yarn install --ignore-scripts --frozen-lockfile
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
 
       - name: Build
         run: yarn build
@@ -40,11 +35,11 @@ jobs:
           GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
           GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
 
-      - name: Copy Common to Build
-        run: cp -r common dist/common
-
-      - name: Copy Functions to Build
-        run: cp -r functions dist/functions
+      - name: Bundle Build Artifacts
+        run: |
+          cp -r common dist/common
+          cp -r functions dist/functions
+          cp package.json dist/package.json
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -62,11 +57,8 @@ jobs:
         with:
           name: greyboard-frontend-${{ github.sha }}
 
-      - name: Setup Node Environment
-        uses: actions/setup-node@v3
-
-      - name: Install NPM Packages
-        run: yarn global add wrangler
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
         
       - name: Replace Tokens
         uses: cschleiden/replace-tokens@v1
