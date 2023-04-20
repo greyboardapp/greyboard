@@ -62,6 +62,7 @@
     "base64-js": "^1.5.1",
     "browser-image-compression": "^2.0.0",
     "class-variance-authority": "^0.2.4",
+    "javascript-time-ago": "^2.5.9",
     "light-date": "^1.2.0",
     "nanoid": "^4.0.0",
     "reflect-metadata": "^0.1.13",

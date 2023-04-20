@@ -1,5 +1,11 @@
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+import hu from "javascript-time-ago/locale/hu";
 import { createEffect, createMemo, createSignal } from "solid-js";
 import { isLocaleValid, languages, LanguageTexts } from "../../languages/languages";
+
+TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(hu);
 
 const STORAGE_KEY = "language-locale";
 const DEFAULT_LOCALE = "en-us";
@@ -41,10 +47,13 @@ export const formattedDate = (date : number | Date, options ?: Intl.DateTimeForm
     ...options,
 }).format((typeof date === "number") ? new Date(date * 1000) : date);
 
-export const formattedRelativeDateTime = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.RelativeTimeFormat(locale(), {
-    dateStyle: "medium",
-    ...options,
-}).format(-(new Date().getTime() - ((typeof date === "number") ? date * 1000 : date.getTime())), "day");
+// export const formattedRelativeDateTime = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.RelativeTimeFormat(locale(), {
+//     dateStyle: "medium",
+//     ...options,
+// }).format(-(new Date().getTime() - ((typeof date === "number") ? date * 1000 : date.getTime())), "day");
+
+export const formattedRelativeDateTime = (date : number | Date) : string => new TimeAgo(locale().replace(/-.*/, ""))
+    .format((typeof date === "number") ? new Date(date * 1000) : date, "round-minute");
 
 export const formattedList = (values : Iterable<string>, options ?: Intl.ListFormatOptions) : string => new Intl.ListFormat(locale(), {
     style: "long",

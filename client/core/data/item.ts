@@ -23,8 +23,9 @@ export abstract class BoardItem {
     constructor(public type = BoardItemType.None) {}
 
     // type + locked + zIndex + label + rect
-    getSerializedSize() : number { return 1 + 1 + 1 + (this.label !== null ? this.label.length + 1 : 1) + 4 * 4; }
+    getSerializedSize() : number { return 4 + 1 + 1 + 1 + (this.label !== null ? this.label.length + 1 : 1) + 4 * 4; }
     serialize(buffer : ByteBuffer) : ByteBuffer {
+        buffer.writeUInt(this.id);
         buffer.writeFormatted("bbb", this.type, this.locked ? 1 : 0, this.zIndex);
         buffer.writeString(this.label || "");
         buffer.writeFormatted("ffff", this.rect.x, this.rect.y, this.rect.w, this.rect.h);

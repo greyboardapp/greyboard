@@ -51,6 +51,7 @@
     "texts.publicBoard": "Nyilványos tábla",
     "texts.accessibleOnWhenYouAreIn": "Elérhető, csak akkor ha bent vagy",
     "texts.modifiableOnWhenYouAreIn": "Módosítható, csak akkor ha bent vagy",
+    "texts.expires": "Lejár",
     "errors.unknown": "A kérést nem sikerült feldolgozni. Probáld meg később.",
     "errors.pageNotFound": "Az oldal amit megprobáltál elérni nem létezik.",
     "errors.apiNotAvailable": "Úgy tűnik, hogy a szervereink nem érhetőek el jelenleg.",

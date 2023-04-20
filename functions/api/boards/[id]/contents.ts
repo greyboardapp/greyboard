@@ -1,7 +1,7 @@
 import { Board } from "../../../../common/models/board";
 import { UUIDSchema } from "../../../../common/models/uuid";
 import { getSignedInUser } from "../../../auth";
-import { ok, BoardCreationFailed, internalError, BoardContentsNotFound, BoardNotFound, Env, Unauthorized, ValidationError, badRequest, buffer, dbGetById, notFound, unauthorized } from "../../../utils";
+import { ok, internalError, BoardContentsNotFound, BoardNotFound, Env, Unauthorized, ValidationError, badRequest, buffer, dbGetById, notFound, unauthorized, BoardModificationFailed } from "../../../utils";
 
 export const onRequestGet : PagesFunction<Env> = async ({ request, params, env }) => {
     const id = UUIDSchema.safeParse(params.id);
@@ -39,7 +39,7 @@ export const onRequestPut : PagesFunction<Env> = async ({ request, params, env }
     const result = await env.boards.put(id.data, content);
 
     if (!result)
-        return internalError(new BoardCreationFailed("Unable to create board"));
+        return internalError(new BoardModificationFailed("Unable to modify board"));
 
     return ok(result.uploaded);
 };

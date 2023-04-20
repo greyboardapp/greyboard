@@ -51,6 +51,7 @@
     "texts.publicBoard": "Public board",
     "texts.accessibleOnWhenYouAreIn": "Accessible only when you are in",
     "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in",
+    "texts.expires": "Expires",
     "errors.unknown": "Your request was not able to be processed. Try again later.",
     "errors.pageNotFound": "The page you tried to access does not exist.",
     "errors.apiNotAvailable": "It seems that our servers are unavailable right now.",

@@ -1,5 +1,6 @@
 import { batch } from "solid-js";
-import { BoardData, BoardSaveData } from "../../models/board";
+import { BoardData } from "../../models/board";
+import { BoardSaveData } from "../../../common/models/board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import createDelegate from "../../utils/datatypes/delegate";
 import { floor } from "../../utils/math/math";
@@ -17,9 +18,12 @@ import { Chunk } from "./board/chunk";
 import { QuadTree } from "./board/quadTree";
 import { builder } from "./builder";
 import { viewport } from "./viewport";
+import { network } from "./network";
+import { selection } from "./selection";
+import { BoardMoveData, BoardResizeData } from "../data/boardAction";
 
 interface BoardState {
-    id : number;
+    id : string;
     name : string;
     author : string;
     slug : string;
@@ -37,28 +41,70 @@ export class Board extends Service<BoardState> {
     public readonly chunks = new Map<string, Chunk>();
 
     public readonly addAction = createAction(
-        (items : Iterable<BoardItem>) => this.add(items),
-        (items : Iterable<BoardItem>) => this.remove(items),
+        (items : BoardItem[]) => {
+            this.add(items);
+            network.addBoardItems(items);
+        },
+        (items : BoardItem[]) => {
+            this.remove(items);
+            network.removeBoardItems(items);
+        },
     );
 
     public readonly removeAction = createAction(
-        (items : Iterable<BoardItem>) => this.remove(items),
-        (items : Iterable<BoardItem>) => this.add(items),
+        (items : BoardItem[]) => {
+            this.remove(items);
+            network.removeBoardItems(items);
+        },
+        (items : BoardItem[]) => {
+            this.add(items);
+            network.addBoardItems(items);
+        },
+    );
+
+    public readonly moveAction = createAction(
+        (data : BoardMoveData, execute ?: boolean) => {
+            if (execute)
+                this.move(data.ids, data.dx, data.dy);
+            network.moveBoardItems(data.ids, data.dx, data.dy);
+            selection.refresh();
+        },
+        (data : BoardMoveData, execute ?: boolean) => {
+            if (execute)
+                this.move(data.ids, -data.dx, -data.dy);
+            network.moveBoardItems(data.ids, -data.dx, -data.dy);
+            selection.refresh();
+        },
+    );
+
+    public readonly resizeAction = createAction(
+        (data : BoardResizeData, execute ?: boolean) => {
+            if (execute)
+                this.resize(data.ids, data.newRect);
+            network.resizeBoardItems(data.ids, data.newRect);
+            selection.refresh();
+        },
+        (data : BoardResizeData, execute ?: boolean) => {
+            if (execute)
+                this.resize(data.ids, data.oldRect);
+            network.resizeBoardItems(data.ids, data.oldRect);
+            selection.refresh();
+        },
     );
 
     public readonly bringForwardAction = createAction(
-        (items : Iterable<BoardItem>) => this.bringForward(items),
-        (items : Iterable<BoardItem>) => this.sendBackward(items),
+        (items : BoardItem[]) => this.bringForward(items),
+        (items : BoardItem[]) => this.sendBackward(items),
     );
 
     public readonly sendBackwardAction = createAction(
-        (items : Iterable<BoardItem>) => this.sendBackward(items),
-        (items : Iterable<BoardItem>) => this.bringForward(items),
+        (items : BoardItem[]) => this.sendBackward(items),
+        (items : BoardItem[]) => this.bringForward(items),
     );
 
     public readonly setLockStateAction = createAction(
-        (data : { items : Iterable<BoardItem>; state : boolean}) => this.setLockState(data.items, data.state),
-        (data : { items : Iterable<BoardItem>; state : boolean}) => this.setLockState(data.items, !data.state),
+        (data : { items : BoardItem[]; state : boolean}) => this.setLockState(data.items, data.state),
+        (data : { items : BoardItem[]; state : boolean}) => this.setLockState(data.items, !data.state),
     );
 
     public readonly onBoardReadyToSave = createDelegate<[data : BoardSaveData]>();
@@ -67,7 +113,7 @@ export class Board extends Service<BoardState> {
 
     constructor() {
         super({
-            id: 0,
+            id: "",
             name: "New Board",
             author: "",
             slug: "",
@@ -104,6 +150,7 @@ export class Board extends Service<BoardState> {
             contents: this.serialize(),
         };
         this.onBoardReadyToSave(data);
+        network.boardSaved();
         return data;
     }
 
@@ -135,17 +182,20 @@ export class Board extends Service<BoardState> {
 
     addFromObject(items : Iterable<BoardItem>) : void {
         this.add(Array.from(items).map((item) : (BoardItem | null) => {
+            let created : BoardItem | null = null;
             if (item.type === BoardItemType.Path) {
-                const path = new Path((item as Path).points.map((point) => new Point(point.x, point.y)), (item as Path).color, (item as Path).weight);
-                path.rect = new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y));
-                return path;
+                created = new Path((item as Path).points.map((point) => new Point(point.x, point.y)), (item as Path).color, (item as Path).weight);
+                created.rect = new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y));
+            } else if (item.type === BoardItemType.Rectangle) {
+                created = new Rectangle(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Rectangle).color, (item as Rectangle).weight, (item as Rectangle).filled);
+            } else if (item.type === BoardItemType.Ellipse) {
+                created = new Ellipse(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Ellipse).color, (item as Ellipse).weight, (item as Ellipse).filled);
             }
-            if (item.type === BoardItemType.Rectangle)
-                return new Rectangle(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Rectangle).color, (item as Rectangle).weight, (item as Rectangle).filled);
-            if (item.type === BoardItemType.Ellipse)
-                return new Ellipse(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Ellipse).color, (item as Ellipse).weight, (item as Ellipse).filled);
 
-            return null;
+            if (created)
+                created.id = item.id;
+
+            return created;
         }).filter((item) => item !== null) as Iterable<BoardItem>);
     }
 
@@ -156,15 +206,35 @@ export class Board extends Service<BoardState> {
     }
 
     removeByIds(ids : Iterable<number>) : void {
-        const items : BoardItem[] = [];
+        this.removeFromChunk(this.getItemsFromIds(ids));
+    }
 
-        for (const id of ids) {
-            const item = this.items.get(id);
-            if (item)
-                items.push(item);
-        }
+    move(ids : Iterable<number>, dx : number, dy : number) : void {
+        const items = this.getItemsFromIds(ids);
 
         this.removeFromChunk(items);
+        for (const item of items) {
+            item.rect.x += dx;
+            item.rect.x2 += dx;
+            item.rect.y += dy;
+            item.rect.y2 += dy;
+        }
+        this.addToChunk(items);
+    }
+
+    resize(ids : Iterable<number>, rect : Rect) : void {
+        const items = this.getItemsFromIds(ids);
+        console.log(items, rect);
+
+        this.removeFromChunk(items);
+        const bb = this.getItemsBoundingBox(items);
+        for (const item of items) {
+            item.rect.x = rect.x + ((item.rect.x - bb.x) / bb.w) * rect.w;
+            item.rect.y = rect.y + ((item.rect.y - bb.y) / bb.h) * rect.h;
+            item.rect.x2 = rect.x + ((item.rect.x2 - bb.x) / bb.w) * rect.w;
+            item.rect.y2 = rect.y + ((item.rect.y2 - bb.y) / bb.h) * rect.h;
+        }
+        this.addToChunk(items);
     }
 
     bringForward(items : Iterable<BoardItem>) : void {
@@ -252,6 +322,7 @@ export class Board extends Service<BoardState> {
         const items : BoardItem[] = [];
         while (!buffer.eod)
             try {
+                const id = buffer.readUInt();
                 const [type, locked, zIndex] = buffer.readFormatted("bbb");
                 const label = buffer.readString();
                 const rect = new Rect(...buffer.readFormatted("ffff"));
@@ -282,6 +353,7 @@ export class Board extends Service<BoardState> {
                 }
 
                 if (item) {
+                    item.id = id;
                     item.locked = locked === 1;
                     item.zIndex = zIndex;
                     item.label = label.length === 0 ? null : label;
@@ -323,6 +395,25 @@ export class Board extends Service<BoardState> {
                         chunk.deleteMany([item]);
                 }
         }
+    }
+
+    getItemsBoundingBox(items ?: Iterable<BoardItem>) : Rect {
+        const rect = Rect.invertedInfinite();
+        for (const item of items ?? this.items.values())
+            rect.append(item.rect);
+        return rect;
+    }
+
+    getItemsFromIds(ids : Iterable<number>) : BoardItem[] {
+        const items : BoardItem[] = [];
+
+        for (const id of ids) {
+            const item = this.items.get(id);
+            if (item)
+                items.push(item);
+        }
+
+        return items;
     }
 
     private rebuildFinished(chunks : Map<string, QuadTree>) : void {

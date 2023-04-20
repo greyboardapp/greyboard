@@ -8,6 +8,7 @@
         display: flex;
         transition: all 0.2s cubic-bezier(0.27, 0.52, 0.52, 0.77);
         z-index: 1;
+        white-space: nowrap;
 
         @include themed() {
             color: color($fg);

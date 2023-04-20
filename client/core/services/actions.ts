@@ -1,16 +1,16 @@
 import { createService, Service } from "../../utils/system/service";
 
 interface Action<T> {
-    (data : T) : void;
-    invoke : (data : T) => void;
-    forward : (data : T) => void;
-    backward : (data : T) => void;
+    (data : T, execute ?: boolean) : void;
+    invoke : (data : T, execute ?: boolean) => void;
+    forward : (data : T, execute ?: boolean) => void;
+    backward : (data : T, execute ?: boolean) => void;
 }
 
 interface ActionEntry {
     data : unknown;
-    forward : (data : unknown) => void;
-    backward : (data : unknown) => void;
+    forward : (data : unknown, execute ?: boolean) => void;
+    backward : (data : unknown, execute ?: boolean) => void;
 }
 
 interface ActionStackState {
@@ -33,7 +33,7 @@ class ActionStack extends Service<ActionStackState> {
         this.state.redoStack.clear();
     }
 
-    push<T>(action : Action<T>, data : T) : void {
+    push<T>(action : Action<T>, data : T, execute = true) : void {
         if (this.state.undoStack.length > ActionStack.STACK_LIMIT)
             this.state.undoStack.shift();
 
@@ -43,7 +43,7 @@ class ActionStack extends Service<ActionStackState> {
             backward: action.backward as (data : unknown) => void,
         });
 
-        action.forward(data);
+        action.forward(data, execute);
 
         this.state.redoStack.clear();
     }
@@ -52,7 +52,7 @@ class ActionStack extends Service<ActionStackState> {
         const entry = this.state.undoStack.pop();
         if (!entry)
             return;
-        entry.backward(entry.data);
+        entry.backward(entry.data, true);
         this.state.redoStack.push(entry);
     }
 
@@ -64,7 +64,7 @@ class ActionStack extends Service<ActionStackState> {
         const entry = this.state.redoStack.pop();
         if (!entry)
             return;
-        entry.forward(entry.data);
+        entry.forward(entry.data, true);
         this.state.undoStack.push(entry);
     }
 
@@ -76,8 +76,8 @@ class ActionStack extends Service<ActionStackState> {
 export const actions = createService<ActionStackState, ActionStack>(ActionStack);
 
 export function createAction<T>(forward : (data : T) => void, backward : (data : T) => void) : Action<T> {
-    const instance = ((data : T) => { instance.invoke(data); }) as Action<T>;
-    instance.invoke = (data : T) => actions.push(instance, data);
+    const instance = ((data : T, execute = true) => { instance.invoke(data, execute); }) as Action<T>;
+    instance.invoke = (data : T, execute = true) => actions.push(instance, data, execute);
     instance.forward = forward;
     instance.backward = backward;
     return instance;

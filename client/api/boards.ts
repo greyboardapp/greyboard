@@ -1,4 +1,5 @@
-import { Board, BoardCreation, BoardCreationSchema, BoardData, BoardSaveData } from "../models/board";
+import { Board, BoardCreation, BoardCreationSchema, BoardSaveData } from "../../common/models/board";
+import { BoardData } from "../models/board";
 import { user } from "../utils/system/auth";
 import { ApiResponse } from "./api";
 

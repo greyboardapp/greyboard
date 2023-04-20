@@ -69,6 +69,7 @@ export class AuthenticationFailed extends RuntimeError {}
 export class NotAuthenticated extends RuntimeError {}
 export class ValidationError extends RuntimeError {}
 export class BoardCreationFailed extends RuntimeError {}
+export class BoardModificationFailed extends RuntimeError {}
 export class BoardNotFound extends RuntimeError {}
 export class BoardContentsNotFound extends RuntimeError {}
 

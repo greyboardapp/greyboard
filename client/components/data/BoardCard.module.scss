@@ -3,17 +3,45 @@
 .card {
     @include transition();
 
+    position: relative;
     border-radius: 10px;
     height: 250px;
     display: flex;
-    align-items: flex-end;
-    padding: 20px;
+    flex-direction: column;
     cursor: pointer;
     outline: 3px solid transparent;
 
-    @include themed() {
-        color: color($panelText);
-        background-color: color($panelBg);
+    .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        padding: 20px;
+        border-radius: 10px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($panelBg);
+        }
+    }
+
+    .expires {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 42px;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        padding: 7px 10px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($primary);
+        }
+
+        + .content {
+            top: 32px;
+        }
     }
 
     &:hover {

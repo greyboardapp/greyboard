@@ -11,6 +11,8 @@ import { input } from "./input";
 import Point from "../data/geometry/point";
 import { NetworkClient } from "../data/networkClient";
 import { viewport } from "./viewport";
+import { BoardItem } from "../data/item";
+import Rect from "../data/geometry/rect";
 
 export interface NetworkState {
     user ?: BasicUser;
@@ -66,13 +68,13 @@ export class Network extends Service<NetworkState> {
     }
 
     onConnectionReady(clients : NetworkClient[], actions : BoardAction[]) : void {
-        console.log(clients);
-        this.state.clients.push(...clients);
-        console.log(this.state.clients);
-        // this.performBoardActions(actions, true);
+        console.log("CONNECTION READY", clients);
+        this.state.clients = clients;
+        this.performBoardActions(actions, false);
     }
 
     onClientConnected(client : NetworkClient) : void {
+        console.log("USER CONNECTED");
         this.state.clients.push(client);
     }
 
@@ -88,6 +90,10 @@ export class Network extends Service<NetworkState> {
             c.afk = client.afk;
     }
 
+    onBoardPerformAction(action : BoardAction) : void {
+        this.performBoardActions([action], true);
+    }
+
     onHeartBeat(pointers : Record<string, [number, number]>) : void {
         for (const [id, pos] of Object.entries(pointers)) {
             if (pos.length !== 2)
@@ -97,16 +103,16 @@ export class Network extends Service<NetworkState> {
             if (!client)
                 continue;
 
-            [client.pointerX, client.pointerY] = pos;
+            client.pointerX = pos[0] * viewport.state.scale;
+            client.pointerY = pos[1] * viewport.state.scale;
         }
         this.lastHeartBeatTime = Date.now();
     }
 
-    // FIXME: The pointer position sent is not correct. Viewport scaling messes up the position.
     async setPointerPosition() : Promise<void> {
         let pos = input.pointerPosition();
         if (this.lastSentPointerPosition.x !== pos.x || this.lastSentPointerPosition.y !== pos.y) {
-            pos = viewport.screenToBoard(pos);
+            pos = viewport.screenToViewport(pos);
             await this.send("SetPointerPosition", pos.x, pos.y);
             this.lastSentPointerPosition = pos;
         }
@@ -114,6 +120,28 @@ export class Network extends Service<NetworkState> {
 
     async setAfk(afk : boolean) : Promise<void> {
         await this.send("SetAfk", afk);
+    }
+
+    async addBoardItems(items : BoardItem[]) : Promise<void> {
+        await this.send("AddItems", items);
+    }
+
+    async removeBoardItems(items : BoardItem[]) : Promise<void> {
+        await this.send("RemoveItems", items.map((item) => item.id));
+    }
+
+    async moveBoardItems(ids : Iterable<number>, dx : number, dy : number) : Promise<void> {
+        await this.send("MoveItems", { ids, dx, dy });
+    }
+
+    async resizeBoardItems(ids : Iterable<number>, rect : Rect) : Promise<void> {
+        await this.send("ResizeItems", {
+            ids, x: rect.x, y: rect.y, w: rect.w, h: rect.h,
+        });
+    }
+
+    async boardSaved() : Promise<void> {
+        await this.send("BoardSaved");
     }
 
     private generateTemporaryUser() : BasicUser {
@@ -130,6 +158,12 @@ export class Network extends Service<NetworkState> {
                 continue;
             if (action.type === BoardActionType.Add)
                 board.addFromObject(action.data);
+            else if (action.type === BoardActionType.Remove)
+                board.removeByIds(action.data);
+            else if (action.type === BoardActionType.Move)
+                board.move(action.data.ids, action.data.dx, action.data.dy);
+            else if (action.type === BoardActionType.Scale)
+                board.resize(action.data.ids, new Rect(action.data.x, action.data.y, action.data.w, action.data.h));
         }
     }
 

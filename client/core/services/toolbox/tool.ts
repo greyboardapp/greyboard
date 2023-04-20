@@ -105,6 +105,8 @@ export abstract class ManipulationTool extends Tool {
     public resizeDirection = ResizeDirection.None;
     protected start = new Point();
     protected end = new Point();
+    protected startRect = new Rect();
+    protected endRect = new Rect();
 
     constructor(description : ToolDescription) {
         super(description);
@@ -126,10 +128,10 @@ export abstract class ManipulationTool extends Tool {
 
             if (this.resizeDirection !== ResizeDirection.None) {
                 this.mode = ManipulationMode.Resize;
-                this.onMoveAndResizeActionStart();
+                this.onResizeActionStart();
             } else if (isPointInRect(rect, this.start)) {
                 this.mode = ManipulationMode.Move;
-                this.onMoveAndResizeActionStart();
+                this.onMoveActionStart();
             } else {
                 this.mode = ManipulationMode.Select;
             }
@@ -140,9 +142,16 @@ export abstract class ManipulationTool extends Tool {
         return true;
     }
 
-    onMoveAndResizeActionStart() : boolean {
+    onMoveActionStart() : boolean {
         selection.removeLockedItems();
         board.removeFromChunk(selection.state.items());
+        return true;
+    }
+
+    onResizeActionStart() : boolean {
+        selection.removeLockedItems();
+        board.removeFromChunk(selection.state.items());
+        this.startRect = selection.state.rect() ?? new Rect();
         return true;
     }
 
@@ -229,8 +238,10 @@ export abstract class ManipulationTool extends Tool {
     onActionEnd(data : PointerEventData) : void {
         if (this.mode === ManipulationMode.Select)
             this.onSelectActionEnd(data);
-        else
-            this.onMoveAndResizeActionEnd();
+        else if (this.mode === ManipulationMode.Move)
+            this.onMoveActionEnd();
+        else if (this.mode === ManipulationMode.Resize)
+            this.onResizeActionEnd();
         this.mode = ManipulationMode.None;
     }
 
@@ -238,7 +249,20 @@ export abstract class ManipulationTool extends Tool {
         this.onActionMove(data);
     }
 
-    onMoveAndResizeActionEnd() : void {
+    onMoveActionEnd() : void {
+        const dx = viewport.viewportToScreenPixels(this.end.x - this.start.x);
+        const dy = viewport.viewportToScreenPixels(this.end.y - this.start.y);
+
+        board.moveAction({ ids: selection.state.ids.copy(), dx, dy }, false);
+
+        board.addToChunk(selection.state.items());
+    }
+
+    onResizeActionEnd() : void {
+        this.endRect = selection.state.rect() ?? new Rect();
+
+        board.resizeAction({ ids: selection.state.ids.copy(), oldRect: this.startRect, newRect: this.endRect });
+
         board.addToChunk(selection.state.items());
     }
 

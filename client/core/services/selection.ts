@@ -71,11 +71,7 @@ class Selection extends Service<SelectionState> {
             if (this.state.ids.length === 0)
                 return null;
 
-            const rect = Rect.invertedInfinite();
-            for (const item of this.state.items())
-                rect.append(item.rect);
-
-            return rect;
+            return board.getItemsBoundingBox(this.state.items());
         });
         this.state.screenRect = createMemo(() => {
             const rect = this.state.rect();
@@ -101,6 +97,10 @@ class Selection extends Service<SelectionState> {
         this.state.ids = [];
     }
 
+    refresh() : void {
+        this.state.ids = track(this.state.ids.copy());
+    }
+
     copyToClipboard() : void {
         const buffer = board.serialize(this.state.items());
         window.navigator.clipboard.writeText(buffer.encode());
@@ -111,19 +111,19 @@ class Selection extends Service<SelectionState> {
         if (!item)
             return;
         item.label = label;
-        this.state.ids = track(this.state.ids.copy());
+        this.refresh();
     }
 
     setColor(color : number) : void {
         this.removeLockedItems();
         board.setColor(this.state.items(), color);
-        this.state.ids = track(this.state.ids.copy());
+        this.refresh();
     }
 
     setWeight(weight : number) : void {
         this.removeLockedItems();
         board.setWeight(this.state.items(), weight);
-        this.state.ids = track(this.state.ids.copy());
+        this.refresh();
     }
 
     removeLockedItems() : void {

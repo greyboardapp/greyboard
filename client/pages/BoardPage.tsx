@@ -38,7 +38,6 @@ import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
 import { hideLoadingOverlay } from "../components/app/LoadingOverlay";
 import Button from "../components/controls/Button";
-import { user } from "../utils/system/auth";
 import Popover from "../components/feedback/Popover";
 import SharePanel from "../components/app/panels/SharePanel";
 import { showModal } from "../components/surfaces/Modal";
@@ -126,7 +125,7 @@ const BoardPage : Component = () => {
                             </Tooltip>
                         </Toolbar>
                         <div class={cls(styles.interactable, "flex h pr2 v-center")}>
-                            <Show when={user()} keyed>
+                            <Show when={network.state.user} keyed>
                                 {(loggedInUser) => <ClientList users={network.state.clients} me={loggedInUser.id} paddingRight={2} />}
                             </Show>
                             <Popover actuator={<Button icon={peopleIcon} content="buttons.share" variant="primary" size="m" />} orientation="right">
