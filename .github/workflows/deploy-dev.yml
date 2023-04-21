@@ -29,6 +29,7 @@ jobs:
         run: yarn build
         env:
           BASE_URL: ${{ vars.BASE_URL }}
+          HUB_URL: ${{ vars.DEV_HUB_URL }}
           DEBUG: ${{ vars.DEBUG }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
           BOARD_SAVE_INTERVAL: ${{ vars.DEV_BOARD_SAVE_INTERVAL }}
