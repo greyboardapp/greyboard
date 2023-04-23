@@ -7,7 +7,7 @@ import { generateStringId } from "../../utils/datatypes/id";
 import generateName from "../../utils/system/nicknames";
 import { board } from "./board";
 import { user } from "../../utils/system/auth";
-import { input } from "./input";
+import { input, PointerType } from "./input";
 import Point from "../data/geometry/point";
 import { NetworkClient } from "../data/networkClient";
 import { viewport } from "./viewport";
@@ -24,6 +24,8 @@ export interface NetworkState {
 export class Network extends Service<NetworkState> {
     public readonly onConnected = createDelegate();
     public readonly onConnectionFailed = createDelegate();
+    public readonly onClientReassigned = createDelegate();
+    public readonly onClientBoardClosed = createDelegate();
 
     private readonly connection : HubConnection;
 
@@ -50,6 +52,9 @@ export class Network extends Service<NetworkState> {
     stop() : void {
         this.onConnected.clear();
         this.onConnectionFailed.clear();
+        this.onClientReassigned.clear();
+        this.onClientBoardClosed.clear();
+
         this.connection.stop();
         this.state.clients.clear();
         if (this.heartBeatTimer)
@@ -60,7 +65,6 @@ export class Network extends Service<NetworkState> {
         try {
             this.state.user = user() ?? this.generateTemporaryUser();
             const pointerPos = viewport.screenToViewport(input.pointerPosition());
-            console.log(pointerPos);
 
             await this.connection.start();
             await this.send("Join", { ...this.state.user, pointerX: pointerPos.x, pointerY: pointerPos.y }, slug);
@@ -77,6 +81,11 @@ export class Network extends Service<NetworkState> {
         return false;
     }
 
+    async disconnect() : Promise<void> {
+        await this.connection.stop();
+        this.state.clients = [];
+    }
+
     async onConnectionReady(clients : NetworkClient[], events : BoardEvent[]) : Promise<void> {
         this.state.clients = clients;
         await this.performBoardActions(events, false);
@@ -84,7 +93,6 @@ export class Network extends Service<NetworkState> {
     }
 
     onClientConnected(client : NetworkClient) : void {
-        console.log(client);
         this.state.clients.push(client);
     }
 
@@ -92,6 +100,11 @@ export class Network extends Service<NetworkState> {
         const index = this.state.clients.findIndex((c) => c.id === client.id);
         if (index >= 0)
             this.state.clients.splice(index, 1);
+    }
+
+    onReassignUserToClient() : void {
+        this.disconnect();
+        this.onClientReassigned();
     }
 
     onClientAfkUpdated(client : NetworkClient) : void {
@@ -104,17 +117,27 @@ export class Network extends Service<NetworkState> {
         this.performBoardActions([event], true);
     }
 
-    onHeartBeat(pointers : Record<string, [number, number]>) : void {
-        for (const [id, pos] of Object.entries(pointers)) {
-            if (pos.length !== 2)
+    onBoardClosed() : void {
+        this.disconnect();
+        this.onClientBoardClosed();
+    }
+
+    onBoardNameChanged(name : string) : void {
+        board.state.name = name;
+    }
+
+    onHeartBeat(pointers : Record<string, [number, number, PointerType]>) : void {
+        for (const [id, data] of Object.entries(pointers)) {
+            if (data.length !== 3)
                 continue;
 
             const client = this.state.clients.find((c) => c.id === id);
             if (!client)
                 continue;
 
-            client.pointerX = pos[0] * viewport.state.scale;
-            client.pointerY = pos[1] * viewport.state.scale;
+            client.pointerX = data[0] * viewport.state.scale;
+            client.pointerY = data[1] * viewport.state.scale;
+            [,, client.pointerType] = data;
         }
         this.lastHeartBeatTime = Date.now();
     }
@@ -123,7 +146,7 @@ export class Network extends Service<NetworkState> {
         let pos = input.pointerPosition();
         if (this.lastSentPointerPosition.x !== pos.x || this.lastSentPointerPosition.y !== pos.y) {
             pos = viewport.screenToViewport(pos);
-            await this.send("SetPointerPosition", pos.x, pos.y);
+            await this.send("SetPointerPosition", pos.x, pos.y, input.state.lastUsedPointerType);
             this.lastSentPointerPosition = pos;
         }
     }
@@ -177,6 +200,14 @@ export class Network extends Service<NetworkState> {
         await this.send("BoardSaved");
     }
 
+    async closeBoard() : Promise<void> {
+        await this.send("CloseBoard");
+    }
+
+    async setBoardName(name : string) : Promise<void> {
+        await this.send("SetBoardName", name);
+    }
+
     private generateTemporaryUser() : BasicUser {
         return {
             id: generateStringId(),
@@ -191,7 +222,7 @@ export class Network extends Service<NetworkState> {
             if (ignoreOwn && event.by === this.state.user?.id)
                 continue;
             if (event.action.type === BoardActionType.Add) {
-                await board.addFromObject(event.action.data);
+                await board.addFromObject(event.action.data, true);
                 isSelectionUpdateNeeded = false;
             } else if (event.action.type === BoardActionType.Remove) {
                 board.removeByIds(event.action.data);

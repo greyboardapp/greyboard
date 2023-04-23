@@ -26,6 +26,9 @@ const TextVariants = {
     bold: {
         true: styles.bold,
     },
+    italic: {
+        true: styles.italic,
+    },
     centered: {
         true: styles.centered,
     },

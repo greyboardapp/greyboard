@@ -136,7 +136,7 @@ export class Toolbox extends Service<ToolboxState> {
             const [item] = data.items;
             if (item.type.startsWith("text")) {
                 const buffer = ByteBuffer.decode(data.getData("text"));
-                const items = await board.deserialize(buffer);
+                const items = await board.deserialize(buffer, false);
                 for (const i of items) {
                     i.rect.x += 10;
                     i.rect.y += 10;

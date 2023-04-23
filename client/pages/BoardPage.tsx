@@ -1,5 +1,5 @@
 import { Component, onCleanup, onMount, For, Show, untrack } from "solid-js";
-import { Link, Params, useParams } from "@solidjs/router";
+import { Link, Params, useNavigate, useParams } from "@solidjs/router";
 import { createMutation, createQuery } from "@tanstack/solid-query";
 import Canvas from "../components/surfaces/Canvas";
 import Toolbar from "../components/toolbar/Toolbar";
@@ -33,7 +33,7 @@ import ToolbarInput from "../components/toolbar/ToolbarInput";
 import { board } from "../core/services/board";
 import SelectionBox from "../components/app/SelectionBox";
 import LabelPanel from "../components/app/panels/LabelPanel";
-import { getBoardData, saveBoard } from "../api/boards";
+import { getBoardData, saveBoardContents, saveBoardData } from "../api/boards";
 import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
 import { hideLoadingOverlay } from "../components/app/LoadingOverlay";
@@ -43,6 +43,8 @@ import SharePanel from "../components/app/panels/SharePanel";
 import { showModal } from "../components/surfaces/Modal";
 import { network } from "../core/services/network";
 import ClientList from "../components/app/ClientAvatars";
+import { user } from "../utils/system/auth";
+import { BoardUpdateData } from "../../common/models/board";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -50,9 +52,10 @@ interface BoardPageParams extends Params {
 
 const BoardPage : Component = () => {
     const params = useParams<BoardPageParams>();
+    const navigate = useNavigate();
 
-    const showErrorModal = (error ?: string) : void => showModal({
-        title: "titles.somethingWentWrong",
+    const showErrorModal = (error ?: string, title ?: string) : void => showModal({
+        title: title ?? "titles.somethingWentWrong",
         content: <>
             <Text content={error ?? "errors.unknown"} />
         </>,
@@ -68,6 +71,7 @@ const BoardPage : Component = () => {
             untrack(() => {
                 if (!data || data.error || !data.result) {
                     showErrorModal(data.error);
+                    navigate(user() === null ? "/" : "/dashboard");
                     return;
                 }
 
@@ -80,14 +84,13 @@ const BoardPage : Component = () => {
             if (!data.result?.isPublic)
                 hideLoadingOverlay();
         },
-        onError: (err) => showErrorModal(),
+        onError: (err) => {
+            showErrorModal();
+            navigate(user() === null ? "/" : "/dashboard");
+        },
     });
 
-    const saveMutation = createMutation(async () : Promise<ApiResponse<string>> => saveBoard({
-        id: board.state.id,
-        name: board.state.name,
-        contents: board.serialize(),
-    }), {
+    const saveContentMutation = createMutation(async () : Promise<ApiResponse<string>> => saveBoardContents(board.state.id, board.serialize()), {
         onSettled: (data, error) => {
             if (!data || data.error || !data.result) {
                 showErrorModal(data?.error);
@@ -98,13 +101,34 @@ const BoardPage : Component = () => {
         },
     });
 
+    const saveBoardDataMutation = createMutation<ApiResponse, string, BoardUpdateData>(async (properties) : Promise<ApiResponse> => saveBoardData(board.state.id, properties), {
+        onSettled: async (data, error, properties) => {
+            if (!data || data.error || !data.result) {
+                console.error(data?.error);
+                return;
+            }
+
+            if (properties.name !== undefined) {
+                board.state.name = properties.name;
+                network.setBoardName(properties.name);
+            }
+        },
+    });
+
     onMount(() => {
         app.start();
-        board.onBoardReadyToSave.add(() => saveMutation.mutate());
+        board.onBoardReadyToSave.add(() => saveContentMutation.mutate());
         network.onConnected.add(hideLoadingOverlay);
         network.onConnectionFailed.add(() => {
             hideLoadingOverlay();
             showErrorModal("errors.hubConnectionFailed");
+        });
+        network.onClientReassigned.add(() => {
+            showErrorModal("errors.hubClientReassigned", "titles.oops");
+        });
+        network.onClientBoardClosed.add(() => {
+            showErrorModal("errors.boardClosed", "titles.oops");
+            navigate(user() === null ? "/" : "/dashboard");
         });
     });
     onCleanup(() => {
@@ -120,7 +144,7 @@ const BoardPage : Component = () => {
                     <div class="flex h h-spaced v-center">
                         <Toolbar class={styles.interactable} variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
-                            <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} />
+                            <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} onChange={async (e, name) => saveBoardDataMutation.mutate({ name })} />
                             <Tooltip content={<><Text content="actions.save" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.save.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                 <ToolbarButton icon={saveIcon} onClick={app.save} disabled={!app.save.when()} />
                             </Tooltip>
@@ -136,7 +160,7 @@ const BoardPage : Component = () => {
                                 {(loggedInUser) => <ClientList users={network.state.clients} me={loggedInUser.id} paddingRight={2} />}
                             </Show>
                             <Popover actuator={<Button icon={peopleIcon} content="buttons.share" variant="primary" size="m" />} orientation="right">
-                                <SharePanel />
+                                {(close) => <SharePanel close={close} />}
                             </Popover>
                         </div>
                     </div>

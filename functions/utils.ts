@@ -69,6 +69,7 @@ export class AuthenticationFailed extends RuntimeError {}
 export class NotAuthenticated extends RuntimeError {}
 export class ValidationError extends RuntimeError {}
 export class BoardCreationFailed extends RuntimeError {}
+export class BoardUpdateFailed extends RuntimeError {}
 export class BoardModificationFailed extends RuntimeError {}
 export class BoardNotFound extends RuntimeError {}
 export class BoardContentsNotFound extends RuntimeError {}
@@ -153,6 +154,19 @@ export const dbGetByProperties = async <T extends Entity>(db : D1Database, table
         if (!result.results)
             return failure("");
         return success(result.results.map((v) => fromDbRecord(v)));
+    } catch (e) {
+        console.error(e);
+        return failure(e);
+    }
+};
+
+export const dbUpdateById = async <T extends Entity>(db : D1Database, table : string, id : string, item : OmitRequired<T, "id">) : PromisedResult => {
+    try {
+        const query = `UPDATE ${table} SET ${Object.keys(item).map((key, i) => `${key}=?${i + 2}`).join(", ")} WHERE id = ?1`;
+        const result = await db.prepare(query).bind(id, ...toDbParameters(item)).run();
+        if (result.error)
+            return failure(result.error);
+        return success(undefined);
     } catch (e) {
         console.error(e);
         return failure(e);

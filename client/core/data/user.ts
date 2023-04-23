@@ -1,3 +1,4 @@
+import { PointerType } from "../services/input";
 import { AuthType } from "./authType";
 
 export interface BasicUser {
@@ -9,6 +10,7 @@ export interface BasicUser {
 export interface BasicNetworkUser extends BasicUser {
     pointerX : number;
     pointerY : number;
+    pointerType : PointerType;
 }
 
 export interface User extends BasicUser {

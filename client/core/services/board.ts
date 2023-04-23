@@ -1,6 +1,5 @@
 import { batch } from "solid-js";
 import { BoardData } from "../../models/board";
-import { BoardSaveData } from "../../../common/models/board";
 import { ByteBuffer } from "../../utils/datatypes/byteBuffer";
 import createDelegate from "../../utils/datatypes/delegate";
 import { floor } from "../../utils/math/math";
@@ -171,7 +170,7 @@ export class Board extends Service<BoardState> {
         },
     );
 
-    public readonly onBoardReadyToSave = createDelegate<[data : BoardSaveData]>();
+    public readonly onBoardReadyToSave = createDelegate();
 
     private saveTimer : number | null = null;
 
@@ -207,15 +206,9 @@ export class Board extends Service<BoardState> {
         this.onBoardReadyToSave.clear();
     }
 
-    save() : BoardSaveData {
-        const data : BoardSaveData = {
-            id: this.state.id,
-            name: this.state.name,
-            contents: this.serialize(),
-        };
-        this.onBoardReadyToSave(data);
+    save() : void {
+        this.onBoardReadyToSave();
         network.boardSaved();
-        return data;
     }
 
     startPeriodicSave() : void {
@@ -234,7 +227,7 @@ export class Board extends Service<BoardState> {
             this.state.isPublic = data.isPublic;
         });
         const buffer = ByteBuffer.fromArrayBuffer(data.contents);
-        const items = await this.deserialize(buffer);
+        const items = await this.deserialize(buffer, true);
         this.add(items);
     }
 
@@ -244,7 +237,7 @@ export class Board extends Service<BoardState> {
         this.addToChunk(items);
     }
 
-    async addFromObject(items : BoardItem[]) : Promise<void> {
+    async addFromObject(items : BoardItem[], sameId = false) : Promise<void> {
         const promises = Array.from(items).map(async (item) : Promise<(BoardItem | null)> => {
             let created : BoardItem | null = null;
             if (item.type === BoardItemType.Path) {
@@ -259,7 +252,7 @@ export class Board extends Service<BoardState> {
                 created = new Image(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), imageData);
             }
 
-            if (created)
+            if (created && sameId)
                 created.id = item.id;
 
             return created;
@@ -388,7 +381,7 @@ export class Board extends Service<BoardState> {
         return buffer;
     }
 
-    async deserialize(buffer : ByteBuffer) : Promise<BoardItem[]> {
+    async deserialize(buffer : ByteBuffer, sameId = false) : Promise<BoardItem[]> {
         const items : BoardItem[] = [];
         while (!buffer.eod)
             try {
@@ -423,7 +416,8 @@ export class Board extends Service<BoardState> {
                 }
 
                 if (item) {
-                    item.id = id;
+                    if (sameId)
+                        item.id = id;
                     item.locked = locked === 1;
                     item.zIndex = zIndex;
                     item.label = label.length === 0 ? null : label;

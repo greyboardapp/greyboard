@@ -36,9 +36,11 @@
     "buttons.ok": "Ok",
     "buttons.cancel": "Cancel",
     "buttons.backToSafeZone": "Back to safe zone",
+    "buttons.reconnect": "Connect back",
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
     "titles.somethingWentWrong": "Oops, something went wrong...",
+    "titles.oops": "Oops...",
     "texts.welcome": "A small online collaborative whiteboard application for mocking, wireframing, solving problems and sketching.",
     "texts.noLabels": "There are no labels in this board. Add one and you will be able to jump to it from here...",
     "texts.unknown": "Unknown",
@@ -52,10 +54,13 @@
     "texts.accessibleOnWhenYouAreIn": "Accessible only when you are in",
     "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in",
     "texts.expires": "Expires",
+    "texts.boardNotPublic": "This board is not public yet. Share it with the button below",
     "errors.unknown": "Your request was not able to be processed. Try again later.",
     "errors.pageNotFound": "The page you tried to access does not exist.",
     "errors.apiNotAvailable": "It seems that our servers are unavailable right now.",
     "errors.boardNameMaxLength": "The name of the board is too long. It can be at maximum 32 character.",
     "errors.boardNameInvalidCharacter": "The name of the board is not correct. It can only contain letters, spaces and numbers.",
-    "errors.hubConnectionFailed": "Unable to connect to our servers. Collaboration will not work, but you can still work alone."
+    "errors.hubConnectionFailed": "Unable to connect to our servers. Collaboration will not work, but you can still work alone.",
+    "errors.hubClientReassigned": "Your user connected to the same board from another device or browser. You have been disconnected here.",
+    "errors.boardClosed": "This board is no longer public. All users are disconnected."
 }

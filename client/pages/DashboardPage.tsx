@@ -21,7 +21,7 @@ import Popover from "../components/feedback/Popover";
 import Panel from "../components/surfaces/Panel";
 import { List, ListItem } from "../components/data/List";
 import ApiSuspense from "../components/feedback/ApiSuspense";
-import { BoardCreation } from "../../common/models/board";
+import { BoardCreationData } from "../../common/models/board";
 import { getText } from "../utils/system/intl";
 import Skeleton from "../components/feedback/Skeleton";
 import IconButton from "../components/controls/IconButton";
@@ -63,7 +63,7 @@ const DashboardPage : Component = () => {
         },
     });
     const createBoardMutation = createMutation({
-        mutationFn: async (data : BoardCreation) => createBoard(data),
+        mutationFn: async (data : BoardCreationData) => createBoard(data),
         onSettled: (data, error) => {
             if (!data || data.error || data.result === undefined)
                 showErrorModal(data?.error);

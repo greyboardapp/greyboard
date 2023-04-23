@@ -41,13 +41,12 @@ const Switch : Component<SwitchProps> = (props) => (
             id={props.id}
             type="checkbox"
             placeholder={props.placeholder ?? ""}
-            // value={props.model[0]() ? "on" : "off"}
+            checked={props.model[0]()}
             disabled={props.disabled ?? false}
             onChange={(e) => {
-                // props.model[1]((e.target as HTMLInputElement).value === "on");
-                console.log(e, (e.target as HTMLInputElement).value);
-                // if (props.onChange)
-                //     props.onChange(e);
+                props.model[1]((e.target as HTMLInputElement).checked);
+                if (props.onChange)
+                    props.onChange(e);
             }}
             max={3}
         />

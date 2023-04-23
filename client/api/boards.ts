@@ -1,4 +1,4 @@
-import { Board, BoardCreation, BoardCreationSchema, BoardSaveData } from "../../common/models/board";
+import { Board, BoardCreationData, BoardCreationSchema, BoardUpdateData } from "../../common/models/board";
 import { BoardData } from "../models/board";
 import { user } from "../utils/system/auth";
 import { ApiResponse } from "./api";
@@ -42,7 +42,7 @@ export async function getBoardData(slug : string) : Promise<ApiResponse<BoardDat
     }
 }
 
-export async function createBoard(data : BoardCreation) : Promise<ApiResponse<Board>> {
+export async function createBoard(data : BoardCreationData) : Promise<ApiResponse<Board>> {
     try {
         const validated = BoardCreationSchema.safeParse(data);
         if (!validated.success)
@@ -58,11 +58,23 @@ export async function createBoard(data : BoardCreation) : Promise<ApiResponse<Bo
     }
 }
 
-export async function saveBoard(data : BoardSaveData) : Promise<ApiResponse<string>> {
+export async function saveBoardContents(id : string, contents : Uint8Array) : Promise<ApiResponse<string>> {
     try {
-        return (await (await fetch(`/api/boards/${data.id}/contents`, {
+        return (await (await fetch(`/api/boards/${id}/contents`, {
             method: "PUT",
-            body: data.contents,
+            body: contents,
+            credentials: "include",
+        })).json());
+    } catch (e) {
+        return { status: 500, error: "errors.apiNotAvailable" };
+    }
+}
+
+export async function saveBoardData(id : string, data : BoardUpdateData) : Promise<ApiResponse> {
+    try {
+        return (await (await fetch(`/api/boards/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(data),
             credentials: "include",
         })).json());
     } catch (e) {

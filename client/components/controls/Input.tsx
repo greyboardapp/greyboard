@@ -51,6 +51,7 @@ const Input : Component<InputProps> = (props) => {
             </Show>
             <input
                 id={props.id}
+                ref={props.ref as HTMLInputElement}
                 type={props.type ?? "text"}
                 placeholder={props.placeholder ?? ""}
                 value={props.model[0]()}

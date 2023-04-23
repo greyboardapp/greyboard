@@ -1,6 +1,6 @@
 import { Motion, Presence } from "@motionone/solid";
 import { cva, VariantProps } from "class-variance-authority";
-import { createSignal, JSX, ParentComponent, Show } from "solid-js";
+import { Component, createSignal, JSX, Show } from "solid-js";
 import { cls } from "../../utils/dom/dom";
 import { createDocumentListener } from "../../utils/dom/hooks";
 import { quickEaseInTransition, quickEaseOutTransition } from "../../utils/dom/motion";
@@ -25,9 +25,10 @@ const popoverStyles = cva(styles.popoverRoot, {
 
 interface PopoverProps extends GenericProps<HTMLDivElement>, VariantProps<typeof popoverStyles> {
     actuator : JSX.Element;
+    children : JSX.Element | ((close : () => void) => JSX.Element);
 }
 
-const Popover : ParentComponent<PopoverProps> = (props) => {
+const Popover : Component<PopoverProps> = (props) => {
     let root! : HTMLDivElement;
 
     const [open, setOpen] = createSignal(false);
@@ -57,7 +58,7 @@ const Popover : ParentComponent<PopoverProps> = (props) => {
                         exit={{ scale: 0.75, opacity: 0, transition: quickEaseOutTransition }}
                         style={{ "transform-origin": `top ${props.orientation}` }}
                     >
-                        {props.children}
+                        {typeof props.children === "function" ? props.children(() => setOpen(false)) : props.children}
                     </Motion.div>
                 </Show>
             </Presence>
