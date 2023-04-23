@@ -60,7 +60,6 @@ export async function createBoard(data : BoardCreation) : Promise<ApiResponse<Bo
 
 export async function saveBoard(data : BoardSaveData) : Promise<ApiResponse<string>> {
     try {
-        console.log(data.contents);
         return (await (await fetch(`/api/boards/${data.id}/contents`, {
             method: "PUT",
             body: data.contents,

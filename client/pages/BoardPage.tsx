@@ -73,10 +73,12 @@ const BoardPage : Component = () => {
 
                 board.loadFromBoardData(data.result);
                 // board.startPeriodicSave();
-                network.connect(data.result.slug);
+                if (data.result.isPublic)
+                    network.connect(data.result.slug);
             });
 
-            hideLoadingOverlay();
+            if (!data.result?.isPublic)
+                hideLoadingOverlay();
         },
         onError: (err) => showErrorModal(),
     });
@@ -99,6 +101,11 @@ const BoardPage : Component = () => {
     onMount(() => {
         app.start();
         board.onBoardReadyToSave.add(() => saveMutation.mutate());
+        network.onConnected.add(hideLoadingOverlay);
+        network.onConnectionFailed.add(() => {
+            hideLoadingOverlay();
+            showErrorModal("errors.hubConnectionFailed");
+        });
     });
     onCleanup(() => {
         app.stop();

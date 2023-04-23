@@ -12,13 +12,14 @@ interface ColorPickerPanelContentProps {
     showColorPicker ?: boolean;
     activeColor : number;
     sliderModel : [() => number, (v : number) => void];
-    colorPicked : (color : number, index : number) => void;
+    weightPicked : (newWeight : number, oldWeight : number) => void;
+    colorPicked : (newColor : number, newIndex : number) => void;
 }
 
 const ColorPickerPanelContent : Component<ColorPickerPanelContentProps> = (props) => (
     <>
         <FormControl name="titles.strokeWeight">
-            {(id) => <Slider id={id} min={1} max={10} model={props.sliderModel} showValue />}
+            {(id) => <Slider id={id} min={1} max={10} model={props.sliderModel} showValue onChange={(e, newValue, oldValue) => props.weightPicked(newValue, oldValue)} />}
         </FormControl>
 
         <FormControl name="titles.color">
@@ -55,6 +56,7 @@ const ColorPickerPanel : Component = () => (
             showColorPicker={true}
             activeColor={toolbox.state.selectedColor()}
             sliderModel={[() => toolbox.state.selectedWeight, (v) => (toolbox.state.selectedWeight = v)]}
+            weightPicked={(newWeight, oldWeight) => {}}
             colorPicked={(color, index) => (toolbox.state.selectedColorIndex = index)}
         />
     </Panel>

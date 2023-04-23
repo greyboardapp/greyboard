@@ -56,5 +56,6 @@
     "errors.pageNotFound": "The page you tried to access does not exist.",
     "errors.apiNotAvailable": "It seems that our servers are unavailable right now.",
     "errors.boardNameMaxLength": "The name of the board is too long. It can be at maximum 32 character.",
-    "errors.boardNameInvalidCharacter": "The name of the board is not correct. It can only contain letters, spaces and numbers."
+    "errors.boardNameInvalidCharacter": "The name of the board is not correct. It can only contain letters, spaces and numbers.",
+    "errors.hubConnectionFailed": "Unable to connect to our servers. Collaboration will not work, but you can still work alone."
 }

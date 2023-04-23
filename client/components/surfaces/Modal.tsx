@@ -55,7 +55,7 @@ const ModalProvider : ParentComponent = (props) => (
                                         <div class={styles.content}>{modal.content}</div>
                                         <div class={styles.buttons}>
                                             <For each={modal.buttons}>
-                                                {(button) => button(() => closeModal)}
+                                                {(button, i) => button(() => closeModal(i))}
                                             </For>
                                         </div>
                                 </Motion.div>

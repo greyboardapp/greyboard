@@ -7,11 +7,12 @@ import styles from "./ToolbarInput.module.scss";
 interface ToolbarInputProps {
     model : [() => string, (v : string) => void];
     placeholder ?: string;
-    onChange ?: (e : Event) => void;
+    onChange ?: (e : Event, newValue : string, oldValue : string) => void;
 }
 
 const ToolbarInput : Component<ToolbarInputProps> = (props) => {
     const [focused, setFocused] = createSignal(false);
+    const [originalValue, setOriginalValue] = createSignal("");
     let input : HTMLInputElement | undefined;
 
     const previewValue = () : string => {
@@ -38,7 +39,8 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
                         if (e.key === "Enter")
                             (e.target as HTMLInputElement).blur();
                     }}
-                    onChange={(e) => props.onChange && props.onChange(e)}
+                    onChange={(e) => props.onChange && props.onChange(e, (e.target as HTMLInputElement).value, originalValue())}
+                    onFocus={(e) => setOriginalValue((e.target as HTMLInputElement).value)}
                     onBlur={(e) => {
                         props.model[1]((e.target as HTMLInputElement).value);
                         setFocused(false);

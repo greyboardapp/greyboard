@@ -61,7 +61,6 @@ export class EraserTool extends Tool {
             if (item instanceof BoardShapeItem) {
                 const c = Color.UIntToRGBA(item.color);
                 item.color = Color.RGBAToUInt(c[0], c[1], c[2], Math.min(c[3] * 2, 255));
-                console.log(c, item.color, Color.UIntToRGBA(item.color));
             }
 
         board.removeAction(items);

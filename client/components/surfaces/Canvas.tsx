@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { input, PointerType } from "../../core/services/input";
-import { createWindowListener } from "../../utils/dom/hooks";
+import { createDocumentListener, createWindowListener } from "../../utils/dom/hooks";
 
 import styles from "./Canvas.module.scss";
 import { viewport } from "../../core/services/viewport";
@@ -14,6 +14,8 @@ import { network } from "../../core/services/network";
 import ClientCursors from "../app/ClientCursors";
 
 const Canvas : Component = () => {
+    createDocumentListener("mouseover", (e) => input.processPointerMoveEvent(e as PointerEvent), { once: true });
+
     createWindowListener("resize", () => {
         setWindowWidth(window.innerWidth);
         setWindowHeight(window.innerHeight);

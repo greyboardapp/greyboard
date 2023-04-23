@@ -6,6 +6,11 @@ export interface BasicUser {
     avatar : string;
 }
 
+export interface BasicNetworkUser extends BasicUser {
+    pointerX : number;
+    pointerY : number;
+}
+
 export interface User extends BasicUser {
     email : string;
     type : AuthType;

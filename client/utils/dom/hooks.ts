@@ -6,8 +6,8 @@ export function createWindowListener<T extends Event>(event : keyof DocumentEven
     onCleanup(() => window.removeEventListener(event, handler));
 }
 
-export function createDocumentListener<T extends Event>(event : keyof DocumentEventMap, callback : (e ?: T) => void) : void {
+export function createDocumentListener<T extends Event>(event : keyof DocumentEventMap, callback : (e ?: T) => void, options ?: AddEventListenerOptions) : void {
     const handler = (e : Event) : void => callback(e as T);
-    onMount(() => document.addEventListener(event, handler));
+    onMount(() => document.addEventListener(event, handler, options));
     onCleanup(() => document.removeEventListener(event, handler));
 }

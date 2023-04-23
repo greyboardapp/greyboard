@@ -56,5 +56,6 @@
     "errors.pageNotFound": "Az oldal amit megprobáltál elérni nem létezik.",
     "errors.apiNotAvailable": "Úgy tűnik, hogy a szervereink nem érhetőek el jelenleg.",
     "errors.boardNameMaxLength": "A tábla neve túl hosszú. Legfeljebb 32 karakter lehet.",
-    "errors.boardNameInvalidCharacter": "A tábla neve nem megfelelő. Csak betűket, szóközöket és számokat tartalmazhat."
+    "errors.boardNameInvalidCharacter": "A tábla neve nem megfelelő. Csak betűket, szóközöket és számokat tartalmazhat.",
+    "errors.hubConnectionFailed": "Nem sikerült csatlakozni a szervereinkhez. A kollaboráció nem fog működni, viszont még így is tudsz dolgozni egyedül."
 }

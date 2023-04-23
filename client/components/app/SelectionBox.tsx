@@ -33,6 +33,7 @@ import { track } from "../../utils/dom/solid";
 import Panel from "../surfaces/Panel";
 import { ColorPickerPanelContent } from "./panels/ColorpickerPanel";
 import { ManipulationMode, ManipulationTool } from "../../core/services/toolbox/tool";
+import { board } from "../../core/services/board";
 
 interface SelectionBoundingBox {
     x : number;
@@ -126,25 +127,34 @@ const SelectionBox : Component = () => {
                                             showColorPicker={false}
                                             activeColor={selection.state.color()}
                                             sliderModel={[selection.state.weight, (v) => selection.setWeight(v)]}
+                                            weightPicked={(newWeight, oldWeight) => board.setWeightAction({ items: selection.state.items(), newWeight, oldWeight }, false)}
                                             colorPicked={(color) => selection.setColor(color)}
                                         />
                                     </Motion.div>
                                 </Show>
                             </Presence>
                             <Toolbar variant="transparent">
-                                <ToolbarButton icon={paletteIcon} onClick={() => setPaletteOpen(!paletteOpen())} />
-                                <Tooltip content={<><Text content="actions.bringForward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.bringForward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
-                                    <ToolbarButton icon={bringForwardIcon} onClick={selection.bringForward} />
-                                </Tooltip>
-                                <Tooltip content={<><Text content="actions.sendBackward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.sendBackward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
-                                    <ToolbarButton icon={sendBackwardIcon} onClick={selection.sendBackward} />
-                                </Tooltip>
+                                <Show
+                                    when={!selection.state.hasAllItemsLocked()}
+                                >
+                                    <ToolbarButton icon={paletteIcon} onClick={() => setPaletteOpen(!paletteOpen())} />
+                                    <Tooltip content={<><Text content="actions.bringForward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.bringForward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                        <ToolbarButton icon={bringForwardIcon} onClick={selection.bringForward} />
+                                    </Tooltip>
+                                    <Tooltip content={<><Text content="actions.sendBackward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.sendBackward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                        <ToolbarButton icon={sendBackwardIcon} onClick={selection.sendBackward} />
+                                    </Tooltip>
+                                </Show>
                                 <Tooltip content={<><Text content="actions.copy" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.undo.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                     <ToolbarButton icon={copyIcon} onClick={selection.copyToClipboard} />
                                 </Tooltip>
-                                <Tooltip content={<><Text content="actions.delete" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.delete.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
-                                    <ToolbarButton icon={deleteIcon} onClick={selection.delete} />
-                                </Tooltip>
+                                <Show
+                                    when={!selection.state.hasAllItemsLocked()}
+                                >
+                                    <Tooltip content={<><Text content="actions.delete" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.delete.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                        <ToolbarButton icon={deleteIcon} onClick={selection.delete} />
+                                    </Tooltip>
+                                </Show>
                                 <Show
                                     when={selection.state.hasUnlockedItem()}
                                     fallback={
@@ -156,7 +166,7 @@ const SelectionBox : Component = () => {
                                         <ToolbarButton icon={lockIcon} onClick={selection.lock} />
                                     </Tooltip>
                                 </Show>
-                                <Show when={selection.state.ids.length === 1}>
+                                <Show when={selection.state.ids.length === 1 && !selection.state.hasAllItemsLocked()}>
                                     <Show
                                         when={selection.state.hasLabel()}
                                         fallback={
@@ -172,7 +182,10 @@ const SelectionBox : Component = () => {
                                             () => selection.state.label() ?? "",
                                             (v) => selection.setLabel(v),
                                         ]}
-                                        onChange={(e) => selection.setLabel((e.target as HTMLInputElement).value)}
+                                        onChange={(e, newLabel, oldLabel) => {
+                                            selection.setLabel(newLabel);
+                                            board.setLabelAction({ items: selection.state.items(), newLabel, oldLabel }, false);
+                                        }}
                                         placeholder="placeholder.typeSomething" />
                                     </Show>
                                 </Show>

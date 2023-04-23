@@ -6,8 +6,11 @@ import Rect from "../geometry/rect";
 import { BoardItem, BoardItemType } from "../item";
 
 export default class Image extends BoardItem {
+    public src = "";
+
     constructor(public rect : Rect, public img : HTMLImageElement) {
         super(BoardItemType.Image);
+        this.src = img.src;
     }
 
     render(graphics : Graphics, isTemporary : boolean) : void {

@@ -28,6 +28,7 @@ import IconButton from "../components/controls/IconButton";
 import { hideLoadingOverlay, showLoadingOverlay } from "../components/app/LoadingOverlay";
 import { logout } from "../api/auth";
 import { showModal } from "../components/surfaces/Modal";
+import Logo from "../assets/branding/logo.svg";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
@@ -75,7 +76,10 @@ const DashboardPage : Component = () => {
                 {(loggedInUser) => (
                     <div class={styles.container}>
                         <div class="container px2 m:px0">
-                            <div class="flex h h-spaced pt2 m:pt6 pb4">
+                            <div class={cls(styles.logo, "flex h h-center v-center py3 m:py4")}>
+                                <Logo /><Text content="Greyboard" size={"xl"} bold class="ml2" />
+                            </div>
+                            <div class="flex h h-spaced pt2 m:pt4 pb4">
                                 <Popover
                                     actuator={<div class={styles.userInfo}>
                                     <CarretIcon />

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { Service, createService } from "../../utils/system/service";
 import { BasicUser } from "../data/user";
-import { BoardAction, BoardActionType } from "../data/boardAction";
+import { BoardAction, BoardActionType, BoardEvent } from "../data/boardAction";
 import { generateStringId } from "../../utils/datatypes/id";
 import generateName from "../../utils/system/nicknames";
 import { board } from "./board";
@@ -13,6 +13,8 @@ import { NetworkClient } from "../data/networkClient";
 import { viewport } from "./viewport";
 import { BoardItem } from "../data/item";
 import Rect from "../data/geometry/rect";
+import { selection } from "./selection";
+import createDelegate from "../../utils/datatypes/delegate";
 
 export interface NetworkState {
     user ?: BasicUser;
@@ -20,6 +22,9 @@ export interface NetworkState {
 }
 
 export class Network extends Service<NetworkState> {
+    public readonly onConnected = createDelegate();
+    public readonly onConnectionFailed = createDelegate();
+
     private readonly connection : HubConnection;
 
     private heartBeatTimer : number | null = null;
@@ -43,6 +48,8 @@ export class Network extends Service<NetworkState> {
     }
 
     stop() : void {
+        this.onConnected.clear();
+        this.onConnectionFailed.clear();
         this.connection.stop();
         this.state.clients.clear();
         if (this.heartBeatTimer)
@@ -52,9 +59,11 @@ export class Network extends Service<NetworkState> {
     async connect(slug : string) : Promise<boolean> {
         try {
             this.state.user = user() ?? this.generateTemporaryUser();
+            const pointerPos = viewport.screenToViewport(input.pointerPosition());
+            console.log(pointerPos);
 
             await this.connection.start();
-            await this.send("Join", this.state.user, slug);
+            await this.send("Join", { ...this.state.user, pointerX: pointerPos.x, pointerY: pointerPos.y }, slug);
 
             this.heartBeatTimer = setInterval(async () : Promise<void> => this.setPointerPosition(), 100, null);
 
@@ -63,18 +72,19 @@ export class Network extends Service<NetworkState> {
             return true;
         } catch (e) {
             console.error(e);
+            this.onConnectionFailed();
         }
         return false;
     }
 
-    onConnectionReady(clients : NetworkClient[], actions : BoardAction[]) : void {
-        console.log("CONNECTION READY", clients);
+    async onConnectionReady(clients : NetworkClient[], events : BoardEvent[]) : Promise<void> {
         this.state.clients = clients;
-        this.performBoardActions(actions, false);
+        await this.performBoardActions(events, false);
+        this.onConnected();
     }
 
     onClientConnected(client : NetworkClient) : void {
-        console.log("USER CONNECTED");
+        console.log(client);
         this.state.clients.push(client);
     }
 
@@ -90,8 +100,8 @@ export class Network extends Service<NetworkState> {
             c.afk = client.afk;
     }
 
-    onBoardPerformAction(action : BoardAction) : void {
-        this.performBoardActions([action], true);
+    onPerformBoardAction(event : BoardEvent) : void {
+        this.performBoardActions([event], true);
     }
 
     onHeartBeat(pointers : Record<string, [number, number]>) : void {
@@ -123,21 +133,44 @@ export class Network extends Service<NetworkState> {
     }
 
     async addBoardItems(items : BoardItem[]) : Promise<void> {
-        await this.send("AddItems", items);
+        await this.sendBoardAction({ type: BoardActionType.Add, data: items });
     }
 
     async removeBoardItems(items : BoardItem[]) : Promise<void> {
-        await this.send("RemoveItems", items.map((item) => item.id));
+        await this.sendBoardAction({ type: BoardActionType.Remove, data: items.map((item) => item.id) });
     }
 
-    async moveBoardItems(ids : Iterable<number>, dx : number, dy : number) : Promise<void> {
-        await this.send("MoveItems", { ids, dx, dy });
+    async moveBoardItems(ids : number[], dx : number, dy : number) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Move, data: { ids, dx, dy } });
     }
 
-    async resizeBoardItems(ids : Iterable<number>, rect : Rect) : Promise<void> {
-        await this.send("ResizeItems", {
-            ids, x: rect.x, y: rect.y, w: rect.w, h: rect.h,
+    async resizeBoardItems(ids : number[], rect : Rect) : Promise<void> {
+        await this.sendBoardAction({
+            type: BoardActionType.Scale,
+            data: {
+                ids, x: rect.x, y: rect.y, w: rect.w, h: rect.h,
+            },
         });
+    }
+
+    async orderBoardItems(ids : number[], direction : number) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Order, data: { ids, direction } });
+    }
+
+    async setBoardItemsLockState(ids : number[], state : boolean) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.LockState, data: { ids, state } });
+    }
+
+    async setBoardItemLabel(ids : number[], label : string | null) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Label, data: { ids, label } });
+    }
+
+    async setBoardItemColor(ids : number[], color : number) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Color, data: { ids, value: color } });
+    }
+
+    async setBoardItemWeight(ids : number[], weight : number) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Weight, data: { ids, value: weight } });
     }
 
     async boardSaved() : Promise<void> {
@@ -152,19 +185,38 @@ export class Network extends Service<NetworkState> {
         };
     }
 
-    private performBoardActions(actions : Iterable<BoardAction>, ignoreOwn = true) : void {
-        for (const action of actions) {
-            if (ignoreOwn && action.by === this.state.user?.id)
+    private async performBoardActions(events : BoardEvent[], ignoreOwn = true) : Promise<void> {
+        let isSelectionUpdateNeeded = true;
+        for (const event of events) {
+            if (ignoreOwn && event.by === this.state.user?.id)
                 continue;
-            if (action.type === BoardActionType.Add)
-                board.addFromObject(action.data);
-            else if (action.type === BoardActionType.Remove)
-                board.removeByIds(action.data);
-            else if (action.type === BoardActionType.Move)
-                board.move(action.data.ids, action.data.dx, action.data.dy);
-            else if (action.type === BoardActionType.Scale)
-                board.resize(action.data.ids, new Rect(action.data.x, action.data.y, action.data.w, action.data.h));
+            if (event.action.type === BoardActionType.Add) {
+                await board.addFromObject(event.action.data);
+                isSelectionUpdateNeeded = false;
+            } else if (event.action.type === BoardActionType.Remove) {
+                board.removeByIds(event.action.data);
+                selection.state.ids = selection.state.ids.filter((id) => !(event.action.data as number[]).includes(id));
+            } else if (event.action.type === BoardActionType.Move) {
+                board.move(event.action.data.ids, event.action.data.dx, event.action.data.dy);
+            } else if (event.action.type === BoardActionType.Scale) {
+                board.resize(event.action.data.ids, new Rect(event.action.data.x, event.action.data.y, event.action.data.w, event.action.data.h));
+            } else if (event.action.type === BoardActionType.Order) {
+                if (event.action.data.direction > 0)
+                    board.bringForward(board.getItemsFromIds(event.action.data.ids));
+                else
+                    board.sendBackward(board.getItemsFromIds(event.action.data.ids));
+            } else if (event.action.type === BoardActionType.LockState) {
+                board.setLockState(board.getItemsFromIds(event.action.data.ids), event.action.data.state);
+            } else if (event.action.type === BoardActionType.Label) {
+                board.setLabel(board.getItemsFromIds(event.action.data.ids), event.action.data.label);
+            } else if (event.action.type === BoardActionType.Color) {
+                board.setColor(board.getItemsFromIds(event.action.data.ids), event.action.data.value);
+            } else if (event.action.type === BoardActionType.Weight) {
+                board.setWeight(board.getItemsFromIds(event.action.data.ids), event.action.data.value);
+            }
         }
+        if (isSelectionUpdateNeeded)
+            selection.refresh();
     }
 
     private async send(method : string, ...args : unknown[]) : Promise<boolean> {
@@ -178,6 +230,10 @@ export class Network extends Service<NetworkState> {
             console.error(e);
         }
         return false;
+    }
+
+    private async sendBoardAction(action : BoardAction) : Promise<boolean> {
+        return this.send("BoardActionPerformed", action);
     }
 
     private registerNetworkEvents() : void {

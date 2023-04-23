@@ -16,7 +16,6 @@ export const onRequestGet : PagesFunction<Env> = async ({ request, params, env }
 
     if (("error" in user && board.value.isPublic) || (!("error" in user) && (board.value.author === user.value.id || board.value.isPublic))) {
         const contents = await env.boards.get(board.value.id);
-        console.log(JSON.stringify(contents));
         if (!contents)
             return notFound(new BoardContentsNotFound("Board contents not found"));
 

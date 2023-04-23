@@ -48,6 +48,7 @@ export class Board extends Service<BoardState> {
         (items : BoardItem[]) => {
             this.remove(items);
             network.removeBoardItems(items);
+            selection.state.ids = selection.state.ids.filter((id) => !items.some((item) => item.id === id));
         },
     );
 
@@ -55,10 +56,12 @@ export class Board extends Service<BoardState> {
         (items : BoardItem[]) => {
             this.remove(items);
             network.removeBoardItems(items);
+            selection.state.ids = selection.state.ids.filter((id) => !items.some((item) => item.id === id));
         },
         (items : BoardItem[]) => {
             this.add(items);
             network.addBoardItems(items);
+            selection.refresh();
         },
     );
 
@@ -93,18 +96,79 @@ export class Board extends Service<BoardState> {
     );
 
     public readonly bringForwardAction = createAction(
-        (items : BoardItem[]) => this.bringForward(items),
-        (items : BoardItem[]) => this.sendBackward(items),
+        (items : BoardItem[]) => {
+            this.bringForward(items);
+            network.orderBoardItems(items.map((item) => item.id), 1);
+        },
+        (items : BoardItem[]) => {
+            this.sendBackward(items);
+            network.orderBoardItems(items.map((item) => item.id), -1);
+        },
     );
 
     public readonly sendBackwardAction = createAction(
-        (items : BoardItem[]) => this.sendBackward(items),
-        (items : BoardItem[]) => this.bringForward(items),
+        (items : BoardItem[]) => {
+            this.sendBackward(items);
+            network.orderBoardItems(items.map((item) => item.id), -1);
+        },
+        (items : BoardItem[]) => {
+            this.bringForward(items);
+            network.orderBoardItems(items.map((item) => item.id), 1);
+        },
     );
 
     public readonly setLockStateAction = createAction(
-        (data : { items : BoardItem[]; state : boolean}) => this.setLockState(data.items, data.state),
-        (data : { items : BoardItem[]; state : boolean}) => this.setLockState(data.items, !data.state),
+        (data : { items : BoardItem[]; state : boolean}) => {
+            this.setLockState(data.items, data.state);
+            network.setBoardItemsLockState(data.items.map((item) => item.id), data.state);
+        },
+        (data : { items : BoardItem[]; state : boolean}) => {
+            this.setLockState(data.items, !data.state);
+            network.setBoardItemsLockState(data.items.map((item) => item.id), !data.state);
+        },
+    );
+
+    public readonly setLabelAction = createAction(
+        (data : { items : BoardItem[]; oldLabel : string | null; newLabel : string | null}, execute ?: boolean) => {
+            if (execute)
+                this.setLabel(data.items, data.newLabel);
+            network.setBoardItemLabel(data.items.map((item) => item.id), data.newLabel);
+        },
+        (data : { items : BoardItem[]; oldLabel : string | null; newLabel : string | null}, execute ?: boolean) => {
+            if (execute)
+                this.setLabel(data.items, data.oldLabel);
+            network.setBoardItemLabel(data.items.map((item) => item.id), data.oldLabel);
+        },
+    );
+
+    public readonly setColorAction = createAction(
+        (data : { items : BoardItem[]; oldColor : number; newColor : number}, execute ?: boolean) => {
+            if (execute)
+                this.setColor(data.items, data.newColor);
+            network.setBoardItemColor(data.items.map((item) => item.id), data.newColor);
+            selection.refresh();
+        },
+        (data : { items : BoardItem[]; oldColor : number; newColor : number}, execute ?: boolean) => {
+            if (execute)
+                this.setColor(data.items, data.oldColor);
+            network.setBoardItemColor(data.items.map((item) => item.id), data.oldColor);
+            selection.refresh();
+        },
+    );
+
+    public readonly setWeightAction = createAction(
+        (data : { items : BoardItem[]; oldWeight : number; newWeight : number}, execute ?: boolean) => {
+            if (execute)
+                this.setWeight(data.items, data.newWeight);
+            network.setBoardItemWeight(data.items.map((item) => item.id), data.newWeight);
+            selection.refresh();
+        },
+        (data : { items : BoardItem[]; oldWeight : number; newWeight : number}, execute ?: boolean) => {
+            if (execute)
+                this.setWeight(data.items, data.oldWeight);
+            network.setBoardItemWeight(data.items.map((item) => item.id), data.oldWeight);
+            selection.refresh();
+        },
     );
 
     public readonly onBoardReadyToSave = createDelegate<[data : BoardSaveData]>();
@@ -174,14 +238,14 @@ export class Board extends Service<BoardState> {
         this.add(items);
     }
 
-    add(items : Iterable<BoardItem>) : void {
+    add(items : BoardItem[]) : void {
         for (const item of items)
             this.items.set(item.id, item);
         this.addToChunk(items);
     }
 
-    addFromObject(items : Iterable<BoardItem>) : void {
-        this.add(Array.from(items).map((item) : (BoardItem | null) => {
+    async addFromObject(items : BoardItem[]) : Promise<void> {
+        const promises = Array.from(items).map(async (item) : Promise<(BoardItem | null)> => {
             let created : BoardItem | null = null;
             if (item.type === BoardItemType.Path) {
                 created = new Path((item as Path).points.map((point) => new Point(point.x, point.y)), (item as Path).color, (item as Path).weight);
@@ -190,26 +254,35 @@ export class Board extends Service<BoardState> {
                 created = new Rectangle(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Rectangle).color, (item as Rectangle).weight, (item as Rectangle).filled);
             } else if (item.type === BoardItemType.Ellipse) {
                 created = new Ellipse(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Ellipse).color, (item as Ellipse).weight, (item as Ellipse).filled);
+            } else if (item.type === BoardItemType.Image) {
+                const imageData = await loadImage((item as Image).src);
+                created = new Image(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), imageData);
             }
 
             if (created)
                 created.id = item.id;
 
             return created;
-        }).filter((item) => item !== null) as Iterable<BoardItem>);
+        });
+
+        const itemsToAdd = await (await Promise.all(promises)).filter((item) => item !== null) as BoardItem[];
+
+        this.add(itemsToAdd);
     }
 
-    remove(items : Iterable<BoardItem>) : void {
+    remove(items : BoardItem[]) : void {
+        this.removeFromChunk(items);
         for (const item of items)
             this.items.delete(item.id);
-        this.removeFromChunk(items);
     }
 
-    removeByIds(ids : Iterable<number>) : void {
+    removeByIds(ids : number[]) : void {
         this.removeFromChunk(this.getItemsFromIds(ids));
+        for (const id of ids)
+            this.items.delete(id);
     }
 
-    move(ids : Iterable<number>, dx : number, dy : number) : void {
+    move(ids : number[], dx : number, dy : number) : void {
         const items = this.getItemsFromIds(ids);
 
         this.removeFromChunk(items);
@@ -222,9 +295,8 @@ export class Board extends Service<BoardState> {
         this.addToChunk(items);
     }
 
-    resize(ids : Iterable<number>, rect : Rect) : void {
+    resize(ids : number[], rect : Rect) : void {
         const items = this.getItemsFromIds(ids);
-        console.log(items, rect);
 
         this.removeFromChunk(items);
         const bb = this.getItemsBoundingBox(items);
@@ -237,44 +309,42 @@ export class Board extends Service<BoardState> {
         this.addToChunk(items);
     }
 
-    bringForward(items : Iterable<BoardItem>) : void {
+    bringForward(items : BoardItem[]) : void {
         for (const item of items)
             if (item.zIndex < 255)
                 item.zIndex++;
         this.updateItems(items);
     }
 
-    sendBackward(items : Iterable<BoardItem>) : void {
+    sendBackward(items : BoardItem[]) : void {
         for (const item of items)
             if (item.zIndex > 0)
                 item.zIndex--;
         this.updateItems(items);
     }
 
-    setLockState(items : Iterable<BoardItem>, state : boolean) : void {
+    setLockState(items : BoardItem[], state : boolean) : void {
         for (const item of items)
             item.locked = state;
     }
 
-    setLabel(items : Iterable<BoardItem>, label : string | null) : void {
+    setLabel(items : BoardItem[], label : string | null) : void {
         for (const item of items)
             item.label = label;
     }
 
-    setColor(items : Iterable<BoardItem>, color : number) : void {
+    setColor(items : BoardItem[], color : number) : void {
         for (const item of items)
             if (item instanceof BoardShapeItem)
                 item.color = color;
-        // NOTE: Filter items based on if they are BoardShapeItems. It could reduce the region that needs to be updated.
-        this.updateItems(items);
+        this.updateItems(items.filter((item) => item instanceof BoardShapeItem));
     }
 
-    setWeight(items : Iterable<BoardItem>, weight : number) : void {
+    setWeight(items : BoardItem[], weight : number) : void {
         for (const item of items)
             if (item instanceof BoardShapeItem)
                 item.weight = weight;
-        // NOTE: Filter items based on if they are BoardShapeItems. It could reduce the region that needs to be updated.
-        this.updateItems(items);
+        this.updateItems(items.filter((item) => item instanceof BoardShapeItem));
     }
 
     rebuild() : void {
@@ -310,7 +380,7 @@ export class Board extends Service<BoardState> {
         return this.getItemsWithinRect(new Rect(p.x, p.y, 1, 1));
     }
 
-    serialize(items ?: Iterable<BoardItem>) : ByteBuffer {
+    serialize(items ?: BoardItem[]) : ByteBuffer {
         const itemsToSerialize = Array.from(items ?? this.items.values());
         const buffer = new ByteBuffer(itemsToSerialize.reduce((len, item) => len + item.getSerializedSize(), 0));
         for (const item of itemsToSerialize)
@@ -383,7 +453,7 @@ export class Board extends Service<BoardState> {
         }
     }
 
-    removeFromChunk(items : Iterable<BoardItem>) : void {
+    removeFromChunk(items : BoardItem[]) : void {
         for (const item of items) {
             const region = this.truncateRegion(viewport.viewportToBoardRect(item.rect));
             for (let { x } = region.min; x <= region.max.x; ++x)
@@ -397,14 +467,14 @@ export class Board extends Service<BoardState> {
         }
     }
 
-    getItemsBoundingBox(items ?: Iterable<BoardItem>) : Rect {
+    getItemsBoundingBox(items ?: BoardItem[]) : Rect {
         const rect = Rect.invertedInfinite();
         for (const item of items ?? this.items.values())
             rect.append(item.rect);
         return rect;
     }
 
-    getItemsFromIds(ids : Iterable<number>) : BoardItem[] {
+    getItemsFromIds(ids : number[]) : BoardItem[] {
         const items : BoardItem[] = [];
 
         for (const id of ids) {
@@ -440,7 +510,7 @@ export class Board extends Service<BoardState> {
         });
     }
 
-    private updateItems(items : Iterable<BoardItem>) : void {
+    private updateItems(items : BoardItem[]) : void {
         const bb = Rect.invertedInfinite();
         for (const item of items)
             bb.append(item.rect);

@@ -15,6 +15,7 @@ interface SelectionState {
     rect : Accessor<Rect | null>;
     screenRect : Accessor<Rect | null>;
     hasUnlockedItem : Accessor<boolean>;
+    hasAllItemsLocked : Accessor<boolean>;
     hasLabel : Accessor<boolean>;
     label : Accessor<string | null>;
     color : Accessor<number>;
@@ -49,7 +50,7 @@ class Selection extends Service<SelectionState> {
     }, () => !this.state.hasUnlockedItem());
 
     public readonly toggleLabel = createCommand(new Shortcut("l", KeyModifiers.Control | KeyModifiers.Shift), () => {
-        board.setLabel(this.state.items(), this.state.hasLabel() ? null : "");
+        board.setLabelAction({ items: this.state.items(), newLabel: this.state.hasLabel() ? null : "", oldLabel: this.state.label() });
         this.state.ids = track(this.state.ids.copy());
     });
 
@@ -60,6 +61,7 @@ class Selection extends Service<SelectionState> {
             rect: () => new Rect(),
             screenRect: () => new Rect(),
             hasUnlockedItem: () => false,
+            hasAllItemsLocked: () => false,
             hasLabel: () => false,
             label: () => "",
             color: () => 0xFFFFFFFF,
@@ -81,6 +83,7 @@ class Selection extends Service<SelectionState> {
             return new Rect(screenRect.x + viewport.state.offsetX, screenRect.y + viewport.state.offsetY, screenRect.w, screenRect.h);
         });
         this.state.hasUnlockedItem = createMemo(() => this.state.items().some((item) => !item.locked));
+        this.state.hasAllItemsLocked = createMemo(() => this.state.items().every((item) => item.locked));
         this.state.hasLabel = createMemo(() => ((this.state.ids.length !== 1) ? false : this.state.items()[0]?.label !== null));
         this.state.label = createMemo(() => this.state.items()[0]?.label ?? null);
         this.state.color = createMemo(() => {
@@ -116,7 +119,7 @@ class Selection extends Service<SelectionState> {
 
     setColor(color : number) : void {
         this.removeLockedItems();
-        board.setColor(this.state.items(), color);
+        board.setColorAction({ items: this.state.items(), newColor: color, oldColor: this.state.color() });
         this.refresh();
     }
 

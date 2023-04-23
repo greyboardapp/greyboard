@@ -64,7 +64,6 @@ export class Input extends Service<InputState> {
         autoBind(this);
     }
 
-    // NOTE: Maybe remove or convert it in a getter.
     pointerPosition() : Point {
         return this.pointerPositions[0] ?? new Point();
     }
@@ -173,7 +172,7 @@ export class Input extends Service<InputState> {
             type,
             button: (e instanceof PointerEvent || e instanceof WheelEvent) ? e.button : MouseButton.Primary,
             modifiers: this.getKeyModifiers(e),
-            positions: (e instanceof PointerEvent || e instanceof WheelEvent) ?
+            positions: (e instanceof MouseEvent || e instanceof PointerEvent || e instanceof WheelEvent) ?
                 [new PressurePoint(e.clientX, e.clientY, (e instanceof PointerEvent && e.pointerType === "pen") ? e.pressure : undefined)] :
                 Array.from(e.touches).map((touch) => new Point(touch.clientX, touch.clientY)),
             movement: [], // movement can not be calculated here since on up event the move fired right before it, resulting in a 0 movement
