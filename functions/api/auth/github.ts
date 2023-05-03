@@ -6,6 +6,8 @@ import { ApiError, failure, success } from "../../utils";
 import type { Env } from "../../utils";
 
 interface GitHubAuthTokenResponse {
+    error ?: string;
+    error_description ?: string;
     access_token ?: string;
 }
 
@@ -47,8 +49,10 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => si
         });
         const token = await tokenResponse.json<GitHubAuthTokenResponse>();
         const accessToken = token.access_token;
-        if (!accessToken)
+        if (!accessToken) {
+            console.error(token.error, token.error_description);
             return failure(new ApiError("Unable to get access token."));
+        }
 
         const headers = {
             accept: "application/vnd.github.v3+json",

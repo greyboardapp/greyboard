@@ -6,6 +6,8 @@ import { AuthType } from "../../../common/models/user";
 import { ApiError, Env, InvalidCredentialsError, failure, success } from "../../utils";
 
 interface GoogleAuthTokenResponse {
+    error ?: string;
+    error_description ?: string;
     access_token ?: string;
 }
 
@@ -44,8 +46,10 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => si
         });
         const token = await tokenResponse.json<GoogleAuthTokenResponse>();
         const accessToken = token.access_token;
-        if (!accessToken)
+        if (!accessToken) {
+            console.error(token.error, token.error_description);
             return failure(new ApiError("Unable to get access token."));
+        }
 
         const userInfoResponse = await fetch(
             "https://www.googleapis.com/oauth2/v2/userinfo",
