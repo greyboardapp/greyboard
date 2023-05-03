@@ -31,8 +31,8 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => si
         const body = await request.json<GitHubAuthCallbackParams>();
 
         const data = {
-            client_id: env.GITHUB_AUTH_CLIENT_ID,
-            client_secret: env.GITHUB_AUTH_CLIENT_SECRET,
+            client_id: env.AUTH_GITHUB_CLIENT_ID,
+            client_secret: env.AUTH_GITHUB_CLIENT_SECRET,
             redirect_uri: body.redirectUrl,
             code: body.code,
         };

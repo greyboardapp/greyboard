@@ -16,6 +16,7 @@ jobs:
         run: yarn lint
 
   deploy:
+    environment: Development
     needs: lint
     if: "!failure()"
     runs-on: ubuntu-latest
@@ -29,12 +30,12 @@ jobs:
         run: yarn build
         env:
           BASE_URL: ${{ vars.BASE_URL }}
-          HUB_URL: ${{ vars.DEV_HUB_URL }}
+          HUB_URL: ${{ vars.HUB_URL }}
           DEBUG: ${{ vars.DEBUG }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-          BOARD_SAVE_INTERVAL: ${{ vars.DEV_BOARD_SAVE_INTERVAL }}
-          GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
-          GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
+          BOARD_SAVE_INTERVAL: ${{ vars.BOARD_SAVE_INTERVAL }}
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
 
       - name: Bundle Build Artifacts
         run: cp -r functions dist/functions
@@ -44,10 +45,10 @@ jobs:
         with:
           files: "wrangler.toml"
         env:
-          GOOGLE_AUTH_CLIENT_ID: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_ID }}
-          GOOGLE_AUTH_CLIENT_SECRET: ${{ secrets.DEV_GOOGLE_AUTH_CLIENT_SECRET }}
-          GITHUB_AUTH_CLIENT_ID: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_ID }}
-          GITHUB_AUTH_CLIENT_SECRET: ${{ secrets.DEV_GITHUB_AUTH_CLIENT_SECRET }}
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Publish Build to Cloudflare Pages

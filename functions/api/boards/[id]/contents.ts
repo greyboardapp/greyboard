@@ -1,7 +1,7 @@
 import { Board } from "../../../../common/models/board";
 import { UUIDSchema } from "../../../../common/models/uuid";
 import { getSignedInUser } from "../../../auth";
-import { ok, internalError, BoardContentsNotFound, BoardNotFound, Env, Unauthorized, ValidationError, badRequest, buffer, dbGetById, notFound, unauthorized, BoardModificationFailed } from "../../../utils";
+import { ok, internalError, BoardContentsNotFound, BoardNotFound, Env, Unauthorized, ValidationError, badRequest, buffer, dbGetById, notFound, unauthorized, BoardModificationFailed, dbUpdateById, getUnixTime } from "../../../utils";
 
 export const onRequestGet : PagesFunction<Env> = async ({ request, params, env }) => {
     const id = UUIDSchema.safeParse(params.id);
@@ -39,6 +39,8 @@ export const onRequestPut : PagesFunction<Env> = async ({ request, params, env }
 
     if (!result)
         return internalError(new BoardModificationFailed("Unable to modify board"));
+
+    await dbUpdateById<Board>(env.db, "boards", id.data, { modifiedAt: getUnixTime() });
 
     return ok(result.uploaded);
 };

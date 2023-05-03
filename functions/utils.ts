@@ -10,10 +10,10 @@ export interface Services {
 export interface Env extends Services {
     DEVELOPMENT : boolean;
     JWT_SECRET : string;
-    GOOGLE_AUTH_CLIENT_ID : string;
-    GOOGLE_AUTH_CLIENT_SECRET : string;
-    GITHUB_AUTH_CLIENT_ID : string;
-    GITHUB_AUTH_CLIENT_SECRET : string;
+    AUTH_GOOGLE_CLIENT_ID : string;
+    AUTH_GOOGLE_CLIENT_SECRET : string;
+    AUTH_GITHUB_CLIENT_ID : string;
+    AUTH_GITHUB_CLIENT_SECRET : string;
 }
 
 export const pass = () : void => {};
@@ -77,7 +77,7 @@ export class BoardContentsNotFound extends RuntimeError {}
 export type Result<T = undefined, E = Error | unknown> = { value : T } | { error : E };
 export type PromisedResult<T = undefined, E = Error | unknown> = Promise<Result<T, E>>;
 
-export type OmitRequired<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type OmitRequired<T, K extends keyof T> = Partial<Omit<T, K>> & Partial<Pick<T, K>>;
 
 export const success = <T, E = Error | unknown>(value : T) : Result<T, E> => ({ value });
 export const failure = <T, E = Error | unknown>(error : E) : Result<T, E> => ({ error });
@@ -177,6 +177,19 @@ export const dbDeleteById = async (db : D1Database, table : string, id : string)
     try {
         const query = `DELETE FROM ${table} WHERE id = ?`;
         const result = await db.prepare(query).bind(id).run();
+        if (result.error)
+            return failure(result.error);
+        return success(undefined);
+    } catch (e) {
+        console.error(e);
+        return failure(e);
+    }
+};
+
+export const dbDeleteByIds = async (db : D1Database, table : string, ids : string[]) : PromisedResult => {
+    try {
+        const query = `DELETE FROM ${table} WHERE id IN (${ids.map((id, i) => `?${i + 1}`)})`;
+        const result = await db.prepare(query).bind(...ids).run();
         if (result.error)
             return failure(result.error);
         return success(undefined);

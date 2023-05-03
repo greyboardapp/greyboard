@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Entity } from "./entity";
+import { UUIDSchema } from "./uuid";
 
 export interface Board extends Entity {
     name : string;
@@ -23,6 +24,15 @@ export const BoardUpdateSchema = z.object({
     name: z.string().max(32, { message: "errors.boardNameMaxLength" }).regex(/^[\sa-zA-Z\u00C0-\u024F\u1E00-\u1EFF0-9-_.]+$/, { message: "errors.boardNameInvalidCharacter" }).trim()
         .optional(),
     isPublic: z.boolean().optional(),
+    isPermanent: z.boolean().optional(),
 });
 
 export type BoardUpdateData = z.infer<typeof BoardUpdateSchema>;
+
+export type BoardUpdateDataWithId = BoardUpdateData & { id : string };
+
+export const BoardDeleteSchema = z.object({
+    ids: z.array(UUIDSchema),
+});
+
+export type BoardDeleteData = z.infer<typeof BoardDeleteSchema>;

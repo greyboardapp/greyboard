@@ -29,7 +29,7 @@ declare interface ImportMeta {
         LOG_LEVEL ?: number;
         BOARD_SAVE_INTERVAL : number;
 
-        GOOGLE_AUTH_CLIENT_ID : string;
-        GITHUB_AUTH_CLIENT_ID : string;
+        AUTH_GOOGLE_CLIENT_ID : string;
+        AUTH_GITHUB_CLIENT_ID : string;
     }
 }

@@ -27,8 +27,8 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => si
         const body = await request.json<GoogleAuthCallbackParams>();
 
         const data = {
-            client_id: env.GOOGLE_AUTH_CLIENT_ID,
-            client_secret: env.GOOGLE_AUTH_CLIENT_SECRET,
+            client_id: env.AUTH_GOOGLE_CLIENT_ID,
+            client_secret: env.AUTH_GOOGLE_CLIENT_SECRET,
             redirect_uri: body.redirectUrl,
             code: body.code,
             grant_type: "authorization_code",

@@ -79,15 +79,15 @@ export default class Path extends BoardShapeItem {
     }
 
     private normalize() : void {
-        if (this.rect.w === 0 || this.rect.h === 0)
+        if (this.rect.w === 0 && this.rect.h === 0)
             for (const point of this.points) {
                 point.x = 0;
                 point.y = 0;
             }
         else
             for (const point of this.points) {
-                point.x = (point.x - this.rect.x) / this.rect.w;
-                point.y = (point.y - this.rect.y) / this.rect.h;
+                point.x = (point.x - this.rect.x) / (this.rect.w || 1);
+                point.y = (point.y - this.rect.y) / (this.rect.h || 1);
             }
     }
 

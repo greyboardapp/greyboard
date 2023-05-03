@@ -11,7 +11,7 @@ export function getGoogleAuthCallbackUrl() : string {
 
 export function getGoogleAuthUrl() : string {
     return `https://accounts.google.com/o/oauth2/v2/auth?${queryString({
-        client_id: import.meta.env.GOOGLE_AUTH_CLIENT_ID,
+        client_id: import.meta.env.AUTH_GOOGLE_CLIENT_ID,
         redirect_uri: getGoogleAuthCallbackUrl(),
         response_type: "code",
         scope: "openid email profile",
@@ -41,7 +41,7 @@ export function getGithubAuthCallbackUrl() : string {
 
 export function getGithubAuthUrl() : string {
     return `https://github.com/login/oauth/authorize?${queryString({
-        client_id: import.meta.env.GITHUB_AUTH_CLIENT_ID,
+        client_id: import.meta.env.AUTH_GITHUB_CLIENT_ID,
         redirect_uri: getGithubAuthCallbackUrl(),
         scope: "read:user read:email",
         allow_signup: true,

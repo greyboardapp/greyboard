@@ -55,6 +55,8 @@
     "texts.modifiableOnWhenYouAreIn": "Modifiable only when you are in",
     "texts.expires": "Expires",
     "texts.boardNotPublic": "This board is not public yet. Share it with the button below",
+    "texts.boardsSelected": "board selected",
+    "texts.boardsSelectedPlural": "boards selected",
     "errors.unknown": "Your request was not able to be processed. Try again later.",
     "errors.pageNotFound": "The page you tried to access does not exist.",
     "errors.apiNotAvailable": "It seems that our servers are unavailable right now.",

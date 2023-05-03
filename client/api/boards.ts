@@ -1,4 +1,4 @@
-import { Board, BoardCreationData, BoardCreationSchema, BoardUpdateData } from "../../common/models/board";
+import { Board, BoardCreationData, BoardCreationSchema, BoardDeleteData, BoardDeleteSchema, BoardUpdateData } from "../../common/models/board";
 import { BoardData } from "../models/board";
 import { user } from "../utils/system/auth";
 import { ApiResponse } from "./api";
@@ -50,6 +50,22 @@ export async function createBoard(data : BoardCreationData) : Promise<ApiRespons
 
         return (await (await fetch("/api/boards/", {
             method: "POST",
+            body: JSON.stringify(data),
+            credentials: "include",
+        })).json());
+    } catch (e) {
+        return { status: 500, error: "errors.apiNotAvailable" };
+    }
+}
+
+export async function deleteBoards(data : BoardDeleteData) : Promise<ApiResponse<number>> {
+    try {
+        const validated = BoardDeleteSchema.safeParse(data);
+        if (!validated.success)
+            return { status: 400, error: validated.error.message };
+
+        return (await (await fetch("/api/boards/", {
+            method: "DELETE",
             body: JSON.stringify(data),
             credentials: "include",
         })).json());

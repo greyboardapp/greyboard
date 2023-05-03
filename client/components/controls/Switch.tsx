@@ -48,7 +48,6 @@ const Switch : Component<SwitchProps> = (props) => (
                 if (props.onChange)
                     props.onChange(e);
             }}
-            max={3}
         />
     </div>
 );

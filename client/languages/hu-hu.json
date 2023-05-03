@@ -55,6 +55,8 @@
     "texts.modifiableOnWhenYouAreIn": "Módosítható, csak akkor ha bent vagy",
     "texts.expires": "Lejár",
     "texts.boardNotPublic": "Ez a tábla még nem nyilványos. Oszd meg a lenti gomb segítségével.",
+    "texts.boardsSelected": "tábla kiválasztva",
+    "texts.boardsSelectedPlural": "tábla kiválasztva",
     "errors.unknown": "A kérést nem sikerült feldolgozni. Probáld meg később.",
     "errors.pageNotFound": "Az oldal amit megprobáltál elérni nem létezik.",
     "errors.apiNotAvailable": "Úgy tűnik, hogy a szervereink nem érhetőek el jelenleg.",
