@@ -1,6 +1,7 @@
 import { Route, Router, Routes } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { Component, createSignal, lazy } from "solid-js";
+import { Toaster } from "solid-toast";
 
 import "./App.scss";
 import DashboardPage from "./pages/DashboardPage";
@@ -32,6 +33,10 @@ const App : Component = () => (
             </Router>
             <LoadingOverlay />
             <ModalProvider />
+            <Toaster
+                position="bottom-center"
+                gutter={8}
+            />
         </QueryClientProvider>
     </div>
 );

@@ -44,7 +44,10 @@ import { showModal } from "../components/surfaces/Modal";
 import { network } from "../core/services/network";
 import ClientList from "../components/app/ClientAvatars";
 import { user } from "../utils/system/auth";
-import { BoardUpdateData } from "../../common/models/board";
+import { BoardUpdateData, BoardUpdateDataWithId } from "../../common/models/board";
+import { clearToasts, showToast } from "../components/feedback/Toast";
+import { getText, formattedRelativeDateTime } from "../utils/system/intl";
+import { getMidnightAfterDays } from "../utils/datatypes/date";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -65,6 +68,14 @@ const BoardPage : Component = () => {
         size: "s",
     });
 
+    const permanentBoardMutation = createMutation({
+        mutationFn: async (data : BoardUpdateDataWithId) => saveBoardData(data.id, data),
+        onSettled: (data, error) => {
+            if (!data || data.error || data.result === undefined)
+                showErrorModal(data?.error);
+        },
+    });
+
     const boardDataQuery = createQuery(() => ["board"], async () => getBoardData(params.slug), {
         refetchOnWindowFocus: false,
         onSuccess: (data) => {
@@ -79,6 +90,24 @@ const BoardPage : Component = () => {
                 // board.startPeriodicSave();
                 if (data.result.isPublic)
                     network.connect(data.result.slug);
+
+                if (!data.result.isPermanent)
+                    showToast({
+                        title: `${getText("titles.permanentBoard")} ${formattedRelativeDateTime(getMidnightAfterDays(data.result.modifiedAt, 7))}`,
+                        closable: true,
+                        actions: [
+                            (close) => <Button content="buttons.makePermanent" variant="primary" onClick={async () => {
+                                if (!data.result)
+                                    return;
+
+                                await permanentBoardMutation.mutateAsync({
+                                    id: data.result.id,
+                                    isPermanent: true,
+                                });
+                                close();
+                            }} />,
+                        ],
+                    });
             });
 
             if (!data.result?.isPublic)
@@ -130,9 +159,13 @@ const BoardPage : Component = () => {
             showErrorModal("errors.boardClosed", "titles.oops");
             navigate(user() === null ? "/" : "/dashboard");
         });
+        network.onDisconnected.add(() => showToast({
+            title: "texts.networkDisconnected",
+        }));
     });
     onCleanup(() => {
         app.stop();
+        clearToasts();
     });
 
     return (

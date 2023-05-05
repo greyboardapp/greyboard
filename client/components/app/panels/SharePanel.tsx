@@ -12,6 +12,7 @@ import { saveBoardData } from "../../../api/boards";
 import { network } from "../../../core/services/network";
 import { BoardUpdateData } from "../../../../common/models/board";
 import { user } from "../../../utils/system/auth";
+import { showToast } from "../../feedback/Toast";
 
 interface SharePanelContentProps {
     close : () => void;
@@ -33,6 +34,9 @@ const SharePanelContent : Component<SharePanelContentProps> = (props) => {
 
                 if (properties.isPublic) {
                     await network.connect(board.state.slug);
+                    showToast({
+                        title: "texts.shared",
+                    });
                 } else {
                     await network.closeBoard();
                     await network.disconnect();

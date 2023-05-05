@@ -110,10 +110,11 @@ const DashboardPage : Component = () => {
                             <div class="flex s:v m:h m:h-spaced py2 m:py4">
                                 <Popover
                                     actuator={<div class={styles.userInfo}>
-                                    <CarretIcon />
-                                    <Avatar user={loggedInUser} />
-                                    <Text content={loggedInUser.name} size="l" />
-                                </div>}
+                                        <CarretIcon />
+                                        <Avatar user={loggedInUser} />
+                                        <Text content={loggedInUser.name} size="l" />
+                                    </div>}
+                                    orientation={"left"}
                                 >
                                     <Panel size="s">
                                         <List>

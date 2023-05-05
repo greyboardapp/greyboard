@@ -13,6 +13,7 @@ import { formattedRelativeDateTime } from "../../utils/system/intl";
 import ToolbarInput from "../toolbar/ToolbarInput";
 import { ApiResponse } from "../../api/api";
 import { saveBoardData } from "../../api/boards";
+import { getMidnightAfterDays } from "../../utils/datatypes/date";
 
 const BoardCardVariants = { ...getGenericVariants({}) };
 const boardCardStyles = cva(styles.card, {
@@ -45,7 +46,7 @@ const BoardCard : Component<BoardCardProps> = (props) => {
         <div {...getGenericProps(props)} class={cls(boardCardStyles(props), props.class)}>
             <Link href={`/b/${props.board.slug}`} class={styles.link} onClick={() => props.onClicked()}>
                 <Show when={!props.board.isPermanent}>
-                    <div class={styles.expires}><Text as="span" content="texts.expires" /> {formattedRelativeDateTime(props.board.modifiedAt + 604800)}</div>
+                    <div class={styles.expires}><Text as="span" content="texts.expires" /> {formattedRelativeDateTime(getMidnightAfterDays(props.board.modifiedAt, 7))}</div>
                 </Show>
                 <div class={styles.content}></div>
             </Link>

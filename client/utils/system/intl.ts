@@ -47,11 +47,6 @@ export const formattedDate = (date : number | Date, options ?: Intl.DateTimeForm
     ...options,
 }).format((typeof date === "number") ? new Date(date * 1000) : date);
 
-// export const formattedRelativeDateTime = (date : number | Date, options ?: Intl.DateTimeFormatOptions) : string => new Intl.RelativeTimeFormat(locale(), {
-//     dateStyle: "medium",
-//     ...options,
-// }).format(-(new Date().getTime() - ((typeof date === "number") ? date * 1000 : date.getTime())), "day");
-
 export const formattedRelativeDateTime = (date : number | Date) : string => new TimeAgo(locale().replace(/-.*/, ""))
     .format((typeof date === "number") ? new Date(date * 1000) : date, "round-minute");
 

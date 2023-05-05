@@ -24,6 +24,9 @@ export interface NetworkState {
 export class Network extends Service<NetworkState> {
     public readonly onConnected = createDelegate();
     public readonly onConnectionFailed = createDelegate();
+    public readonly onConnectionLost = createDelegate();
+    public readonly onReconnected = createDelegate();
+    public readonly onDisconnected = createDelegate();
     public readonly onClientReassigned = createDelegate();
     public readonly onClientBoardClosed = createDelegate();
 
@@ -38,6 +41,8 @@ export class Network extends Service<NetworkState> {
             clients: [],
         });
 
+        console.log(import.meta.env.HUB_URL);
+
         this.connection = new HubConnectionBuilder()
             .withUrl(import.meta.env.HUB_URL)
             .configureLogging(LogLevel.Debug)
@@ -46,12 +51,15 @@ export class Network extends Service<NetworkState> {
 
         this.connection.onreconnecting((e) => console.log("Reconnecting", e));
         this.connection.onreconnected((connectionId) => console.log("Reconnected", connectionId));
-        this.connection.onclose((e) => console.error("Connection closed", e));
+        this.connection.onclose((e) => this.onDisconnected());
     }
 
     stop() : void {
         this.onConnected.clear();
         this.onConnectionFailed.clear();
+        this.onConnectionLost.clear();
+        this.onReconnected.clear();
+        this.onReconnected.clear();
         this.onClientReassigned.clear();
         this.onClientBoardClosed.clear();
 
