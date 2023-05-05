@@ -173,6 +173,19 @@ export const dbUpdateById = async <T extends Entity>(db : D1Database, table : st
     }
 };
 
+export const dbUpdateByIds = async <T extends Entity>(db : D1Database, table : string, ids : string[], item : OmitRequired<T, "id">) : PromisedResult => {
+    try {
+        const query = `UPDATE ${table} SET ${Object.keys(item).map((key, i) => `${key}=?${i + 1 + ids.length}`).join(", ")} WHERE id IN (${ids.map((id, i) => `?${i + 1}`)})`;
+        const result = await db.prepare(query).bind(...ids, ...toDbParameters(item)).run();
+        if (result.error)
+            return failure(result.error);
+        return success(undefined);
+    } catch (e) {
+        console.error(e);
+        return failure(e);
+    }
+};
+
 export const dbDeleteById = async (db : D1Database, table : string, id : string) : PromisedResult => {
     try {
         const query = `DELETE FROM ${table} WHERE id = ?`;

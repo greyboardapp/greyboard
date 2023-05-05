@@ -44,7 +44,7 @@ import { showModal } from "../components/surfaces/Modal";
 import { network } from "../core/services/network";
 import ClientList from "../components/app/ClientAvatars";
 import { user } from "../utils/system/auth";
-import { BoardUpdateData, BoardUpdateDataWithId } from "../../common/models/board";
+import { BoardUpdateData } from "../../common/models/board";
 import { clearToasts, showToast } from "../components/feedback/Toast";
 import { getText, formattedRelativeDateTime } from "../utils/system/intl";
 import { getMidnightAfterDays } from "../utils/datatypes/date";
@@ -68,10 +68,10 @@ const BoardPage : Component = () => {
         size: "s",
     });
 
-    const permanentBoardMutation = createMutation({
-        mutationFn: async (data : BoardUpdateDataWithId) => saveBoardData(data.id, data),
+    const updateBoardMutation = createMutation({
+        mutationFn: async (data : BoardUpdateData) => saveBoardData(board.state.id, data),
         onSettled: (data, error) => {
-            if (!data || data.error || data.result === undefined)
+            if (!data || data.error || data.result === undefined || data.result !== 1)
                 showErrorModal(data?.error);
         },
     });
@@ -100,8 +100,7 @@ const BoardPage : Component = () => {
                                 if (!data.result)
                                     return;
 
-                                await permanentBoardMutation.mutateAsync({
-                                    id: data.result.id,
+                                await updateBoardMutation.mutateAsync({
                                     isPermanent: true,
                                 });
                                 close();

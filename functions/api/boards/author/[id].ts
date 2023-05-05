@@ -16,6 +16,6 @@ export const onRequestGet : PagesFunction<Env> = async ({ request, params, env }
     const user = await getSignedInUser(request, env.JWT_SECRET);
 
     if ("error" in user || user.value.id !== id.data)
-        return ok(board.value.filter((b) => b.isPublic));
-    return ok(board.value);
+        return ok(board.value.filter((b) => b.isPublic && !b.isDeleted));
+    return ok(board.value.filter((b) => !b.isDeleted));
 };

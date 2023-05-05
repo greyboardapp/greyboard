@@ -34,6 +34,6 @@ const ToastContent : Component<Toast & ToastData> = (props) => {
     );
 };
 
-export const showToast = (data : ToastData) : string => toast((t) => ToastContent({ ...data, ...t }), { unmountDelay: 500, className: styles.toast });
+export const showToast = (data : ToastData, duration = 5000) : string => toast((t) => ToastContent({ ...data, ...t }), { unmountDelay: 500, duration, className: styles.toast });
 
 export const clearToasts = () : void => toast.remove();

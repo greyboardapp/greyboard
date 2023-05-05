@@ -18,13 +18,13 @@ import DeleteIcon from "../assets/icons/delete.svg";
 import LockIcon from "../assets/icons/lock.svg";
 import HintArrow from "../assets/misc/hint_arrow.svg";
 import BoardCard from "../components/data/BoardCard";
-import { createBoard, deleteBoards, getUserBoards, saveBoardData } from "../api/boards";
+import { createBoard, getUserBoards, saveBoardsData } from "../api/boards";
 import { cls } from "../utils/dom/dom";
 import Popover from "../components/feedback/Popover";
 import Panel from "../components/surfaces/Panel";
 import { List, ListItem } from "../components/data/List";
 import ApiSuspense from "../components/feedback/ApiSuspense";
-import { Board, BoardCreationData, BoardDeleteData, BoardUpdateDataWithId } from "../../common/models/board";
+import { Board, BoardCreationData, BoardsUpdateData } from "../../common/models/board";
 import { getText } from "../utils/system/intl";
 import Skeleton from "../components/feedback/Skeleton";
 import IconButton from "../components/controls/IconButton";
@@ -33,6 +33,7 @@ import { logout } from "../api/auth";
 import { showModal } from "../components/surfaces/Modal";
 import Logo from "../assets/branding/logo.svg";
 import Divider from "../components/feedback/Divider";
+import { showToast } from "../components/feedback/Toast";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
@@ -40,6 +41,7 @@ const DashboardPage : Component = () => {
         navigate("/");
 
     const [selectedBoards, setSelectedBoards] = createSignal<Board[]>([]);
+    const [deletedBoards, setDeletedBoards] = createSignal<string[]>([]);
 
     const showErrorModal = (error ?: string) : void => showModal({
         title: "titles.somethingWentWrong",
@@ -76,19 +78,8 @@ const DashboardPage : Component = () => {
         },
     });
 
-    const deleteBoardsMutation = createMutation({
-        mutationFn: async (data : BoardDeleteData) => deleteBoards(data),
-        onSettled: (data, error) => {
-            if (!data || data.error || data.result === undefined || data.result !== selectedBoards().length) {
-                showErrorModal(data?.error);
-                return;
-            }
-            setSelectedBoards([]);
-        },
-    });
-
-    const permanentBoardMutation = createMutation({
-        mutationFn: async (data : BoardUpdateDataWithId) => saveBoardData(data.id, data),
+    const updateBoardsMutation = createMutation({
+        mutationFn: async (data : BoardsUpdateData) => saveBoardsData(data),
         onSettled: (data, error) => {
             if (!data || data.error || data.result === undefined) {
                 showErrorModal(data?.error);
@@ -141,14 +132,27 @@ const DashboardPage : Component = () => {
                                                 <Text as="span" content={selectedBoards().length === 1 ? "texts.boardsSelected" : "texts.boardsSelectedPlural"} />
                                             </div>
                                             <IconButton icon={LockIcon} variant="tertiary" onClick={async () => {
-                                                for (const board of selectedBoards())
-                                                    await permanentBoardMutation.mutateAsync({ id: board.id, isPermanent: true });
+                                                await updateBoardsMutation.mutateAsync({ ids: selectedBoards().map((board) => board.id), properties: { isPermanent: true } });
                                                 await boardQuery.refetch();
-                                            }} loading={permanentBoardMutation.isLoading} marginRight={2} />
+                                            }} loading={updateBoardsMutation.isLoading} marginRight={2} />
                                             <IconButton icon={DeleteIcon} variant="tertiary" onClick={async () => {
-                                                await deleteBoardsMutation.mutateAsync({ ids: selectedBoards().map((board) => board.id) });
+                                                const ids = selectedBoards().map((board) => board.id);
+                                                setDeletedBoards(ids);
+                                                await updateBoardsMutation.mutateAsync({ ids, properties: { isDeleted: true } });
                                                 await boardQuery.refetch();
-                                            }} loading={deleteBoardsMutation.isLoading} />
+                                                showToast({
+                                                    title: "texts.boardDeleteUndo",
+                                                    actions: [
+                                                        (close) => <Button content="actions.undo" variant="primary" onClick={async () => {
+                                                            await updateBoardsMutation.mutateAsync({ ids: deletedBoards(), properties: { isDeleted: false } });
+                                                            await boardQuery.refetch();
+                                                            setDeletedBoards([]);
+                                                            close();
+                                                        }} />,
+                                                    ],
+                                                    closable: true,
+                                                }, 60000);
+                                            }} loading={updateBoardsMutation.isLoading} />
                                         </Motion.div>
                                         <Divider direction="v" class="mx2 s:hide m:show" />
                                     </Show>

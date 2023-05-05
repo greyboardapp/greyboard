@@ -61,6 +61,7 @@
     "texts.boardsSelectedPlural": "tábla kiválasztva",
     "texts.shared": "A tábla linkje másolva lett. Osszd meg másokkal!",
     "texts.networkDisconnected": "A kollaboráció megállt",
+    "texts.boardDeleteUndo": "Sikeresen törölve, viszont ez még visszafordítható",
     "errors.unknown": "A kérést nem sikerült feldolgozni. Probáld meg később.",
     "errors.pageNotFound": "Az oldal amit megprobáltál elérni nem létezik.",
     "errors.apiNotAvailable": "Úgy tűnik, hogy a szervereink nem érhetőek el jelenleg.",

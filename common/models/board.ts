@@ -7,6 +7,7 @@ export interface Board extends Entity {
     author : string;
     isPublic : boolean;
     isPermanent : boolean;
+    isDeleted : boolean;
     slug : string;
     createdAt : number;
     modifiedAt : number;
@@ -25,14 +26,14 @@ export const BoardUpdateSchema = z.object({
         .optional(),
     isPublic: z.boolean().optional(),
     isPermanent: z.boolean().optional(),
+    isDeleted: z.boolean().optional(),
 });
 
 export type BoardUpdateData = z.infer<typeof BoardUpdateSchema>;
 
-export type BoardUpdateDataWithId = BoardUpdateData & { id : string };
-
-export const BoardDeleteSchema = z.object({
+export const BoardsUpdateSchema = z.object({
     ids: z.array(UUIDSchema),
+    properties: BoardUpdateSchema,
 });
 
-export type BoardDeleteData = z.infer<typeof BoardDeleteSchema>;
+export type BoardsUpdateData = z.infer<typeof BoardsUpdateSchema>;
