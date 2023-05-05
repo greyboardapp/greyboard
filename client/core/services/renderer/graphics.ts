@@ -125,8 +125,10 @@ export default class Graphics {
 
         const offscreen = new OffscreenCanvas(w, h);
         const offscreenCtx = offscreen.getContext("2d");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         offscreenCtx?.drawImage(bitmap, 0, 0);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         const compressedBlob = await imageCompression((await offscreen.convertToBlob()) as File, {
             alwaysKeepResolution: true,
             maxWidthOrHeight: 300,

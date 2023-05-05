@@ -142,14 +142,16 @@ const BoardPage : Component = () => {
         },
     });
 
+    const saveBoard = async () : Promise<void> => {
+        await saveContentMutation.mutateAsync();
+        const thumbnail = await board.getBoardThumbnail();
+        if (thumbnail)
+            await saveBoardDataMutation.mutateAsync({ thumbnail });
+    };
+
     onMount(() => {
         app.start();
-        board.onBoardReadyToSave.add(async () => {
-            await saveContentMutation.mutateAsync();
-            const thumbnail = await board.getBoardThumbnail();
-            if (thumbnail)
-                await saveBoardDataMutation.mutateAsync({ thumbnail });
-        });
+        board.onBoardReadyToSave.add(saveBoard);
         network.onConnected.add(hideLoadingOverlay);
         network.onConnectionFailed.add(() => {
             hideLoadingOverlay();
@@ -166,7 +168,9 @@ const BoardPage : Component = () => {
             title: "texts.networkDisconnected",
         }));
     });
-    onCleanup(() => {
+
+    onCleanup(async () => {
+        await saveBoard();
         app.stop();
         clearToasts();
     });
