@@ -1,6 +1,8 @@
+import imageCompression from "browser-image-compression";
 import Color from "../../../utils/datatypes/color";
 import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
+import { toDataUrl } from "../../../utils/system/image";
 
 export default class Graphics {
     private static readonly backgroundColor = "#222222";
@@ -114,5 +116,26 @@ export default class Graphics {
 
     image(rect : Rect, img : CanvasImageSource) : void {
         this.ctx.drawImage(img, rect.x, rect.y, rect.w, rect.h);
+    }
+
+    async getImage(bb : Rect) : Promise<string | null> {
+        const w = Math.max(300, Math.min(1280, bb.w));
+        const h = Math.max(300, Math.min(620, bb.h));
+        const bitmap = await createImageBitmap(this.canvas, bb.x - 10, bb.y - 10, w, h);
+
+        const offscreen = new OffscreenCanvas(w, h);
+        const offscreenCtx = offscreen.getContext("2d");
+        offscreenCtx?.drawImage(bitmap, 0, 0);
+
+        const compressedBlob = await imageCompression((await offscreen.convertToBlob()) as File, {
+            alwaysKeepResolution: true,
+            maxWidthOrHeight: 300,
+            maxSizeMB: 0.001,
+            initialQuality: 0.1,
+            useWebWorker: true,
+        });
+
+        const image = await toDataUrl(URL.createObjectURL(compressedBlob));
+        return image?.toString() ?? null;
     }
 }

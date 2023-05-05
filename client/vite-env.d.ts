@@ -27,7 +27,7 @@ declare interface ImportMeta {
         HUB_URL : string;
         DEBUG ?: string;
         LOG_LEVEL ?: number;
-        BOARD_SAVE_INTERVAL : number;
+        BOARD_SAVE_DELAY : number;
 
         AUTH_GOOGLE_CLIENT_ID : string;
         AUTH_GITHUB_CLIENT_ID : string;

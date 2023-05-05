@@ -87,7 +87,6 @@ const BoardPage : Component = () => {
                 }
 
                 board.loadFromBoardData(data.result);
-                // board.startPeriodicSave();
                 if (data.result.isPublic)
                     network.connect(data.result.slug);
 
@@ -145,7 +144,12 @@ const BoardPage : Component = () => {
 
     onMount(() => {
         app.start();
-        board.onBoardReadyToSave.add(() => saveContentMutation.mutate());
+        board.onBoardReadyToSave.add(async () => {
+            await saveContentMutation.mutateAsync();
+            const thumbnail = await board.getBoardThumbnail();
+            if (thumbnail)
+                await saveBoardDataMutation.mutateAsync({ thumbnail });
+        });
         network.onConnected.add(hideLoadingOverlay);
         network.onConnectionFailed.add(() => {
             hideLoadingOverlay();

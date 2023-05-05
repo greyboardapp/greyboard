@@ -9,7 +9,6 @@ import { isLoggedIn, setUser, user } from "../utils/system/auth";
 
 import styles from "./DashboardPage.module.scss";
 import CarretIcon from "../assets/icons/carret.svg";
-import PeopleIcon from "../assets/icons/people.svg";
 import SettingsIcon from "../assets/icons/settings.svg";
 import LogoutIcon from "../assets/icons/logout.svg";
 import PlusIcon from "../assets/icons/plus.svg";
@@ -34,6 +33,7 @@ import { showModal } from "../components/surfaces/Modal";
 import Logo from "../assets/branding/logo.svg";
 import Divider from "../components/feedback/Divider";
 import { showToast } from "../components/feedback/Toast";
+import Tooltip from "../components/feedback/Tooltip";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
@@ -89,6 +89,24 @@ const DashboardPage : Component = () => {
         },
     });
 
+    const deleteBoards = async (ids : string[]) : Promise<void> => {
+        setDeletedBoards(ids);
+        await updateBoardsMutation.mutateAsync({ ids, properties: { isDeleted: true } });
+        await boardQuery.refetch();
+        showToast({
+            title: "texts.boardDeleteUndo",
+            actions: [
+                (close) => <Button content="actions.undo" variant="primary" onClick={async () => {
+                    await updateBoardsMutation.mutateAsync({ ids: deletedBoards(), properties: { isDeleted: false } });
+                    await boardQuery.refetch();
+                    setDeletedBoards([]);
+                    close();
+                }} />,
+            ],
+            closable: true,
+        }, 60000);
+    };
+
     return (
         <>
             <Show when={user()} keyed>
@@ -109,13 +127,12 @@ const DashboardPage : Component = () => {
                                 >
                                     <Panel size="s">
                                         <List>
-                                            <ListItem><PeopleIcon /><Text content="Profile" /></ListItem>
                                             <ListItem><SettingsIcon /><Text content="Settings" /></ListItem>
                                             <ListItem onClick={async () => {
                                                 logout();
                                                 setUser(null);
                                                 navigate("/");
-                                            }}><LogoutIcon /><Text content="Logout" /></ListItem>
+                                            }}><LogoutIcon /><Text content="buttons.logout" /></ListItem>
                                         </List>
                                     </Panel>
                                 </Popover>
@@ -131,28 +148,20 @@ const DashboardPage : Component = () => {
                                                 <Text as="span" content={`${selectedBoards().length} `} />
                                                 <Text as="span" content={selectedBoards().length === 1 ? "texts.boardsSelected" : "texts.boardsSelectedPlural"} />
                                             </div>
-                                            <IconButton icon={LockIcon} variant="tertiary" onClick={async () => {
-                                                await updateBoardsMutation.mutateAsync({ ids: selectedBoards().map((board) => board.id), properties: { isPermanent: true } });
-                                                await boardQuery.refetch();
-                                            }} loading={updateBoardsMutation.isLoading} marginRight={2} />
-                                            <IconButton icon={DeleteIcon} variant="tertiary" onClick={async () => {
-                                                const ids = selectedBoards().map((board) => board.id);
-                                                setDeletedBoards(ids);
-                                                await updateBoardsMutation.mutateAsync({ ids, properties: { isDeleted: true } });
-                                                await boardQuery.refetch();
-                                                showToast({
-                                                    title: "texts.boardDeleteUndo",
-                                                    actions: [
-                                                        (close) => <Button content="actions.undo" variant="primary" onClick={async () => {
-                                                            await updateBoardsMutation.mutateAsync({ ids: deletedBoards(), properties: { isDeleted: false } });
-                                                            await boardQuery.refetch();
-                                                            setDeletedBoards([]);
-                                                            close();
-                                                        }} />,
-                                                    ],
-                                                    closable: true,
-                                                }, 60000);
-                                            }} loading={updateBoardsMutation.isLoading} />
+                                            <div class="mr2">
+                                                <Tooltip content={<Text content="buttons.makePermanent" />} orientation="vertical">
+                                                    <IconButton icon={LockIcon} variant="tertiary" onClick={async () => {
+                                                        await updateBoardsMutation.mutateAsync({ ids: selectedBoards().map((board) => board.id), properties: { isPermanent: true } });
+                                                        await boardQuery.refetch();
+                                                    }} loading={updateBoardsMutation.isLoading} />
+                                                </Tooltip>
+                                            </div>
+                                            <Tooltip content={<Text content="actions.delete" />} orientation="vertical">
+                                                <IconButton icon={DeleteIcon} variant="tertiary" onClick={async () => {
+                                                    const ids = selectedBoards().map((board) => board.id);
+                                                    deleteBoards(ids);
+                                                }} loading={updateBoardsMutation.isLoading} />
+                                            </Tooltip>
                                         </Motion.div>
                                         <Divider direction="v" class="mx2 s:hide m:show" />
                                     </Show>
@@ -197,7 +206,15 @@ const DashboardPage : Component = () => {
                                                             const b = selectedBoards().copy();
                                                             b.splice(b.findIndex((v) => v === board), 1);
                                                             setSelectedBoards(b);
-                                                        }} />
+                                                        }}
+                                                        onMadePermanent={async () => {
+                                                            await updateBoardsMutation.mutateAsync({ ids: [board.id], properties: { isPermanent: true } });
+                                                            await boardQuery.refetch();
+                                                        }}
+                                                        onDeleted={async () => {
+                                                            deleteBoards([board.id]);
+                                                        }}
+                                                        />
                                                 </div>
                                             )}
                                         </For>

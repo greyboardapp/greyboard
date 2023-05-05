@@ -43,11 +43,13 @@ export class Board extends Service<BoardState> {
         (items : BoardItem[]) => {
             this.add(items);
             network.addBoardItems(items);
+            this.queueSave();
         },
         (items : BoardItem[]) => {
             this.remove(items);
             network.removeBoardItems(items);
             selection.state.ids = selection.state.ids.filter((id) => !items.some((item) => item.id === id));
+            this.queueSave();
         },
     );
 
@@ -56,11 +58,13 @@ export class Board extends Service<BoardState> {
             this.remove(items);
             network.removeBoardItems(items);
             selection.state.ids = selection.state.ids.filter((id) => !items.some((item) => item.id === id));
+            this.queueSave();
         },
         (items : BoardItem[]) => {
             this.add(items);
             network.addBoardItems(items);
             selection.refresh();
+            this.queueSave();
         },
     );
 
@@ -70,12 +74,14 @@ export class Board extends Service<BoardState> {
                 this.move(data.ids, data.dx, data.dy);
             network.moveBoardItems(data.ids, data.dx, data.dy);
             selection.refresh();
+            this.queueSave();
         },
         (data : BoardMoveData, execute ?: boolean) => {
             if (execute)
                 this.move(data.ids, -data.dx, -data.dy);
             network.moveBoardItems(data.ids, -data.dx, -data.dy);
             selection.refresh();
+            this.queueSave();
         },
     );
 
@@ -85,12 +91,13 @@ export class Board extends Service<BoardState> {
                 this.resize(data.ids, data.newRect);
             network.resizeBoardItems(data.ids, data.newRect);
             selection.refresh();
+            this.queueSave();
         },
         (data : BoardResizeData, execute ?: boolean) => {
             if (execute)
                 this.resize(data.ids, data.oldRect);
             network.resizeBoardItems(data.ids, data.oldRect);
-            selection.refresh();
+            selection.refresh(); this.queueSave();
         },
     );
 
@@ -98,10 +105,12 @@ export class Board extends Service<BoardState> {
         (items : BoardItem[]) => {
             this.bringForward(items);
             network.orderBoardItems(items.map((item) => item.id), 1);
+            this.queueSave();
         },
         (items : BoardItem[]) => {
             this.sendBackward(items);
             network.orderBoardItems(items.map((item) => item.id), -1);
+            this.queueSave();
         },
     );
 
@@ -109,10 +118,12 @@ export class Board extends Service<BoardState> {
         (items : BoardItem[]) => {
             this.sendBackward(items);
             network.orderBoardItems(items.map((item) => item.id), -1);
+            this.queueSave();
         },
         (items : BoardItem[]) => {
             this.bringForward(items);
             network.orderBoardItems(items.map((item) => item.id), 1);
+            this.queueSave();
         },
     );
 
@@ -120,10 +131,12 @@ export class Board extends Service<BoardState> {
         (data : { items : BoardItem[]; state : boolean}) => {
             this.setLockState(data.items, data.state);
             network.setBoardItemsLockState(data.items.map((item) => item.id), data.state);
+            this.queueSave();
         },
         (data : { items : BoardItem[]; state : boolean}) => {
             this.setLockState(data.items, !data.state);
             network.setBoardItemsLockState(data.items.map((item) => item.id), !data.state);
+            this.queueSave();
         },
     );
 
@@ -132,11 +145,13 @@ export class Board extends Service<BoardState> {
             if (execute)
                 this.setLabel(data.items, data.newLabel);
             network.setBoardItemLabel(data.items.map((item) => item.id), data.newLabel);
+            this.queueSave();
         },
         (data : { items : BoardItem[]; oldLabel : string | null; newLabel : string | null}, execute ?: boolean) => {
             if (execute)
                 this.setLabel(data.items, data.oldLabel);
             network.setBoardItemLabel(data.items.map((item) => item.id), data.oldLabel);
+            this.queueSave();
         },
     );
 
@@ -146,12 +161,14 @@ export class Board extends Service<BoardState> {
                 this.setColor(data.items, data.newColor);
             network.setBoardItemColor(data.items.map((item) => item.id), data.newColor);
             selection.refresh();
+            this.queueSave();
         },
         (data : { items : BoardItem[]; oldColor : number; newColor : number}, execute ?: boolean) => {
             if (execute)
                 this.setColor(data.items, data.oldColor);
             network.setBoardItemColor(data.items.map((item) => item.id), data.oldColor);
             selection.refresh();
+            this.queueSave();
         },
     );
 
@@ -161,12 +178,14 @@ export class Board extends Service<BoardState> {
                 this.setWeight(data.items, data.newWeight);
             network.setBoardItemWeight(data.items.map((item) => item.id), data.newWeight);
             selection.refresh();
+            this.queueSave();
         },
         (data : { items : BoardItem[]; oldWeight : number; newWeight : number}, execute ?: boolean) => {
             if (execute)
                 this.setWeight(data.items, data.oldWeight);
             network.setBoardItemWeight(data.items.map((item) => item.id), data.oldWeight);
             selection.refresh();
+            this.queueSave();
         },
     );
 
@@ -209,13 +228,14 @@ export class Board extends Service<BoardState> {
     save() : void {
         this.onBoardReadyToSave();
         network.boardSaved();
+        if (this.saveTimer)
+            clearTimeout(this.saveTimer);
     }
 
-    startPeriodicSave() : void {
-        this.state.savingEnabled = true;
+    queueSave() : void {
         if (this.saveTimer)
-            clearInterval(this.saveTimer);
-        this.saveTimer = setInterval(() => this.save(), (import.meta.env.BOARD_SAVE_INTERVAL ?? 10) * 1000, null);
+            clearTimeout(this.saveTimer);
+        this.saveTimer = setTimeout(() => this.save(), (import.meta.env.BOARD_SAVE_DELAY ?? 10) * 1000, null);
     }
 
     async loadFromBoardData(data : BoardData) : Promise<void> {
@@ -228,6 +248,7 @@ export class Board extends Service<BoardState> {
         });
         const buffer = ByteBuffer.fromArrayBuffer(data.contents);
         const items = await this.deserialize(buffer, true);
+        this.remove(Array.from(this.items.values()));
         this.add(items);
     }
 
@@ -478,6 +499,15 @@ export class Board extends Service<BoardState> {
         }
 
         return items;
+    }
+
+    async getBoardThumbnail() : Promise<string | null> {
+        const [chunk] = Array.from(this.chunks.values());
+        if (!chunk)
+            return null;
+        const bb = this.getItemsBoundingBox(Array.from(chunk.qt.getAll()));
+
+        return (await chunk.graphics.getImage(bb))?.replace("data:image/png;base64,", "") ?? null;
     }
 
     private rebuildFinished(chunks : Map<string, QuadTree>) : void {
