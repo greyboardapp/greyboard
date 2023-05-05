@@ -71,7 +71,7 @@ const BoardPage : Component = () => {
     const updateBoardMutation = createMutation({
         mutationFn: async (data : BoardUpdateData) => saveBoardData(board.state.id, data),
         onSettled: (data, error) => {
-            if (!data || data.error || data.result === undefined || data.result !== 1)
+            if (!data || data.error || data.result === undefined)
                 showErrorModal(data?.error);
         },
     });
