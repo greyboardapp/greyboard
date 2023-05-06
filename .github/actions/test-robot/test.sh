@@ -1,4 +1,4 @@
-npx wrangler pages dev . --local --persist &
+npx wrangler pages dev dist --local --persist &
 pid=$!
 
 sleep 5

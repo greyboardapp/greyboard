@@ -51,6 +51,7 @@ jobs:
           path: dist
 
   test:
+    environment: Development
     needs: build
     if: "!failure()"
     runs-on: ubuntu-latest
@@ -69,6 +70,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: greyboard-${{ github.sha }}
+          path: dist
 
       - name: Prepare Provisioning
         uses: cschleiden/replace-tokens@v1
@@ -82,17 +84,23 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Run End-to-end tests
+        id: test
         uses: ./.github/actions/test-robot
         with:
           browser: headlessfirefox
           username: ${{ secrets.RFW_USERNAME }}
           password: ${{ secrets.RFW_PASSWORD }}
+        continue-on-error: true
 
       - name: Publish Test Reports
         uses: actions/upload-artifact@v3
         with:
           name: greyboard-tests-${{ github.sha }}
           path: tests/robot/results
+
+      - name: Stop Workflow If Tests Have Failed
+        if: steps.test.outcome != 'success'
+        run: exit 1
 
   deploy:
     environment: Development
