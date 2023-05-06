@@ -11,6 +11,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    if: github.event.inputs.skipLinting == false
     steps:
       - uses: actions/checkout@v3
 
@@ -22,8 +23,6 @@ jobs:
 
   build:
     environment: Development
-    needs: lint
-    if: "!failure()"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
