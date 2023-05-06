@@ -82,6 +82,9 @@ jobs:
           AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
           AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      - name: Run Database Migrations
+        run: npx wrangler d1 migrations apply greyboard-db-dev --local
 
       - name: Run End-to-end tests
         id: test
@@ -111,15 +114,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - uses: actions/setup-node@v3
-
-      - name: Install wrangler
-        run: yarn global add wrangler
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
 
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: greyboard-${{ github.sha }}
+          path: dist
 
       - name: Prepare Provisioning
         uses: cschleiden/replace-tokens@v1
