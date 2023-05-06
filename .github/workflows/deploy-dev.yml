@@ -2,6 +2,11 @@ name: Deploy Development
 
 on:
   workflow_dispatch:
+    inputs:
+      skipLinting:
+        type: boolean
+        description: Skip Linting
+        default: false
 
 jobs:
   lint:
@@ -67,7 +72,7 @@ jobs:
           name: greyboard-${{ github.sha }}
 
       - name: Run End-to-end tests
-        uses: ./.github/actions/test
+        uses: ./.github/actions/test-robot
         with:
           browser: headlessfirefox
           username: ${{ secrets.RFW_USERNAME }}
