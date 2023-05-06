@@ -57,8 +57,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup Node and Install Dependencies
-        uses: ./.github/actions/setup
+      - uses: actions/setup-node@v2.5.1
+
+      - name: Install Dependencies For Development Server
+        run: yarn install
 
       - name: Install Robot Framework
         run: pip install robotframework robotframework-selenium2library
@@ -67,6 +69,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: greyboard-${{ github.sha }}
+
+      - name: Prepare Provisioning
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: "wrangler.toml"
+        env:
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Run End-to-end tests
         uses: ./.github/actions/test-robot
