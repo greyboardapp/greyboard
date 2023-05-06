@@ -17,7 +17,7 @@ runs:
     - shell: bash
       run: ${{ github.action_path }}/test.sh
       env:
-        RFW_HOST: http://localhost:3000
+        RFW_HOST: http://localhost:8788
         RFW_BROWSER: ${{ inputs.browser }}
         RFW_USERNAME: ${{ inputs.username }}
         RFW_PASSWORD: ${{ inputs.password }}
