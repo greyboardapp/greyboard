@@ -5,6 +5,9 @@ inputs:
     description: The browser in which robot framework will run the tests.
     required: true
     default: headlessfirefox
+  token:
+    description: The token that will be used for the logged in user.
+    required: true
   username:
     description: The username which will be used for authentication.
     required: true
@@ -18,6 +21,7 @@ runs:
       run: ${{ github.action_path }}/test.sh
       env:
         RFW_HOST: http://localhost:8788
+        RFW_TOKEN: ${{ inputs.token }}
         RFW_BROWSER: ${{ inputs.browser }}
         RFW_USERNAME: ${{ inputs.username }}
         RFW_PASSWORD: ${{ inputs.password }}

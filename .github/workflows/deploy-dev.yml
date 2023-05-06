@@ -88,6 +88,7 @@ jobs:
         uses: ./.github/actions/test-robot
         with:
           browser: headlessfirefox
+          token: ${{ secrets.RFW_TOKEN }}
           username: ${{ secrets.RFW_USERNAME }}
           password: ${{ secrets.RFW_PASSWORD }}
         continue-on-error: true

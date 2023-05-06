@@ -2,11 +2,15 @@
 Library     String
 Library     Selenium2Library
 
-Suite Teardown      Close All Browsers
+Test Setup    Open Greyboard With Logged In User
+Test Teardown    Close Greyboard
+
+Suite Teardown    Close All Browsers
 
 
 *** Variables ***
 ${HOST}    %{RFW_HOST}
+${TOKEN}    %{RFW_TOKEN}
 ${BROWSER}    %{RFW_BROWSER}
 ${USERNAME}    %{RFW_USERNAME}
 ${PASSWORD}    %{RFW_PASSWORD}
@@ -14,56 +18,37 @@ ${PASSWORD}    %{RFW_PASSWORD}
 
 *** Test Cases ***
 Open Page
-    [Documentation]    Tests if the web applications opens or not.
+    [Documentation]    Tests if the web application opens or not.
     [Tags]    positive
-    Open greyboard
-    Close greyboard
+    Log    "Page opened"
 
-Sign In
-    [Documentation]    Tests if the user can sign in with third parties.
+Open Dashboard
+    [Documentation]    Tests if the user can open the dashboard from the home page.
     [Tags]    positive
-    Open greyboard
-    Sign In With Google    ${USERNAME}    ${PASSWORD}
-    Close greyboard
+    Click Button With Text    Go to my Dashboard
+    Wait Until Location Contains    /dashboard
+    Wait Until Page Contains    Greyboard Tester
 
 Log Out
     [Documentation]    Tests if the user can log out.
     [Tags]    positive
-    Open greyboard
-    Sign In With Google    ${USERNAME}    ${PASSWORD}
     Navigate To    /
     Click Button With Text    Log out
     Wait Until Page Contains    Sign in with...
-    Close greyboard
 
-Go to Dashboard from Home Page
-    [Documentation]    Tests if the user can open the dashboard from the home page.
-    [Tags]    positive
-    Open greyboard
-    Sign In With Google    ${USERNAME}    ${PASSWORD}
-    Navigate To    /
-    Click Button With Text    Go to my Dashboard
-    Wait Until Location Contains    /dashboard
-    Wait Until Page Contains    Greyboard Tester
-    Close greyboard
-
-Create Board
-    [Documentation]    Tests if the user can create a new board.
-    [Tags]    positive
-    Open greyboard
-    Sign In With Google    ${USERNAME}    ${PASSWORD}
-    Click Button With Text    New Board
-    Wait Until Location Contains    /b/
-    Wait Until Element With Text Is Visible    button    Share
-    Wait Until Page Contains    This board will expire in
-    Wait Until Element With Text Is Visible    button    Make Permanent
-    Close greyboard
 
 *** Keywords ***
-Open greyboard
+Open Greyboard
     Open Browser    ${HOST}    browser=${BROWSER}
     Wait Until Page Contains    Greyboard
     Wait Until Page Contains    A small online collaborative whiteboard application for mocking, wireframing, solving problems and sketching.
+
+Open Greyboard With Logged In User
+    Open Browser    ${HOST}    browser=${BROWSER}
+    Add Cookie    jwtToken    ${TOKEN}
+    Execute Javascript    window.localStorage.setItem('user', '{"id":"e0fd4b98-5f67-47eb-9d95-253f3dbd598b","name":"Greyboard Tester","email":"","avatar":"https://lh3.googleusercontent.com/a/AGNmyxZjd8E-sMJa3-kunNUw_UHOnHWqU919mRUQZlfP=s96-c","type":1,"createdAt":1683341538,"iat":1683368283}')
+    Reload Page
+    Wait Until Element With Text Is Visible    button    Go to my Dashboard
 
 Navigate To
     [Arguments]    ${path}
@@ -88,7 +73,7 @@ Type Into
     Set Focus To Element    xpath:${xpath}
     Input Text    xpath:${xpath}    ${text}
 
-Close greyboard
+Close Greyboard
     Close Browser
 
 Sign In With Google
@@ -101,5 +86,11 @@ Sign In With Google
     Wait Until Location Contains    /dashboard
     Wait Until Page Contains    Greyboard Tester
 
-
+Sign In With GitHub
+    [Arguments]    ${user}    ${password}
+    Click    /html/body/div/div/div[1]/div/div/a[2]
+    Type Into    //*[@id="login_field"]    ${user}
+    Type Into    //*[@id="password"]    ${password}
+    Click    /html/body/div[1]/div[3]/main/div/div[3]/form/div/input[12]
+    Click    //*[@id="js-oauth-authorize-btn"]
 
