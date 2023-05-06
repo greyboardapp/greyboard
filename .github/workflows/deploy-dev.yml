@@ -15,7 +15,7 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  deploy:
+  build:
     environment: Development
     needs: lint
     if: "!failure()"
@@ -39,6 +39,59 @@ jobs:
 
       - name: Bundle Build Artifacts
         run: cp -r functions dist/functions
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
+          path: dist
+
+  test:
+    needs: build
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+
+      - name: Install wrangler
+        run: yarn global add wrangler
+
+      - name: Install Robot Framework
+        run: pip install robotframework robotframework-selenium2library
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
+
+      - name: Run End-to-end tests
+        uses: ./.github/actions/test
+        with:
+          browser: headlessfirefox
+          username: ${{ secrets.RFW_USERNAME }}
+          password: ${{ secrets.RFW_PASSWORD }}
+
+      - name: Publish Test Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: greyboard-tests-${{ github.sha }}
+          path: tests/robot/results
+
+  deploy:
+    environment: Development
+    needs: test
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+
+      - name: Install wrangler
+        run: yarn global add wrangler
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
 
       - name: Prepare Provisioning
         uses: cschleiden/replace-tokens@v1

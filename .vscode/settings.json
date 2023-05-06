@@ -46,5 +46,8 @@
     "typescript.preferences.importModuleSpecifier": "relative",
     "cSpell.words": [
         "tweenjs"
-    ]
+    ],
+
+    "robotcode.robot.outputDir": "${workspaceRoot}/tests/robot/results",
+    "robotcode.robot.variableFiles": ["${workspaceRoot}/tests/robot/variables.yml"]
 }

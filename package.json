@@ -28,6 +28,7 @@
     "deploy": "wrangler pages publish . --project-name=greyboard"
   },
   "devDependencies": {
+    "@actions/core": "^1.10.0",
     "@babel/core": "7.16.7",
     "@cloudflare/workers-types": "^4.20230404.0",
     "@gergoszaszvaradi/eslint-config": "^1.1.2",
@@ -41,6 +42,7 @@
     "@storybook/builder-vite": "^0.2.5",
     "babel-loader": "^8.3.0",
     "better-sqlite3": "8.1.0",
+    "env-cmd": "^10.1.0",
     "postcss": "^8.4.18",
     "sass": "^1.54.8",
     "typescript": "^4.7.4",

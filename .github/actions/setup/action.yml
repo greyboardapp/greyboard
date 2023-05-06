@@ -3,7 +3,7 @@ description: Setup Node environment and install packages
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v2.5.1
+    - uses: actions/setup-node@v3
       with:
         cache: yarn
 
