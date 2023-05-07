@@ -34,6 +34,8 @@ import Logo from "../assets/branding/logo.svg";
 import Divider from "../components/feedback/Divider";
 import { showToast } from "../components/feedback/Toast";
 import Tooltip from "../components/feedback/Tooltip";
+import { SettingsPanelContent } from "../components/app/panels/SettingsPanel";
+import Icon from "../components/data/Icon";
 
 const DashboardPage : Component = () => {
     const navigate = useNavigate();
@@ -114,27 +116,39 @@ const DashboardPage : Component = () => {
                     <div class={styles.container}>
                         <div class="container px2 m:px0">
                             <div class={cls(styles.logo, "flex h h-center v-center py3 m:py4")}>
-                                <Logo /><Text content="Greyboard" size={"xl"} bold class="ml2" />
+                                <Icon icon={Logo} /><Text content="Greyboard" size={"xl"} bold class="ml2" />
                             </div>
                             <div class="flex s:v m:h m:h-spaced py2 m:py4">
                                 <Popover
                                     actuator={<div class={styles.userInfo}>
-                                        <CarretIcon />
+                                        <Icon icon={CarretIcon} />
                                         <Avatar user={loggedInUser} />
                                         <Text content={loggedInUser.name} size="l" />
                                     </div>}
                                     orientation={"left"}
                                 >
-                                    <Panel size="s">
-                                        <List>
-                                            <ListItem><SettingsIcon /><Text content="Settings" /></ListItem>
-                                            <ListItem onClick={async () => {
-                                                logout();
-                                                setUser(null);
-                                                navigate("/");
-                                            }}><LogoutIcon /><Text content="buttons.logout" /></ListItem>
-                                        </List>
-                                    </Panel>
+                                    {(close) => (
+                                        <Panel size="s">
+                                            <List>
+                                                <ListItem onClick={async () => {
+                                                    close();
+                                                    showModal({
+                                                        title: "texts.settings",
+                                                        size: "m",
+                                                        content: <SettingsPanelContent />,
+                                                        buttons: [
+                                                            (closeSettings) => <Button content="buttons.close" onClick={closeSettings} />,
+                                                        ],
+                                                    });
+                                                }}><Icon icon={SettingsIcon} /><Text content="texts.settings" /></ListItem>
+                                                <ListItem onClick={async () => {
+                                                    logout();
+                                                    setUser(null);
+                                                    navigate("/");
+                                                }}><Icon icon={LogoutIcon} /><Text content="buttons.logout" /></ListItem>
+                                            </List>
+                                        </Panel>
+                                    )}
                                 </Popover>
                                 <div class="flex s:v m:h h-right">
                                     <Show when={selectedBoards().length > 0}>

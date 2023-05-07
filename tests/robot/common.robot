@@ -40,9 +40,13 @@ Click All
         Wait Until Keyword Succeeds    5x    500ms    Click Element    ${el}
     END
 
+Click Element With Text
+    [Arguments]    ${element}    ${text}
+    Click    //${element}\[normalize-space(.) = "${text}"]
+
 Click Button With Text
     [Arguments]    ${text}
-    Click    //button[normalize-space(.) = "${text}"]
+    Click Element With Text    button    ${text}
 
 Wait Until Element With Text Is Visible
     [Arguments]    ${element}    ${text}

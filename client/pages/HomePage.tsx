@@ -12,19 +12,20 @@ import { setUser, user } from "../utils/system/auth";
 import Button from "../components/controls/Button";
 import Avatar from "../components/data/Avatar";
 import { cls } from "../utils/dom/dom";
+import Icon from "../components/data/Icon";
 
 const HomePage : Component = () => (
     <div class={styles.container}>
         <div class={cls(styles.content, "fluid m:w7 l:w5 xl:w4")}>
-            <Logo />
+            <Icon icon={Logo} />
             <Title content="Greyboard" size="l" class="mt3" />
             <Show when={user()} keyed fallback={() => (
                 <>
                     <Text content="texts.welcome" centered class="mt5 w8" />
                     <Text content="texts.signInWith" class="mt5" />
                     <div class={styles.providerList}>
-                        <a href={getGoogleAuthUrl()}><GoogleLogo /></a>
-                        <a href={getGithubAuthUrl()}><GithubLogo /></a>
+                        <a href={getGoogleAuthUrl()}><Icon icon={GoogleLogo} /></a>
+                        <a href={getGithubAuthUrl()}><Icon icon={GithubLogo} /></a>
                     </div>
                 </>
             )}>

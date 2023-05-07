@@ -6,7 +6,7 @@
 
     @include themed() {
         background-color: color($bg);
-        color: color($panelText);
+        color: color($fg);
     }
 }
 

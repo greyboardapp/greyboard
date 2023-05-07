@@ -24,10 +24,20 @@ Open Dashboard
     Wait Until Page Contains    Greyboard Tester
 
 
-Log Out
-    [Documentation]    Tests if the user can log out.
+Log Out From Home Page
+    [Documentation]    Tests if the user can log out from the home page.
     [Tags]    positive
     
     Navigate To    /
     Click Button With Text    Log out
+    Wait Until Page Contains    Sign in with...
+
+Log Out From Dashboard
+    [Documentation]    Tests if the user can log out from the dashboard page.
+    [Tags]    positive
+    
+    Navigate To    /dashboard
+    Click Element With Text    p    Greyboard Tester
+    Click Element With Text    p    Log out
+    Wait Until Location Does Not Contain    /dashboard
     Wait Until Page Contains    Sign in with...

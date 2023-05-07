@@ -36,6 +36,14 @@ $duration: 2s;
     opacity: 0;
 }
 
+#board-loading-pencil-tip,
+#board-loading-pencil-cap,
+#board-loading-eraser {
+    @include themed(null, true) {
+        stroke: color($bg);
+    }
+}
+
 #board-loading-line {
     stroke-dasharray: 130px;
     animation: line-draw $duration linear infinite forwards;

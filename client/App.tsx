@@ -1,6 +1,6 @@
 import { Route, Router, Routes } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
-import { Component, createSignal, lazy } from "solid-js";
+import { Component, createEffect, createSignal, lazy } from "solid-js";
 import { Toaster } from "solid-toast";
 
 import "./App.scss";
@@ -13,7 +13,19 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 const BoardPage = lazy(async () => import("./pages/BoardPage"));
 
-const [theme, setTheme] = createSignal("dark");
+const themes = ["light", "dark"] as const;
+type Theme = typeof themes[number];
+
+let savedTheme = localStorage.getItem("theme") as Theme | null;
+if (!savedTheme || !themes.includes(savedTheme))
+    savedTheme = "dark";
+const [theme, setTheme] = createSignal<Theme>(savedTheme ?? "dark");
+createEffect(() => {
+    if (themes.includes(theme()))
+        localStorage.setItem("theme", theme());
+    else
+        setTheme("dark");
+});
 
 const queryClient = new QueryClient();
 
@@ -42,4 +54,4 @@ const App : Component = () => (
 );
 
 export default App;
-export { theme, setTheme };
+export { themes, theme, setTheme };

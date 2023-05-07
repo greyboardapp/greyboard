@@ -46,7 +46,7 @@
         padding: 7px 10px;
 
         @include themed() {
-            color: color($panelText);
+            color: color($primaryText);
             background-color: color($primary);
         }
 

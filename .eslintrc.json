@@ -9,7 +9,8 @@
     "rules": {
         "no-extend-native": "off",
         "no-return-assign": "off",
-        "no-await-in-loop": "off"
+        "no-await-in-loop": "off",
+        "@typescript-eslint/no-type-alias": "off"
     },
     "ignorePatterns": ["*.svg"],
     "globals": {

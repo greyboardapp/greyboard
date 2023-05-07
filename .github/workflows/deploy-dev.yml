@@ -102,6 +102,11 @@ jobs:
           name: greyboard-tests-${{ github.sha }}
           path: tests/robot/results
 
+      - name: Generate Test Summary
+        uses: joonvena/robotframework-reporter-action@v2
+        with:
+          gh_access_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Stop Workflow If Tests Have Failed
         if: steps.test.outcome != 'success'
         run: exit 1
