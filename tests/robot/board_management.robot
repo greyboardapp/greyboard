@@ -96,7 +96,9 @@ Bulk Delete Multiple Boards From Dashboard
 
     Create Board And Return To Dashboard
     Create Board And Return To Dashboard
+    Wait Until Page Contains Element    //*[contains(@class, "card")]
     ${boardCount}=    Get Users Board Count
+    Should Be True    ${boardCount} > 0
     ${toBeDeletedCount}=    Get Element Count    //div[contains(@class, "card")]//input[@type='checkbox']
     Click All    //div[contains(@class, "card")]//input[@type='checkbox']
     Click    /html/body/div/div/div[1]/div/div[2]/div[2]/div[1]/div[3]/button
