@@ -56,8 +56,8 @@ Clear Input
     [Arguments]    ${xpath}    ${return}=True
     Wait Until Element Is Visible    xpath:${xpath}
     Set Focus To Element    xpath:${xpath}
-    Press Keys    xpath:${xpath}    END
-    Press Keys    xpath:${xpath}    SHIFT+HOME+DELETE
+    Press Keys    None    CONTROL+A
+    Press Keys    None    DELETE
     IF    ${return} == True
         Press Keys    xpath:${xpath}    RETURN
     END

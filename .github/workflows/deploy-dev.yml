@@ -106,6 +106,7 @@ jobs:
         uses: joonvena/robotframework-reporter-action@v2
         with:
           gh_access_token: ${{ secrets.GITHUB_TOKEN }}
+          report_path: tests/robot/results
 
       - name: Stop Workflow If Tests Have Failed
         if: steps.test.outcome != 'success'
