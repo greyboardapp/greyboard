@@ -11,10 +11,11 @@ import { getGoogleAuthUrl, getGithubAuthUrl, logout } from "../api/auth";
 import { setUser, user } from "../utils/system/auth";
 import Button from "../components/controls/Button";
 import Avatar from "../components/data/Avatar";
+import { cls } from "../utils/dom/dom";
 
 const HomePage : Component = () => (
     <div class={styles.container}>
-        <div class={styles.content}>
+        <div class={cls(styles.content, "fluid m:w7 l:w5 xl:w4")}>
             <Logo />
             <Title content="Greyboard" size="l" class="mt3" />
             <Show when={user()} keyed fallback={() => (

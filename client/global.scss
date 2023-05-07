@@ -15,6 +15,8 @@ $inputText: "input-text";
 $opaque: "opaque";
 $opaqueDark: "opaque-dark";
 $shadow: "shadow";
+$error: "error";
+$errorText: "errorText";
 $themes: (
     light: (
         bg: #222,
@@ -32,6 +34,8 @@ $themes: (
         opaque: #0000001a,
         opaque-dark: #0000001a,
         shadow: #0003,
+        error: #b1251b,
+        errorText: #fff,
     ),
     dark: (
         bg: #222,
@@ -49,6 +53,8 @@ $themes: (
         opaque: #ffffff1a,
         opaque-dark: #0000001a,
         shadow: #0003,
+        error: #b1251b,
+        errorText: #fff,
     )
 );
 $timingCurve: cubic-bezier(0, 1, 0.2, 1);

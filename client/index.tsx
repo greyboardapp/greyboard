@@ -6,4 +6,6 @@ import "./utils/datatypes/map";
 
 import App from "./App";
 
-render(() => <App />, document.getElementById("root"));
+const root = document.getElementById("root");
+if (root)
+    render(() => <App />, root);

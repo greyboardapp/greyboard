@@ -3,11 +3,13 @@ import { getText } from "../../utils/system/intl";
 import Text from "../typography/Text";
 
 import styles from "./ToolbarInput.module.scss";
+import { cls } from "../../utils/dom/dom";
 
 interface ToolbarInputProps {
     model : [() => string, (v : string) => void];
     placeholder ?: string;
-    onChange ?: (e : Event, newValue : string, oldValue : string) => void;
+    onChange ?: (e : Event, newValue : string, oldValue : string) => undefined | boolean | Promise<undefined | boolean>;
+    class ?: string;
 }
 
 const ToolbarInput : Component<ToolbarInputProps> = (props) => {
@@ -22,7 +24,7 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
 
     return (
         <div
-            class={styles.toolbarInput}
+            class={cls(styles.toolbarInput, props.class)}
             onClick={() => {
                 setFocused(true);
                 if (input)
@@ -32,6 +34,7 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
             <Show when={focused()} fallback={<Text content={previewValue()} />}>
                 <input
                     ref={input}
+                    type="text"
                     value={props.model[0]()}
                     placeholder={getText(props.placeholder)}
                     onInput={(e) => { props.model[1]((e.target as HTMLInputElement).value); }}
@@ -39,7 +42,16 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
                         if (e.key === "Enter")
                             (e.target as HTMLInputElement).blur();
                     }}
-                    onChange={(e) => props.onChange && props.onChange(e, (e.target as HTMLInputElement).value, originalValue())}
+                    onChange={async (e) => {
+                        if (props.onChange) {
+                            const isValid = props.onChange(e, (e.target as HTMLInputElement).value, originalValue());
+                            if (isValid === false || (isValid instanceof Promise && (await isValid) === false)) {
+                                if (input)
+                                    input.value = originalValue();
+                                props.model[1](originalValue());
+                            }
+                        }
+                    }}
                     onFocus={(e) => setOriginalValue((e.target as HTMLInputElement).value)}
                     onBlur={(e) => {
                         props.model[1]((e.target as HTMLInputElement).value);

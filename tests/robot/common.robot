@@ -1,12 +1,7 @@
 *** Settings ***
-Library     String
-Library     Selenium2Library
-
-Test Setup    Open Greyboard With Logged In User
-Test Teardown    Close Greyboard
-
-Suite Teardown    Close All Browsers
-
+Library    String
+Library    OperatingSystem
+Library    Selenium2Library
 
 *** Variables ***
 ${HOST}    %{RFW_HOST}
@@ -14,28 +9,6 @@ ${TOKEN}    %{RFW_TOKEN}
 ${BROWSER}    %{RFW_BROWSER}
 ${USERNAME}    %{RFW_USERNAME}
 ${PASSWORD}    %{RFW_PASSWORD}
-
-
-*** Test Cases ***
-Open Page
-    [Documentation]    Tests if the web application opens or not.
-    [Tags]    positive
-    Log    "Page opened"
-
-Open Dashboard
-    [Documentation]    Tests if the user can open the dashboard from the home page.
-    [Tags]    positive
-    Click Button With Text    Go to my Dashboard
-    Wait Until Location Contains    /dashboard
-    Wait Until Page Contains    Greyboard Tester
-
-Log Out
-    [Documentation]    Tests if the user can log out.
-    [Tags]    positive
-    Navigate To    /
-    Click Button With Text    Log out
-    Wait Until Page Contains    Sign in with...
-
 
 *** Keywords ***
 Open Greyboard
@@ -59,6 +32,14 @@ Click
     Wait Until Element Is Enabled    xpath:${xpath}
     Wait Until Keyword Succeeds    5x    500ms    Click Element    xpath:${xpath}
 
+Click All
+    [Arguments]    ${xpath}
+    ${elements}=    Get WebElements    xpath:${xpath}
+    FOR    ${el}    IN    @{elements}
+        Wait Until Element Is Enabled    ${el}
+        Wait Until Keyword Succeeds    5x    500ms    Click Element    ${el}
+    END
+
 Click Button With Text
     [Arguments]    ${text}
     Click    //button[normalize-space(.) = "${text}"]
@@ -67,14 +48,33 @@ Wait Until Element With Text Is Visible
     [Arguments]    ${element}    ${text}
     Wait Until Element Is Enabled    xpath://${element}\[normalize-space(.) = "${text}"]
 
+Clear Input
+    [Arguments]    ${xpath}    ${return}=True
+    Wait Until Element Is Visible    xpath:${xpath}
+    Set Focus To Element    xpath:${xpath}
+    Press Keys    xpath:${xpath}    END
+    Press Keys    xpath:${xpath}    SHIFT+HOME+DELETE
+    IF    ${return} == True
+        Press Keys    xpath:${xpath}    RETURN
+    END
+
 Type Into
     [Arguments]    ${xpath}    ${text}
     Wait Until Element Is Visible    xpath:${xpath}
     Set Focus To Element    xpath:${xpath}
-    Input Text    xpath:${xpath}    ${text}
+    Input Text    xpath:${xpath}    ${text}    True
 
-Close Greyboard
-    Close Browser
+Type Into Input
+    [Arguments]    ${xpath}    ${text}    ${clear}=True    ${return}=True
+    Wait Until Element Is Visible    xpath:${xpath}
+    Set Focus To Element    xpath:${xpath}
+    IF    ${clear} == True
+        Clear Input    ${xpath}    False
+    END
+    Press Keys    xpath:${xpath}    ${text}
+    IF    ${return} == True
+        Press Keys    xpath:${xpath}    RETURN
+    END
 
 Sign In With Google
     [Arguments]    ${user}    ${password}
@@ -94,3 +94,9 @@ Sign In With GitHub
     Click    /html/body/div[1]/div[3]/main/div/div[3]/form/div/input[12]
     Click    //*[@id="js-oauth-authorize-btn"]
 
+Page Should Not Contain Error Popup
+    Page Should Not Contain    Oops, something went wrong...
+
+Close Greyboard
+    Close Browser
+    Run    npx wrangler d1 execute greyboard-db-dev --local --command="DELETE FROM boards WHERE author = 'e0fd4b98-5f67-47eb-9d95-253f3dbd598b'"

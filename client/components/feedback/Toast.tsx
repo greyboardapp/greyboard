@@ -11,6 +11,7 @@ import { cls } from "../../utils/dom/dom";
 interface ToastData {
     title : string;
     closable ?: true;
+    isError ?: true;
     actions ?: ((close : () => void) => JSX.Element)[];
 }
 
@@ -34,6 +35,6 @@ const ToastContent : Component<Toast & ToastData> = (props) => {
     );
 };
 
-export const showToast = (data : ToastData, duration = 5000) : string => toast((t) => ToastContent({ ...data, ...t }), { unmountDelay: 500, duration, className: styles.toast });
+export const showToast = (data : ToastData, duration = 5000) : string => toast((t) => ToastContent({ ...data, ...t }), { unmountDelay: 500, duration, className: cls(styles.toast, data.isError ? styles.error : "") });
 
 export const clearToasts = () : void => toast.remove();

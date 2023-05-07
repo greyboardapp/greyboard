@@ -10,6 +10,11 @@
     @include themed() {
         color: color($panelText) !important;
         background-color: color($panelBg) !important;
+
+        &.error {
+            color: color($errorText) !important;
+            background-color: color($error) !important;
+        }
     }
 
     .content {

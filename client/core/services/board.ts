@@ -33,6 +33,7 @@ interface BoardState {
     temporaryScale : number;
     savingEnabled : boolean;
     lastSaveDate ?: Date;
+    modifiedSinceLastSave : boolean;
 }
 
 export class Board extends Service<BoardState> {
@@ -203,6 +204,7 @@ export class Board extends Service<BoardState> {
             lastBuildScale: 1,
             temporaryScale: 1,
             savingEnabled: false,
+            modifiedSinceLastSave: false,
         });
     }
 
@@ -223,16 +225,23 @@ export class Board extends Service<BoardState> {
             this.state.temporaryScale = this.state.lastBuildScale = 1;
         });
         this.onBoardReadyToSave.clear();
+        this.state.modifiedSinceLastSave = false;
     }
 
-    save() : void {
+    save(force = false) : void {
+        if (!force && !this.state.modifiedSinceLastSave)
+            return;
+
         this.onBoardReadyToSave();
         network.boardSaved();
         if (this.saveTimer)
             clearTimeout(this.saveTimer);
+
+        this.state.modifiedSinceLastSave = false;
     }
 
     queueSave() : void {
+        this.state.modifiedSinceLastSave = true;
         if (this.saveTimer)
             clearTimeout(this.saveTimer);
         this.saveTimer = setTimeout(() => this.save(), (import.meta.env.BOARD_SAVE_DELAY ?? 10) * 1000, null);

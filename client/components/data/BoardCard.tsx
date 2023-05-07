@@ -2,7 +2,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import { Component, createSignal, Show } from "solid-js";
 import { Link } from "@solidjs/router";
 import { createMutation } from "@tanstack/solid-query";
-import { Board, BoardUpdateData } from "../../../common/models/board";
+import { Board, BoardUpdateData, BoardUpdateSchema } from "../../../common/models/board";
 import { cls } from "../../utils/dom/dom";
 import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/dom/props";
 import Checkbox from "../controls/Checkbox";
@@ -11,13 +11,14 @@ import LockIcon from "../../assets/icons/lock.svg";
 import DeleteIcon from "../../assets/icons/delete.svg";
 
 import styles from "./BoardCard.module.scss";
-import { formattedRelativeDateTime } from "../../utils/system/intl";
 import ToolbarInput from "../toolbar/ToolbarInput";
 import { ApiResponse } from "../../api/api";
 import { saveBoardData } from "../../api/boards";
 import { getMidnightAfterDays } from "../../utils/datatypes/date";
 import IconButton from "../controls/IconButton";
 import Tooltip from "../feedback/Tooltip";
+import { showToast } from "../feedback/Toast";
+import RelativeDateTime from "../typography/RelativeDateTime";
 
 const BoardCardVariants = { ...getGenericVariants({}) };
 const boardCardStyles = cva(styles.card, {
@@ -52,7 +53,7 @@ const BoardCard : Component<BoardCardProps> = (props) => {
         <div {...getGenericProps(props)} class={cls(boardCardStyles(props), props.class)}>
             <Link href={`/b/${props.board.slug}`} class={styles.link} onClick={() => props.onClicked()}>
                 <Show when={!props.board.isPermanent}>
-                    <div class={styles.expires}><Text as="span" content="texts.expires" /> {formattedRelativeDateTime(getMidnightAfterDays(props.board.modifiedAt, 7))}</div>
+                    <div class={styles.expires}><Text as="span" content="texts.expires" /> <RelativeDateTime date={getMidnightAfterDays(props.board.modifiedAt, 7)} /></div>
                 </Show>
                 <div class={styles.content}>
                     <Show
@@ -64,7 +65,7 @@ const BoardCard : Component<BoardCardProps> = (props) => {
                 </div>
             </Link>
             <div class={styles.info}>
-                <div class={styles.infoSide}>
+                <div class={cls(styles.infoSide, styles.filled)}>
                     <Checkbox model={[selected, (value) => {
                         setSelected(value);
                         if (value)
@@ -72,12 +73,22 @@ const BoardCard : Component<BoardCardProps> = (props) => {
                         else
                             props.onDeselected();
                     }]} marginRight={2} />
-                    <ToolbarInput model={[() => props.board.name, (v) => (props.board.name = v)]} onChange={async (e, name) => saveBoardDataMutation.mutate({ name })} />
+                    <ToolbarInput class={styles.filled} model={[() => props.board.name, (v) => (props.board.name = v)]} onChange={async (e, name) => {
+                        const parsed = BoardUpdateSchema.safeParse({ name });
+                        if (!parsed.success) {
+                            showToast({ title: parsed.error.issues[0].message, isError: true, closable: true }, 5000);
+                            return false;
+                        }
+                        saveBoardDataMutation.mutate(parsed.data);
+                        return true;
+                    }} />
                 </div>
                 <div class={cls(styles.infoSide, styles.actions)}>
-                    <Tooltip content={<Text content="buttons.makePermanent" />} orientation="vertical">
-                        <IconButton icon={LockIcon} variant="tertiary" size="s" onClick={() => props.onMadePermanent()} />
-                    </Tooltip>
+                    <Show when={!props.board.isPermanent}>
+                        <Tooltip content={<Text content="buttons.makePermanent" />} orientation="vertical">
+                            <IconButton icon={LockIcon} variant="tertiary" size="s" onClick={() => props.onMadePermanent()} />
+                        </Tooltip>
+                    </Show>
                     <Tooltip content={<Text content="actions.delete" />} orientation="vertical">
                         <IconButton icon={DeleteIcon} variant="tertiary" size="s" onClick={() => props.onDeleted()} />
                     </Tooltip>

@@ -1,4 +1,4 @@
-import TimeAgo from "javascript-time-ago";
+import TimeAgo, { FormatStyleName, Style } from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import hu from "javascript-time-ago/locale/hu";
 import { createEffect, createMemo, createSignal } from "solid-js";
@@ -47,8 +47,8 @@ export const formattedDate = (date : number | Date, options ?: Intl.DateTimeForm
     ...options,
 }).format((typeof date === "number") ? new Date(date * 1000) : date);
 
-export const formattedRelativeDateTime = (date : number | Date) : string => new TimeAgo(locale().replace(/-.*/, ""))
-    .format((typeof date === "number") ? new Date(date * 1000) : date, "round-minute");
+export const formattedRelativeDateTime = (date : number | Date, style : FormatStyleName | Style = "round-minute") : string => new TimeAgo(locale().replace(/-.*/, ""))
+    .format((typeof date === "number") ? new Date(date * 1000) : date, style);
 
 export const formattedList = (values : Iterable<string>, options ?: Intl.ListFormatOptions) : string => new Intl.ListFormat(locale(), {
     style: "long",

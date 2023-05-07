@@ -44,10 +44,11 @@ import { showModal } from "../components/surfaces/Modal";
 import { network } from "../core/services/network";
 import ClientList from "../components/app/ClientAvatars";
 import { user } from "../utils/system/auth";
-import { BoardUpdateData } from "../../common/models/board";
+import { BoardUpdateData, BoardUpdateSchema } from "../../common/models/board";
 import { clearToasts, showToast } from "../components/feedback/Toast";
 import { getText, formattedRelativeDateTime } from "../utils/system/intl";
 import { getMidnightAfterDays } from "../utils/datatypes/date";
+import { createWindowListener } from "../utils/dom/hooks";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -170,10 +171,20 @@ const BoardPage : Component = () => {
     });
 
     onCleanup(async () => {
-        await saveBoard();
+        if (board.state.modifiedSinceLastSave)
+            await saveBoard();
         app.stop();
         clearToasts();
     });
+
+    createWindowListener("beforeunload", (event) : boolean => {
+        if (board.state.modifiedSinceLastSave) {
+            event.preventDefault();
+            saveBoard();
+            return true;
+        }
+        return false;
+    }, { capture: true });
 
     return (
         <>
@@ -184,7 +195,15 @@ const BoardPage : Component = () => {
                     <div class="flex h h-spaced v-center">
                         <Toolbar class={styles.interactable} variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
-                            <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} onChange={async (e, name) => saveBoardDataMutation.mutate({ name })} />
+                            <ToolbarInput model={[() => board.state.name, (v) => (board.state.name = v)]} onChange={async (e, name) => {
+                                const parsed = BoardUpdateSchema.safeParse({ name });
+                                if (!parsed.success) {
+                                    showToast({ title: parsed.error.issues[0].message, isError: true, closable: true }, 5000);
+                                    return false;
+                                }
+                                saveBoardDataMutation.mutate(parsed.data);
+                                return true;
+                            }} />
                             <Tooltip content={<><Text content="actions.save" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.save.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                 <ToolbarButton icon={saveIcon} onClick={app.save} disabled={!app.save.when()} />
                             </Tooltip>

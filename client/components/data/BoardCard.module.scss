@@ -76,6 +76,11 @@
         gap: 4px;
     }
 
+    .filled {
+        flex-grow: 1;
+        width: 100%;
+    }
+
     .actions {
         opacity: 0;
         transition: opacity 0.2s;
