@@ -9,7 +9,7 @@ import "./services/toolbox";
 import { board } from "./services/board";
 
 class Application {
-    public save = createCommand(new Shortcut("s", KeyModifiers.Control), board.save);
+    public save = createCommand(new Shortcut("s", KeyModifiers.Control), board.save, board.canSave);
     public undo = createCommand(new Shortcut("z", KeyModifiers.Control), actions.undo, actions.canUndo);
     public redo = createCommand(new Shortcut("z", KeyModifiers.Control | KeyModifiers.Shift), actions.redo, actions.canRedo);
 

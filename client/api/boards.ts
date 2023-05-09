@@ -42,6 +42,22 @@ export async function getBoardData(slug : string) : Promise<ApiResponse<BoardDat
     }
 }
 
+export async function getBoardContents(id : string) : Promise<ApiResponse<Uint8Array>> {
+    try {
+        const contentResult = await fetch(`/api/boards/${id}/contents`, { credentials: "include" });
+        if (contentResult.status !== 200)
+            return { status: 500, error: "errors.boardDoesNotHaveContents" };
+        const contents = await contentResult.arrayBuffer() as Uint8Array;
+
+        return {
+            status: 200,
+            result: contents,
+        };
+    } catch (e) {
+        return { status: 500, error: "errors.apiNotAvailable" };
+    }
+}
+
 export async function createBoard(data : BoardCreationData) : Promise<ApiResponse<Board>> {
     try {
         const validated = BoardCreationSchema.safeParse(data);

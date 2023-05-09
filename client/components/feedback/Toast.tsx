@@ -20,17 +20,19 @@ const ToastContent : Component<Toast & ToastData> = (props) => {
 
     return (
         <div class={styles.content}>
-            <Text content={props.title} />
-            <div class={cls(styles.content, "pl3")}>
-                <Show when={props.actions} keyed>
-                    {(actions) => <For each={actions}>
-                        {(action) => action(close)}
-                    </For>}
-                </Show>
-                <Show when={props.closable}>
-                    <IconButton icon={CloseButton} variant="tertiary" onClick={close} />
-                </Show>
-            </div>
+            <Text content={props.title} class="px3" />
+            <Show when={(props.actions && props.actions.length > 0) || props.closable}>
+                <div class={styles.content}>
+                    <Show when={props.actions} keyed>
+                        {(actions) => <For each={actions}>
+                            {(action) => action(close)}
+                        </For>}
+                    </Show>
+                    <Show when={props.closable}>
+                        <IconButton icon={CloseButton} variant="tertiary" onClick={close} />
+                    </Show>
+                </div>
+            </Show>
         </div>
     );
 };

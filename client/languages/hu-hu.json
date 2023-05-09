@@ -2,6 +2,7 @@
     "board.newPlaceholder": "Új tábla",
     "board.loading": "A táblád töltödik...",
     "board.creating": "A táblád készül...",
+    "board.reloading": "A táblád újratöltödik...",
     "tools.boxSelect": "Dobozolt kijelölés",
     "tools.pencil": "Ceruza",
     "tools.marker": "Marker",
@@ -38,6 +39,7 @@
     "buttons.backToSafeZone": "Vissza a főoldalra",
     "buttons.makePermanent": "Állandósítás",
     "buttons.reconnect": "Visszacsatlakozás",
+    "buttons.tryAgain": "Újra próbálás",
     "buttons.ok": "Ok",
     "placeholder.typeSomething": "Írj valamit...",
     "titles.labels": "Címkék",
@@ -72,6 +74,8 @@
     "errors.boardNameMaxLength": "A tábla neve túl hosszú. Legfeljebb 32 karakter lehet.",
     "errors.boardNameInvalidCharacter": "A tábla neve nem megfelelő. Csak betűket, szóközöket és számokat tartalmazhat.",
     "errors.hubConnectionFailed": "Nem sikerült csatlakozni a szervereinkhez. A kollaboráció nem fog működni, viszont még így is tudsz dolgozni egyedül.",
+    "errors.hubConnectionLost": "A kapcsolat a szervereinkkel épp megszünt. Ellenőrizd az internetkapcsolatot.",
+    "errors.hubReconnected": "Sikeresen visszacsatlakoztál. A kollaboráció ismét él.",
     "errors.hubClientReassigned": "A felhasználod egy másik eszközről vagy bongészőből hozzácsatlakozott ugyan ehhez a táblához. A kapcsolatot megszüntettük itt.",
     "errors.boardClosed": "Ez a tábla már nem nyilvános. Minden kapcsolat megszakadt."
 }

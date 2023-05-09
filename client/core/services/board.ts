@@ -20,6 +20,7 @@ import { viewport } from "./viewport";
 import { network } from "./network";
 import { selection } from "./selection";
 import { BoardMoveData, BoardResizeData } from "../data/boardAction";
+import logger from "../../utils/system/logger";
 
 interface BoardState {
     id : string;
@@ -34,6 +35,7 @@ interface BoardState {
     savingEnabled : boolean;
     lastSaveDate ?: Date;
     modifiedSinceLastSave : boolean;
+    isSavingEnabled : boolean;
 }
 
 export class Board extends Service<BoardState> {
@@ -205,6 +207,7 @@ export class Board extends Service<BoardState> {
             temporaryScale: 1,
             savingEnabled: false,
             modifiedSinceLastSave: false,
+            isSavingEnabled: false,
         });
     }
 
@@ -229,9 +232,10 @@ export class Board extends Service<BoardState> {
     }
 
     save(force = false) : void {
-        if (!force && !this.state.modifiedSinceLastSave)
+        if (!force && !this.canSave())
             return;
 
+        logger.debug("Saving board");
         this.onBoardReadyToSave();
         network.boardSaved();
         if (this.saveTimer)
@@ -247,7 +251,20 @@ export class Board extends Service<BoardState> {
         this.saveTimer = setTimeout(() => this.save(), (import.meta.env.BOARD_SAVE_DELAY ?? 10) * 1000, null);
     }
 
+    canSave() : boolean {
+        return this.state.modifiedSinceLastSave && this.state.isSavingEnabled;
+    }
+
+    async loadContents(contents : Uint8Array) : Promise<void> {
+        logger.debug("Loading board contents", contents);
+        const buffer = ByteBuffer.fromArrayBuffer(contents);
+        const items = await this.deserialize(buffer, true);
+        this.remove(Array.from(this.items.values()));
+        this.add(items);
+    }
+
     async loadFromBoardData(data : BoardData) : Promise<void> {
+        logger.debug("Loading board from data", data);
         batch(() => {
             this.state.id = data.id;
             this.state.name = data.name;
@@ -255,10 +272,7 @@ export class Board extends Service<BoardState> {
             this.state.slug = data.slug;
             this.state.isPublic = data.isPublic;
         });
-        const buffer = ByteBuffer.fromArrayBuffer(data.contents);
-        const items = await this.deserialize(buffer, true);
-        this.remove(Array.from(this.items.values()));
-        this.add(items);
+        this.loadContents(data.contents);
     }
 
     add(items : BoardItem[]) : void {

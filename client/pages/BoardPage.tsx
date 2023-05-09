@@ -1,4 +1,4 @@
-import { Component, onCleanup, onMount, For, Show, untrack } from "solid-js";
+import { Component, onCleanup, onMount, For, Show, untrack, createSignal } from "solid-js";
 import { Link, Params, useNavigate, useParams } from "@solidjs/router";
 import { createMutation, createQuery } from "@tanstack/solid-query";
 import Canvas from "../components/surfaces/Canvas";
@@ -33,10 +33,10 @@ import ToolbarInput from "../components/toolbar/ToolbarInput";
 import { board } from "../core/services/board";
 import SelectionBox from "../components/app/SelectionBox";
 import LabelPanel from "../components/app/panels/LabelPanel";
-import { getBoardData, saveBoardContents, saveBoardData } from "../api/boards";
+import { getBoardContents, getBoardData, saveBoardContents, saveBoardData } from "../api/boards";
 import ApiSuspense from "../components/feedback/ApiSuspense";
 import { ApiResponse } from "../api/api";
-import { hideLoadingOverlay } from "../components/app/LoadingOverlay";
+import { hideLoadingOverlay, showLoadingOverlay } from "../components/app/LoadingOverlay";
 import Button from "../components/controls/Button";
 import Popover from "../components/feedback/Popover";
 import SharePanel from "../components/app/panels/SharePanel";
@@ -57,6 +57,8 @@ interface BoardPageParams extends Params {
 const BoardPage : Component = () => {
     const params = useParams<BoardPageParams>();
     const navigate = useNavigate();
+
+    const [hubConnectionFailAttemps, setHubConnectionFailAttemps] = createSignal(0);
 
     const showErrorModal = (error ?: string, title ?: string) : void => showModal({
         title: title ?? "titles.somethingWentWrong",
@@ -90,6 +92,9 @@ const BoardPage : Component = () => {
                 board.loadFromBoardData(data.result);
                 if (data.result.isPublic)
                     network.connect(data.result.slug);
+
+                if (data.result.author === user()?.id)
+                    board.state.isSavingEnabled = true;
 
                 if (!data.result.isPermanent)
                     showToast({
@@ -156,7 +161,34 @@ const BoardPage : Component = () => {
         network.onConnected.add(hideLoadingOverlay);
         network.onConnectionFailed.add(() => {
             hideLoadingOverlay();
-            showErrorModal("errors.hubConnectionFailed");
+            showToast({
+                title: "errors.hubConnectionFailed",
+                isError: true,
+                closable: true,
+                actions: untrack(hubConnectionFailAttemps) < 4 ? [
+                    (close) => <Button content="buttons.tryAgain" variant="secondary" onClick={async () => {
+                        const isConnected = await network.connect(board.state.slug);
+                        close();
+                        if (isConnected)
+                            setHubConnectionFailAttemps(0);
+                        else
+                            setHubConnectionFailAttemps(hubConnectionFailAttemps() + 1);
+                    }} />,
+                ] : undefined,
+            }, 60000);
+        });
+        network.onConnectionLost.add(() => {
+            showToast({
+                title: "errors.hubConnectionLost",
+                isError: true,
+                closable: true,
+            });
+        });
+        network.onReconnected.add(() => {
+            showToast({
+                title: "errors.hubReconnected",
+                closable: true,
+            });
         });
         network.onClientReassigned.add(() => {
             showErrorModal("errors.hubClientReassigned", "titles.oops");
@@ -168,17 +200,31 @@ const BoardPage : Component = () => {
         network.onDisconnected.add(() => showToast({
             title: "texts.networkDisconnected",
         }));
+        network.onClientReloadBoard.add(async () => {
+            showLoadingOverlay("");
+            const data = await getBoardContents(board.state.id);
+            hideLoadingOverlay();
+
+            if (!data.result) {
+                showErrorModal(data.error);
+                return;
+            }
+
+            board.loadContents(data.result);
+        });
+
+        clearToasts();
     });
 
     onCleanup(async () => {
-        if (board.state.modifiedSinceLastSave)
+        if (board.canSave())
             await saveBoard();
         app.stop();
         clearToasts();
     });
 
     createWindowListener("beforeunload", (event) : boolean => {
-        if (board.state.modifiedSinceLastSave) {
+        if (board.canSave()) {
             event.preventDefault();
             saveBoard();
             return true;

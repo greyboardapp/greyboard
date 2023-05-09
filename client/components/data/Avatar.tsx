@@ -39,7 +39,7 @@ const Avatar : Component<AvatarProps> = (props) => (
     <div {...getGenericProps(props)} class={cls(avatarStyles(props), props.class)}>
         <Text content={(props.size === "xs" ? props.user.name[0] : getInitials(props.user.name))} size={props.size} />
         <Show when={props.user.avatar} keyed>
-            {(img) => <img src={img} onError={(e) => (e.target as HTMLImageElement).style.display = "none"} />}
+            {(img) => <img src={img} alt={props.user.name} onError={(e) => (e.target as HTMLImageElement).style.display = "none"} />}
         </Show>
     </div>
 );

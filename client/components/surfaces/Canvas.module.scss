@@ -4,7 +4,7 @@
     position: relative;
 
     @include themed() {
-        background-color: color($bg);
+        background-color: color($board);
     }
 }
 

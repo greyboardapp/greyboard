@@ -1,5 +1,6 @@
 @use "sass:map";
 
+$board: "board";
 $bg: "bg";
 $fg: "fg";
 $panelBg: "panel-bg";
@@ -19,6 +20,7 @@ $error: "error";
 $errorText: "errorText";
 $themes: (
     light: (
+        board: #222,
         bg: #dfd9d3,
         fg: #222,
         panel-bg: #fff8f5,
@@ -38,6 +40,7 @@ $themes: (
         errorText: #fff,
     ),
     dark: (
+        board: #222,
         bg: #222,
         fg: #fff,
         panel-bg: #313131,

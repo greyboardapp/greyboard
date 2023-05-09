@@ -2,6 +2,7 @@
     "board.newPlaceholder": "New Board",
     "board.loading": "Your board is loading...",
     "board.creating": "Your board is being made...",
+    "board.reloading": "Your board is reloading...",
     "tools.boxSelect": "Box Select",
     "tools.pencil": "Pencil",
     "tools.marker": "Marker",
@@ -39,6 +40,7 @@
     "buttons.backToSafeZone": "Back to safe zone",
     "buttons.makePermanent": "Make Permanent",
     "buttons.reconnect": "Connect back",
+    "buttons.tryAgain": "Try Again",
     "placeholder.typeSomething": "Type something...",
     "titles.labels": "Labels",
     "titles.somethingWentWrong": "Oops, something went wrong...",
@@ -72,6 +74,8 @@
     "errors.boardNameMaxLength": "The name of the board is too long. It can be at maximum 32 character.",
     "errors.boardNameInvalidCharacter": "The name of the board is not correct. It can only contain letters, spaces and numbers.",
     "errors.hubConnectionFailed": "Unable to connect to our servers. Collaboration will not work, but you can still work alone.",
+    "errors.hubConnectionLost": "The connection to our servers just got lost. Check your internet connectivity.",
+    "errors.hubReconnected": "Successfully reconnected. Collaboration is live again.",
     "errors.hubClientReassigned": "Your user connected to the same board from another device or browser. You have been disconnected here.",
     "errors.boardClosed": "This board is no longer public. All users are disconnected."
 }
