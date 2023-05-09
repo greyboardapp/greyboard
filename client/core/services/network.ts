@@ -117,7 +117,9 @@ export class Network extends Service<NetworkState> {
         return false;
     }
 
-    async disconnect() : Promise<void> {
+    async disconnect(stoppedForReconnect = false) : Promise<void> {
+        if (!stoppedForReconnect)
+            this.stopped = true;
         await this.connection.stop();
         this.state.clients = [];
         if (board.state.author !== this.state.user?.id)
@@ -337,11 +339,11 @@ export class Network extends Service<NetworkState> {
     }
 
     private async reconnect(attempt = 1) : Promise<void> {
-        logger.debug("Reconnecting...");
+        logger.debug(`Reconnecting... Attempt: ${attempt}`);
         if (!this.boardSlug)
             return;
         this.reconnecting = true;
-        await this.disconnect();
+        await this.disconnect(true);
         const isConnected = await this.connect(this.boardSlug);
         if (!isConnected)
             this.reconnectTimer = setTimeout(async () => this.reconnect(attempt + 1), 5000, null);
