@@ -146,5 +146,11 @@ Create Board And Return To Dashboard
     Navigate To    /dashboard
 
 Get Users Board Count
-    ${count}=  Execute Javascript  return document.querySelectorAll("*[class^=_card]").length;
+    TRY
+        Wait Until Element Is Visible  //div[contains(@class, "_card")]
+    EXCEPT
+        Log  No elements to be counted
+    FINALLY
+        ${count}=  Get Element Count  //div[contains(@class, "_card")]
+    END
     [return]  ${count}
