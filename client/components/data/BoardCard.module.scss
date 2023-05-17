@@ -1,0 +1,170 @@
+@import "../../global";
+
+.card {
+    @include transition();
+
+    position: relative;
+
+    .content {
+        position: relative;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        padding: 5px;
+        padding-bottom: 0;
+        overflow: hidden;
+
+        // z-index: 1;
+        height: 150px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($panelBg);
+        }
+
+        img {
+            border-radius: 5px;
+            border-style: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top left;
+
+            @include themed() {
+                background-color: color($bg);
+            }
+        }
+    }
+
+    .expires {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 42px;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        padding: 7px 10px;
+
+        @include themed() {
+            color: color($primaryText);
+            background-color: color($primary);
+        }
+
+        + .content {
+            margin-top: 32px;
+            height: 150px - 32px;
+        }
+    }
+
+    .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($panelBg);
+        }
+    }
+
+    .infoSide {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .filled {
+        flex-grow: 1;
+        width: 100%;
+    }
+
+    .actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    &:hover .actions {
+        opacity: 1;
+    }
+}
+
+/*
+.card {
+    @include transition();
+
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    outline: 3px solid transparent;
+
+    @include themed() {
+        color: color($panelText);
+        background-color: color($panelBg);
+    }
+
+    .link {
+        height: 200px;
+        display: block;
+        position: relative;
+    }
+
+    .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        overflow: hidden;
+        padding: 5px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($panelBg);
+        }
+
+        img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .info {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .expires {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 42px;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        padding: 7px 10px;
+
+        @include themed() {
+            color: color($panelText);
+            background-color: color($primary);
+        }
+
+        + .content {
+            top: 32px;
+        }
+    }
+
+    &:hover,
+    &:focus-within {
+        @include themed() {
+            outline: 3px solid color($shadow);
+        }
+    }
+}
+*/

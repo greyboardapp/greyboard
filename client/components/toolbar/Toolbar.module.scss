@@ -1,0 +1,40 @@
+@import "../../global";
+
+.toolbar {
+    display: flex;
+    padding: 5px;
+    pointer-events: all;
+    gap: 5px;
+
+    @include themed() {
+        background-color: color($panelBg);
+    }
+
+    &.top,
+    &.floating,
+    &.transparent {
+        flex-direction: row;
+        align-items: center;
+        border-bottom-right-radius: 10px;
+    }
+
+    &.left {
+        flex-direction: column;
+        justify-content: space-between;
+        width: 50px;
+        height: 100%;
+        padding-top: 10px;
+    }
+
+    &.floating {
+        border-radius: 10px;
+
+        @include themed() {
+            box-shadow: 0 5px 10px color($shadow);
+        }
+    }
+
+    &.transparent {
+        padding: 0;
+    }
+}

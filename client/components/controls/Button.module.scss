@@ -1,0 +1,108 @@
+@import "../../global";
+
+.button {
+    @include centeredInlineFlex();
+    @include smallUppercaseText();
+    @include transition();
+
+    position: relative;
+    overflow: hidden;
+    border: 0;
+    outline: 0;
+    border-radius: 999px;
+    user-select: none;
+    text-decoration: none;
+    cursor: pointer;
+
+    @include themed() {
+        outline: 3px solid transparent;
+
+        &:not(:disabled):active,
+        &:not(:disabled):focus-visible {
+            outline: 3px solid color($shadow);
+        }
+
+        &.primary {
+            color: color($primaryText);
+            background-color: color($primary);
+
+            &:not(:disabled):hover {
+                background-color: color($primaryFocus);
+            }
+        }
+
+        &.secondary {
+            color: color($secondaryText);
+            background-color: color($secondary);
+
+            &:not(:disabled):hover {
+                background-color: color($secondaryFocus);
+            }
+        }
+
+        &.tertiary {
+            color: color($panelText);
+            background-color: transparent;
+
+            &:not(:disabled):hover {
+                background-color: color($opaque);
+            }
+        }
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    &.xs {
+        height: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    &.s {
+        height: 2rem;
+        padding: 0 1rem;
+    }
+
+    &.m {
+        height: 2.5rem;
+        padding: 0 1.5rem;
+    }
+
+    &.fluent {
+        width: 100%;
+    }
+
+    > * {
+        z-index: 1;
+    }
+
+    > svg {
+        margin-right: 0.5rem;
+
+        &.loadingIcon {
+            animation: loading-icon-spin 1s linear 0s infinite;
+        }
+    }
+
+    > .loadingProgress {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 0;
+        width: 50%;
+        transition: width 0.2s;
+
+        @include themed() {
+            background-color: color($opaqueDark);
+        }
+    }
+}
+
+@keyframes loading-icon-spin {
+    0% { rotate: 0deg; }
+    100% { rotate: 360deg; }
+}

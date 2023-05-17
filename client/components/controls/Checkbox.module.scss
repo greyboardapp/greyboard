@@ -1,0 +1,42 @@
+@import "../../global";
+
+.checkbox {
+    > input {
+        @include transition();
+
+        appearance: none;
+        position: relative;
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        cursor: pointer;
+
+        @include themed() {
+            color: color($inputText);
+            background-color: color($inputBg);
+
+            &:checked {
+                background-color: color($primary);
+            }
+
+            &:not(.disabled):hover {
+                box-shadow: 0 0 0 2px color($shadow) inset;
+            }
+        }
+
+        &:checked::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            width: 6px;
+            height: 12px;
+            transform: translateX(-50%) rotate(45deg);
+
+            @include themed() {
+                border: solid color($inputBg);
+                border-width: 0 3px 3px 0;
+            }
+        }
+    }
+}

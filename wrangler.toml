@@ -1,0 +1,22 @@
+name = "greyboard"
+compatibility_date = "2022-11-12"
+
+kv_namespaces = [
+  { binding = "cache", id = "da81eed7d1d64537b85ad8dca4e9b337", preview_id = "da81eed7d1d64537b85ad8dca4e9b337" }
+]
+
+r2_buckets = [
+  { binding = "boards", bucket_name = "greyboard-boards-dev", preview_bucket_name = "greyboard-boards-dev" }
+]
+
+d1_databases = [
+  { binding = "db", database_name = "greyboard-db-dev", database_id = "20cd24c5-f76a-4d9b-b35e-3c4b7102428e", preview_database_id = "20cd24c5-f76a-4d9b-b35e-3c4b7102428e" }
+]
+
+[vars]
+DEVELOPMENT = false
+AUTH_GOOGLE_CLIENT_ID = "#{AUTH_GOOGLE_CLIENT_ID}#"
+AUTH_GOOGLE_CLIENT_SECRET = "#{AUTH_GOOGLE_CLIENT_SECRET}#"
+AUTH_GITHUB_CLIENT_ID = "#{AUTH_GITHUB_CLIENT_ID}#"
+AUTH_GITHUB_CLIENT_SECRET = "#{AUTH_GITHUB_CLIENT_SECRET}#"
+JWT_SECRET = "#{JWT_SECRET}#"

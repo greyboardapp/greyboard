@@ -1,0 +1,76 @@
+@import "../../global";
+
+.slider {
+    @include centeredInlineFlex();
+
+    width: 100%;
+
+    > input[type="range"] {
+        appearance: none;
+        height: 4px;
+        border-radius: 2px;
+        width: 100%;
+        flex-grow: 1;
+        cursor: ew-resize;
+
+        @include themed() {
+            background-color: color($inputBg);
+        }
+
+        &::-webkit-slider-thumb,
+        &::-moz-range-thumb {
+            @include transition();
+
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 0;
+            outline: 0;
+            border-radius: 50%;
+
+            @include themed() {
+                background-color: color($secondary);
+            }
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
+        &:not(:disabled) {
+            &:hover {
+                &::-webkit-slider-thumb,
+                &::-moz-range-thumb {
+                    @include themed() {
+                        background-color: color($secondaryFocus);
+                    }
+                }
+            }
+
+            &:focus,
+            &:active {
+                &::-webkit-slider-thumb,
+                &::-moz-range-thumb {
+                    @include themed() {
+                        background-color: color($primary);
+                    }
+                }
+            }
+        }
+    }
+
+    &.showValue > input[type="range"] {
+        margin-right: 0.5rem;
+    }
+
+    input[type="text"] {
+        width: 30px;
+        text-align: center;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+        }
+    }
+}

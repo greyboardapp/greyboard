@@ -1,0 +1,42 @@
+@import "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
+@import "../src/global";
+
+* {
+    font-family: Inter, sans-serif;
+}
+
+html,
+body.sb-show-main,
+#root,
+.sb-theme-container,
+.sb-theme-column {
+    min-height: 100vh;
+}
+
+body.sb-show-main {
+    padding: 0 !important;
+    height: 100%;
+}
+
+.sb-theme-container {
+    display: flex;
+    flex-wrap: nowrap;
+
+    .sb-theme-column {
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &.theme-light {
+            background-color: map-get(map-get($themes, "light"), $panelBg);
+        }
+
+        &.theme-dark {
+            background-color: map-get(map-get($themes, "dark"), $panelBg);
+        }
+    }
+}

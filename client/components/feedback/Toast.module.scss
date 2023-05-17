@@ -1,0 +1,24 @@
+@import "../../global";
+
+.toast {
+    height: 64px;
+    max-width: 90vw !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+
+    @include themed() {
+        color: color($panelText) !important;
+        background-color: color($panelBg) !important;
+
+        &.error {
+            color: color($errorText) !important;
+            background-color: color($error) !important;
+        }
+    }
+
+    .content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}

@@ -1,0 +1,57 @@
+@import "../../global";
+
+.selectionBox {
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+
+    @include themed() {
+        border: 1px solid color($primary);
+    }
+
+    .resizeKnob {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        translate: -50% -50%;
+
+        @include themed() {
+            background-color: color($primaryText);
+            box-shadow: 0 0 0 2px color($shadow);
+        }
+
+        &.topLeft {
+            top: 0;
+            left: 0;
+            cursor: nwse-resize;
+        }
+
+        &.topRight {
+            top: 0;
+            left: 100%;
+            cursor: nesw-resize;
+        }
+
+        &.bottomRight {
+            top: 100%;
+            left: 100%;
+            cursor: nwse-resize;
+        }
+
+        &.bottomLeft {
+            top: 100%;
+            left: 0;
+            cursor: nesw-resize;
+        }
+    }
+
+    .toolbar {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        translate: -50% -100% !important;
+        margin-top: -10px;
+        pointer-events: all;
+    }
+}

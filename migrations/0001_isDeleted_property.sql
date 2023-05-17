@@ -1,0 +1,2 @@
+-- Migration number: 0001 	 2023-05-05T09:50:54.783Z
+ALTER TABLE "boards" ADD COLUMN "isDeleted" INTEGER DEFAULT 0;

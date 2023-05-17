@@ -1,0 +1,21 @@
+@import "../../global";
+
+.divider {
+    border-radius: 2px;
+
+    @include themed() {
+        background-color: color($opaque);
+    }
+
+    &.h {
+        width: 80%;
+        height: 2px;
+        transform: translateX(12.5%);
+    }
+
+    &.v {
+        width: 2px;
+        height: 80%;
+        transform: translateY(12.5%);
+    }
+}

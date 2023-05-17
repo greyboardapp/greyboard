@@ -1,0 +1,39 @@
+@import "../../global";
+
+.skeleton {
+    border-radius: 10px;
+    animation: skeleton-pulse 2s ease infinite forwards;
+
+    @include themed() {
+        background-color: color($opaque);
+    }
+
+    &.circle {
+        border-radius: 9999px;
+    }
+
+    &.text {
+        display: block !important;
+        height: 1rem;
+        border-radius: 3px;
+        margin-bottom: 10px;
+    }
+}
+
+.skeletonList {
+    .skeleton:last-child:not(:first-child) {
+        width: 75%;
+        margin-bottom: 0;
+    }
+}
+
+@keyframes skeleton-pulse {
+    0%,
+    100% {
+        opacity: 0.2;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

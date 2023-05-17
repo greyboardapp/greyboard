@@ -1,0 +1,154 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      skipLinting:
+        type: boolean
+        description: Skip Linting
+        default: false
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.skipLinting == false
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Lint
+        run: yarn lint
+
+  build:
+    environment: Production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build
+        run: yarn build
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+          HUB_URL: ${{ vars.HUB_URL }}
+          DEBUG: ${{ vars.DEBUG }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          BOARD_SAVE_INTERVAL: ${{ vars.BOARD_SAVE_INTERVAL }}
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+
+      - name: Bundle Build Artifacts
+        run: cp -r functions dist/functions
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
+          path: dist
+
+  test:
+    environment: Production
+    needs: build
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v2.5.1
+
+      - name: Install Dependencies For Development Server
+        run: yarn install
+
+      - name: Install Robot Framework
+        run: pip install robotframework robotframework-selenium2library
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
+          path: dist
+
+      - name: Prepare Provisioning
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: "wrangler.toml"
+        env:
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      - name: Run Database Migrations
+        run: npx wrangler d1 migrations apply greyboard-db-dev --local
+
+      - name: Run End-to-end tests
+        id: test
+        uses: ./.github/actions/test-robot
+        with:
+          browser: headlessfirefox
+          token: ${{ secrets.RFW_TOKEN }}
+          username: ${{ secrets.RFW_USERNAME }}
+          password: ${{ secrets.RFW_PASSWORD }}
+        continue-on-error: true
+
+      - name: Publish Test Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: greyboard-tests-${{ github.sha }}
+          path: tests/robot/results
+
+      - name: Generate Test Summary
+        uses: joonvena/robotframework-reporter-action@v2
+        with:
+          gh_access_token: ${{ secrets.GITHUB_TOKEN }}
+          report_path: tests/robot/results
+          only_summary: true
+
+      - name: Stop Workflow If Tests Have Failed
+        if: steps.test.outcome != 'success'
+        run: exit 1
+
+  deploy:
+    environment: Production
+    needs: test
+    if: "!failure()"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node and Install Dependencies
+        uses: ./.github/actions/setup
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: greyboard-${{ github.sha }}
+          path: dist
+
+      - name: Prepare Provisioning
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: "wrangler.toml"
+        env:
+          AUTH_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+          AUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
+          AUTH_GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+          AUTH_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Publish Build to Cloudflare Pages
+        run: npx wrangler pages publish dist --project-name greyboard --branch ${{ github.ref_name }} --commit-message ${{ github.sha }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Run Database Migrations
+        run: npx wrangler d1 migrations apply greyboard-db-prod
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

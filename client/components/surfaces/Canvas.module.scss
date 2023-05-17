@@ -1,0 +1,33 @@
+@import "../../global";
+
+.canvasLayerRoot {
+    position: relative;
+
+    @include themed() {
+        background-color: color($board);
+    }
+}
+
+.staticCanvasContainer {
+    position: fixed;
+}
+
+canvas {
+    position: absolute;
+}
+
+.canvasOverlayContainer {
+    pointer-events: none;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+
+    > canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+    }
+}

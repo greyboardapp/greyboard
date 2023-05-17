@@ -1,0 +1,35 @@
+@import "../../global";
+
+.list {
+    display: flex;
+    flex-direction: column;
+
+    > .listItem {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        // justify-content: space-between;
+        border-radius: 5px;
+        padding: 10px;
+
+        &:not(:last-child) {
+            margin-bottom: 2px;
+        }
+
+        &:hover {
+            @include themed() {
+                background-color: color($opaque);
+            }
+        }
+
+        > svg {
+            margin-right: 10px;
+        }
+    }
+
+    &.flush > .listItem {
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+}

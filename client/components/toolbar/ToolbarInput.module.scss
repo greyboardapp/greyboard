@@ -1,0 +1,30 @@
+@import "../../global";
+
+.toolbarInput {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin: 0 5px;
+    cursor: text;
+
+    p {
+        max-width: 300px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    input {
+        height: 100%;
+        background: transparent;
+        outline: 0;
+        border: 0;
+        width: 100%;
+        max-width: 300px;
+
+        @include themed() {
+            color: color($inputText);
+            font-size: 1rem;
+        }
+    }
+}

@@ -1,0 +1,127 @@
+@use "sass:map";
+
+$board: "board";
+$bg: "bg";
+$fg: "fg";
+$panelBg: "panel-bg";
+$panelText: "panel-text";
+$primary: "primary";
+$primaryFocus: "primary-focus";
+$primaryText: "primary-text";
+$secondary: "secondary";
+$secondaryFocus: "secondary-focus";
+$secondaryText: "secondary-text";
+$inputBg: "input-bg";
+$inputText: "input-text";
+$opaque: "opaque";
+$opaqueDark: "opaque-dark";
+$shadow: "shadow";
+$error: "error";
+$errorText: "errorText";
+$themes: (
+    light: (
+        board: #222,
+        bg: #dfd9d3,
+        fg: #222,
+        panel-bg: #fff8f5,
+        panel-text: #333,
+        primary: #f79131,
+        primary-focus: #e9882c,
+        primary-text: #fff,
+        secondary: #bf9e8a,
+        secondary-focus: #a88773,
+        secondary-text: #fff,
+        input-bg: #e0d1ca,
+        input-text: #111,
+        opaque: #8b470f1a,
+        opaque-dark: #0000001a,
+        shadow: #0003,
+        error: #b1251b,
+        errorText: #fff,
+    ),
+    dark: (
+        board: #222,
+        bg: #222,
+        fg: #fff,
+        panel-bg: #313131,
+        panel-text: #fff,
+        primary: #fc8210,
+        primary-focus: #ce6503,
+        primary-text: #fff,
+        secondary: #686868,
+        secondary-focus: #444,
+        secondary-text: #fff,
+        input-bg: #222,
+        input-text: #fff,
+        opaque: #ffffff1a,
+        opaque-dark: #0000001a,
+        shadow: #0003,
+        error: #b1251b,
+        errorText: #fff,
+    )
+);
+$timingCurve: cubic-bezier(0, 1, 0.2, 1);
+
+@mixin themed ($restriction: null, $local: false) {
+    @each $theme, $map in $themes {
+        @if not $restriction or $restriction == $theme {
+            @if $local == true {
+                .theme-#{$theme} & {
+                    $themeMap: () !global !default;
+
+                    @each $key, $submap in $map {
+                        $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
+                        $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                    }
+                    @content;
+                }
+            } @else {
+                :global(.theme-#{$theme}) & {
+                    $themeMap: () !global !default;
+
+                    @each $key, $submap in $map {
+                        $value: map.get($map: map.get($map: $themes, $key: $theme), $key: "#{$key}");
+                        $themeMap: map.merge($map1: $themeMap, $map2: ($key: $value)) !global;
+                    }
+                    @content;
+                }
+            }
+        }
+    }
+}
+
+@function color ($key) {
+    @return map-get($themeMap, $key);
+}
+
+@mixin smallUppercaseText () {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+@mixin transition () {
+    transition:
+        background-color 0.2s $timingCurve,
+        color 0.2s $timingCurve,
+        outline 0.2s $timingCurve,
+        box-shadow 0.2s $timingCurve;
+}
+
+@mixin centeredFlex () {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin centeredInlineFlex () {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin fontSize ($size) {
+    font-size: $size;
+    line-height: $size * 1.25;
+}

@@ -1,0 +1,38 @@
+@import "../../global";
+
+p,
+span,
+h1,
+h2,
+h3,
+h4 {
+    font-weight: normal;
+    color: currentcolor;
+    text-decoration: none;
+
+    &.uppercase {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    &.faded { opacity: 0.5; }
+    &.bold { font-weight: bold; }
+    &.italic { font-style: italic; }
+    &.centered { text-align: center; }
+}
+
+p,
+span {
+    font-size: 1rem;
+    text-decoration: none;
+
+    &.xs { @include fontSize(0.5rem); }
+    &.s { @include fontSize(0.75rem); }
+    &.m { @include fontSize(1rem); }
+    &.l { @include fontSize(1.125rem); }
+    &.xl { @include fontSize(1.5rem); }
+}
+
+h1 { @include fontSize(3.5rem); }
+h2 { @include fontSize(2.5rem); }
+h3 { @include fontSize(1.5rem); }
+h4 { @include fontSize(1.125rem); }

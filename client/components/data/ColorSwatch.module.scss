@@ -1,0 +1,26 @@
+@import "../../global";
+
+.colorSwatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.2s $timingCurve;
+
+    @include themed() {
+        outline: 2px solid color($panelBg);
+    }
+
+    &:hover {
+        @include themed() {
+            box-shadow: 0 0 0 4px color($secondary);
+        }
+    }
+
+    &.active {
+        @include themed() {
+            box-shadow: 0 0 0 4px color($primary);
+        }
+    }
+}

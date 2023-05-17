@@ -1,0 +1,101 @@
+@import "../../global";
+
+.tooltipRoot {
+    position: relative;
+
+    @include themed() {
+        &.default {
+            .tooltipContent,
+            .tooltipArrow {
+                background-color: color($secondary);
+                color: color($secondaryText);
+            }
+        }
+
+        &.panel {
+            .tooltipContent,
+            .tooltipArrow {
+                background-color: color($panelBg);
+                color: color($panelText);
+            }
+        }
+    }
+
+    .tooltipContainer {
+        position: absolute;
+        pointer-events: none;
+        z-index: 999;
+
+        .tooltipArrow {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            translate: -50% -50%;
+            rotate: 45deg;
+        }
+
+        .tooltipContent {
+            padding: 0.5rem;
+            border-radius: 5px;
+            white-space: nowrap;
+
+            @include themed() {
+                box-shadow: 0 0 4px color($shadow);
+            }
+        }
+    }
+
+    &.top {
+        .tooltipContainer {
+            translate: -50% 0;
+            left: 50%;
+            bottom: 100%;
+        }
+
+        .tooltipArrow {
+            top: 100%;
+            left: 50%;
+        }
+    }
+
+    &.right {
+        .tooltipContainer {
+            translate: 0 -50%;
+            left: 100%;
+            top: 50%;
+        }
+
+        .tooltipArrow {
+            top: 50%;
+            left: 0;
+        }
+    }
+
+    &.bottom {
+        .tooltipContainer {
+            translate: -50% 0;
+            left: 50%;
+            top: 100%;
+        }
+
+        .tooltipArrow {
+            top: 0;
+            left: 50%;
+        }
+    }
+
+    &.left {
+        .tooltipContainer {
+            translate: 0 -50%;
+            right: 100%;
+            top: 50%;
+        }
+
+        .tooltipArrow {
+            top: 50%;
+            left: 100%;
+        }
+    }
+}

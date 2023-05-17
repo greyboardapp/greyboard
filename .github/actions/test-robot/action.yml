@@ -1,0 +1,27 @@
+name: 'Robot Framework Tests'
+description: 'End to End test with Robot Framework'
+inputs:
+  browser:
+    description: The browser in which robot framework will run the tests.
+    required: true
+    default: headlessfirefox
+  token:
+    description: The token that will be used for the logged in user.
+    required: true
+  username:
+    description: The username which will be used for authentication.
+    required: true
+  password:
+    description: The password which will be used for authentication.
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: ${{ github.action_path }}/test.sh
+      env:
+        RFW_HOST: http://localhost:8788
+        RFW_TOKEN: ${{ inputs.token }}
+        RFW_BROWSER: ${{ inputs.browser }}
+        RFW_USERNAME: ${{ inputs.username }}
+        RFW_PASSWORD: ${{ inputs.password }}

@@ -1,0 +1,22 @@
+{
+    "extends": [
+        "@gergoszaszvaradi/eslint-config",
+        "@gergoszaszvaradi/eslint-config-solid"
+    ],
+    "env": {
+        "worker": true
+    },
+    "rules": {
+        "no-extend-native": "off",
+        "no-return-assign": "off",
+        "no-await-in-loop": "off",
+        "@typescript-eslint/no-type-alias": "off"
+    },
+    "ignorePatterns": ["*.svg"],
+    "globals": {
+        "PagesFunction": "readonly",
+        "D1Database": "readonly",
+        "KVNamespace": "readonly",
+        "R2Bucket": "readonly"
+    }
+}

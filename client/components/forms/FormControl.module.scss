@@ -1,0 +1,20 @@
+.formControl {
+    margin-bottom: 0.5rem;
+
+    > label {
+        display: block;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+        user-select: none;
+    }
+
+    &.inline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        > label {
+            margin-bottom: 0;
+        }
+    }
+}

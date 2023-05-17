@@ -1,0 +1,57 @@
+@import "../global";
+
+.container {
+    width: 100vw;
+    min-height: 100vh;
+
+    @include themed() {
+        background-color: color($bg);
+        color: color($fg);
+    }
+}
+
+.logo svg {
+    width: 32px;
+    height: 32px;
+}
+
+.userInfo {
+    @include transition();
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        @include themed() {
+            background-color: color($opaque);
+        }
+    }
+}
+
+.content {
+    position: relative;
+}
+
+.noBoardsHint {
+    position: absolute;
+    top: 0;
+    right: 75px;
+    display: flex;
+    align-items: flex-end;
+    margin-top: 0;
+    padding: 0;
+
+    > p {
+        margin-right: 1rem;
+    }
+}
+
+.boardActions {
+    display: flex;
+    overflow: hidden;
+}
