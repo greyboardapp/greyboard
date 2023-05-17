@@ -17,6 +17,10 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => {
             author: user.value.id,
             isPublic: false,
             isPermanent: false,
+            // Disabled due to issues with DOM and ESNext type conflicts in typescript-eslint.
+            // The @cloudflare/workers-types defines a Request type, but typescript overrides it the native fetch API Request from the DOM lib
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            region: (request.cf?.continent ?? "eu").toLocaleLowerCase(),
             slug: randomString(),
             createdAt: getUnixTime(),
             modifiedAt: getUnixTime(),

@@ -6,13 +6,15 @@
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
+		"lib": ["DOM", "ESNext"],
         "jsx": "preserve",
         "jsxImportSource": "solid-js",
         "strict": true,
+		"alwaysStrict": true,
         "noEmit": true,
         "isolatedModules": true,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
-        "types": ["@cloudflare/workers-types"]
+		"types": ["@cloudflare/workers-types"]
     }
 }

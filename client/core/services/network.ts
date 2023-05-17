@@ -33,8 +33,9 @@ export class Network extends Service<NetworkState> {
     public readonly onClientBoardClosed = createDelegate();
     public readonly onClientReloadBoard = createDelegate();
 
-    private readonly connection : HubConnection;
+    private connection : HubConnection | null = null;
     private boardSlug ?: string;
+    private boardRegion ?: string;
 
     private reconnectTimer : number | null = null;
 
@@ -49,24 +50,6 @@ export class Network extends Service<NetworkState> {
             clients: [],
             age: -1,
         });
-
-        this.connection = new HubConnectionBuilder()
-            .withUrl(import.meta.env.HUB_URL)
-            .configureLogging(getSignalRLogLevel())
-            .build();
-
-        this.registerNetworkEvents();
-
-        this.connection.onclose((e) => {
-            if (this.stopped) {
-                this.onDisconnected();
-                return;
-            }
-            if (!this.reconnecting) {
-                this.onConnectionLost();
-                this.reconnect();
-            }
-        });
     }
 
     stop() : void {
@@ -80,7 +63,7 @@ export class Network extends Service<NetworkState> {
         this.onClientReloadBoard.clear();
 
         this.stopped = true;
-        this.connection.stop();
+        this.connection?.stop();
         this.state.clients.clear();
         this.state.age = -1;
         if (this.reconnectTimer)
@@ -89,11 +72,30 @@ export class Network extends Service<NetworkState> {
             clearInterval(this.heartBeatTimer);
     }
 
-    async connect(slug : string) : Promise<boolean> {
+    async connect(slug : string, region : string) : Promise<boolean> {
         this.boardSlug = slug;
+        this.boardRegion = region;
         try {
             this.state.user = user() ?? this.generateTemporaryUser();
             const pointerPos = viewport.screenToViewport(input.pointerPosition());
+
+            this.connection = new HubConnectionBuilder()
+                .withUrl(import.meta.env.HUB_URL.replace("{{REGION}}", region))
+                .configureLogging(getSignalRLogLevel())
+                .build();
+
+            this.registerNetworkEvents();
+
+            this.connection.onclose((e) => {
+                if (this.stopped) {
+                    this.onDisconnected();
+                    return;
+                }
+                if (!this.reconnecting) {
+                    this.onConnectionLost();
+                    this.reconnect();
+                }
+            });
 
             this.stopped = false;
             await this.connection.start();
@@ -120,7 +122,8 @@ export class Network extends Service<NetworkState> {
     async disconnect(stoppedForReconnect = false) : Promise<void> {
         if (!stoppedForReconnect)
             this.stopped = true;
-        await this.connection.stop();
+        await this.connection?.stop();
+        this.connection = null;
         this.state.clients = [];
         if (board.state.author !== this.state.user?.id)
             board.state.isSavingEnabled = false;
@@ -315,7 +318,7 @@ export class Network extends Service<NetworkState> {
 
     private async send(method : string, ...args : unknown[]) : Promise<boolean> {
         try {
-            if (this.connection.state !== HubConnectionState.Connected)
+            if (this.connection?.state !== HubConnectionState.Connected)
                 return false;
 
             await this.connection.send(method, ...args);
@@ -334,17 +337,17 @@ export class Network extends Service<NetworkState> {
         for (const prop of Reflect.ownKeys(Network.prototype as object))
             if (typeof prop === "string" && prop.startsWith("on")) {
                 const func = Reflect.get(Network.prototype as object, prop) as (...args : unknown[]) => unknown;
-                this.connection.on(prop.replace("on", ""), func.bind(this));
+                this.connection?.on(prop.replace("on", ""), func.bind(this));
             }
     }
 
     private async reconnect(attempt = 1) : Promise<void> {
         logger.debug(`Reconnecting... Attempt: ${attempt}`);
-        if (!this.boardSlug)
+        if (!this.boardSlug || !this.boardRegion)
             return;
         this.reconnecting = true;
         await this.disconnect(true);
-        const isConnected = await this.connect(this.boardSlug);
+        const isConnected = await this.connect(this.boardSlug, this.boardRegion);
         if (!isConnected)
             this.reconnectTimer = setTimeout(async () => this.reconnect(attempt + 1), 5000, null);
     }

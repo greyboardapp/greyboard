@@ -30,7 +30,7 @@
   "devDependencies": {
     "@actions/core": "^1.10.0",
     "@babel/core": "7.16.7",
-    "@cloudflare/workers-types": "^4.20230404.0",
+    "@cloudflare/workers-types": "^3.18.0",
     "@gergoszaszvaradi/eslint-config": "^1.1.2",
     "@gergoszaszvaradi/eslint-config-solid": "^1.1.2",
     "@gergoszaszvaradi/stylelint-config": "^1.2.1",

@@ -27,9 +27,11 @@ interface BoardState {
     name : string;
     author : string;
     slug : string;
+    region : string;
 
     // NOTE: properties in this state will change once collaboration will be implemented.
     isPublic : boolean;
+    isDeleted : boolean;
     lastBuildScale : number;
     temporaryScale : number;
     savingEnabled : boolean;
@@ -202,7 +204,9 @@ export class Board extends Service<BoardState> {
             name: "New Board",
             author: "",
             slug: "",
+            region: "",
             isPublic: false,
+            isDeleted: false,
             lastBuildScale: 1,
             temporaryScale: 1,
             savingEnabled: false,
@@ -271,6 +275,8 @@ export class Board extends Service<BoardState> {
             this.state.author = data.author;
             this.state.slug = data.slug;
             this.state.isPublic = data.isPublic;
+            this.state.isDeleted = data.isDeleted;
+            this.state.region = data.region;
         });
         this.loadContents(data.contents);
     }

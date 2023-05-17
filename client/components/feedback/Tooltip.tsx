@@ -37,11 +37,12 @@ const Tooltip : ParentComponent<TooltipProps> = (props) => {
     const [side, setSide] = createSignal(defaultSide());
 
     createEffect(() => {
-        if (!visible()) {
-            setHOffset(0);
-            setHRelOffset(0.5);
-            setSide(props.orientation === "horizontal" ? styles.right : styles.top);
-        }
+        if (!visible())
+            setTimeout(() => {
+                setHOffset(0);
+                setHRelOffset(0.5);
+                setSide(props.orientation === "horizontal" ? styles.right : styles.top);
+            }, 100);
     });
 
     const calculatePosition = (elem : HTMLElement) : void => {

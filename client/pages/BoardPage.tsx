@@ -86,32 +86,47 @@ const BoardPage : Component = () => {
                 if (!data || data.error || !data.result) {
                     showErrorModal(data.error);
                     navigate(user() === null ? "/" : "/dashboard");
-                    return;
+                } else {
+                    board.loadFromBoardData(data.result);
+                    if (data.result.isPublic)
+                        network.connect(data.result.slug, data.result.region);
+
+                    if (data.result.author === user()?.id)
+                        board.state.isSavingEnabled = true;
+
+                    if (data.result.author === user()?.id && data.result.isDeleted)
+                        showModal({
+                            title: "titles.boardDeleted",
+                            content: <Text content="texts.deletedBoardRevert" />,
+                            buttons: [
+                                (close) => <Button content="buttons.cancel" variant="secondary" onClick={() => {
+                                    close();
+                                    navigate(user() === null ? "/" : "/dashboard");
+                                }} marginRight={2} />,
+                                (close) => <Button content="buttons.recover" variant="primary" onClick={async () => {
+                                    await updateBoardMutation.mutateAsync({ isDeleted: false });
+                                    close();
+                                }} />,
+                            ],
+                        });
+
+                    if (!data.result.isPermanent)
+                        showToast({
+                            title: `${getText("titles.permanentBoard")} ${formattedRelativeDateTime(getMidnightAfterDays(data.result.modifiedAt, 7))}`,
+                            closable: true,
+                            actions: [
+                                (close) => <Button content="buttons.makePermanent" variant="primary" onClick={async () => {
+                                    if (!data.result)
+                                        return;
+
+                                    await updateBoardMutation.mutateAsync({
+                                        isPermanent: true,
+                                    });
+                                    close();
+                                }} />,
+                            ],
+                        });
                 }
-
-                board.loadFromBoardData(data.result);
-                if (data.result.isPublic)
-                    network.connect(data.result.slug);
-
-                if (data.result.author === user()?.id)
-                    board.state.isSavingEnabled = true;
-
-                if (!data.result.isPermanent)
-                    showToast({
-                        title: `${getText("titles.permanentBoard")} ${formattedRelativeDateTime(getMidnightAfterDays(data.result.modifiedAt, 7))}`,
-                        closable: true,
-                        actions: [
-                            (close) => <Button content="buttons.makePermanent" variant="primary" onClick={async () => {
-                                if (!data.result)
-                                    return;
-
-                                await updateBoardMutation.mutateAsync({
-                                    isPermanent: true,
-                                });
-                                close();
-                            }} />,
-                        ],
-                    });
             });
 
             if (!data.result?.isPublic)
@@ -167,7 +182,7 @@ const BoardPage : Component = () => {
                 closable: true,
                 actions: untrack(hubConnectionFailAttemps) < 4 ? [
                     (close) => <Button content="buttons.tryAgain" variant="secondary" onClick={async () => {
-                        const isConnected = await network.connect(board.state.slug);
+                        const isConnected = await network.connect(board.state.slug, board.state.region);
                         close();
                         if (isConnected)
                             setHubConnectionFailAttemps(0);

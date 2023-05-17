@@ -9,7 +9,7 @@ import styles from "../data/AvatarList.module.scss";
 import { NetworkClient } from "../../core/data/networkClient";
 
 const ClientListVariants = { ...getGenericVariants({}) };
-const clientListStyles = cva(styles.clientList, {
+const clientListStyles = cva(styles.avatarList, {
     variants: ClientListVariants,
 });
 
@@ -22,7 +22,7 @@ interface ClientListProps extends GenericProps<HTMLDivElement>, VariantProps<typ
 const ClientList : ParentComponent<ClientListProps> = (props) => (
     <div {...getGenericProps(props)} class={cls(clientListStyles(props), props.class)}>
         <For each={props.users.slice(0, 9)}>
-            {(user) => <Avatar user={user} me={user.id === props.me} inactive={user.afk} size={props.size} />}
+            {(user) => <Avatar user={user} me={user.id === props.me} inactive={user.afk} size={props.size} showNameAsTooltip />}
         </For>
         <Show when={props.users.length > 9}>
             <Text content={`+${props.users.length - 9}`} as="span" />

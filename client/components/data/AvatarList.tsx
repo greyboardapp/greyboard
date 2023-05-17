@@ -17,12 +17,13 @@ interface AvatarListProps extends GenericProps<HTMLDivElement>, VariantProps<typ
     users : BasicUser[];
     me ?: string;
     size ?: keyof typeof AvatarVariants.size;
+    showNameAsTooltip ?: boolean;
 }
 
 const AvatarList : ParentComponent<AvatarListProps> = (props) => (
     <div {...getGenericProps(props)} class={cls(avatarListStyles(props), props.class)}>
         <For each={props.users.slice(0, 9)}>
-            {(user) => <Avatar user={user} me={user.id === props.me} size={props.size} />}
+            {(user) => <Avatar user={user} me={user.id === props.me} size={props.size} showNameAsTooltip={props.showNameAsTooltip} />}
         </For>
         <Show when={props.users.length > 9}>
             <Text content={`+${props.users.length - 9}`} as="span" />

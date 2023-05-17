@@ -10,6 +10,7 @@ export interface Board extends Entity {
     isDeleted : boolean;
     slug : string;
     thumbnail : string;
+    region : string;
     createdAt : number;
     modifiedAt : number;
 }

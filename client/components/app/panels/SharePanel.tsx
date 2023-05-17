@@ -33,7 +33,7 @@ const SharePanelContent : Component<SharePanelContentProps> = (props) => {
                 board.state.isPublic = properties.isPublic;
 
                 if (properties.isPublic) {
-                    await network.connect(board.state.slug);
+                    await network.connect(board.state.slug, board.state.region);
                     showToast({
                         title: "texts.shared",
                     });
