@@ -4,6 +4,7 @@ Resource    common.robot
 Test Setup    Open Greyboard To Dashboard
 Test Teardown    Close Greyboard
 
+Suite Setup    Create Test User
 Suite Teardown    Close All Browsers
 
 

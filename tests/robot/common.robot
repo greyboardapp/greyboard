@@ -11,6 +11,9 @@ ${USERNAME}    %{RFW_USERNAME}
 ${PASSWORD}    %{RFW_PASSWORD}
 
 *** Keywords ***
+Create Test User
+    Run    npx wrangler d1 execute greyboard-db-dev --local --command="INSERT OR IGNORE INTO users VALUES ('e0fd4b98-5f67-47eb-9d95-253f3dbd598b', 'Greyboard Tester', '${USERNAME}', 'https://lh3.googleusercontent.com/a/AGNmyxZjd8E-sMJa3-kunNUw_UHOnHWqU919mRUQZlfP=s96-c', 1, 1683341538)"
+
 Open Greyboard
     Open Browser    ${HOST}    browser=${BROWSER}
     Wait Until Page Contains    Greyboard
