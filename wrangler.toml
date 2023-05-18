@@ -20,3 +20,27 @@ AUTH_GOOGLE_CLIENT_SECRET = "#{AUTH_GOOGLE_CLIENT_SECRET}#"
 AUTH_GITHUB_CLIENT_ID = "#{AUTH_GITHUB_CLIENT_ID}#"
 AUTH_GITHUB_CLIENT_SECRET = "#{AUTH_GITHUB_CLIENT_SECRET}#"
 JWT_SECRET = "#{JWT_SECRET}#"
+
+[env.production]
+name = "greyboard"
+compatibility_date = "2022-11-12"
+
+kv_namespaces = [
+  { binding = "cache", id = "d6172c1d4e9a4daa93e9a80ecf7014e0", preview_id = "d6172c1d4e9a4daa93e9a80ecf7014e0" }
+]
+
+r2_buckets = [
+  { binding = "boards", bucket_name = "greyboard-boards-prod", preview_bucket_name = "greyboard-boards-prod" }
+]
+
+d1_databases = [
+  { binding = "db", database_name = "greyboard-db-prod", database_id = "3f6e1467-dc9d-4d3a-8125-3d51f62117d1", preview_database_id = "3f6e1467-dc9d-4d3a-8125-3d51f62117d1" }
+]
+
+[env.production.vars]
+DEVELOPMENT = false
+AUTH_GOOGLE_CLIENT_ID = "#{AUTH_GOOGLE_CLIENT_ID}#"
+AUTH_GOOGLE_CLIENT_SECRET = "#{AUTH_GOOGLE_CLIENT_SECRET}#"
+AUTH_GITHUB_CLIENT_ID = "#{AUTH_GITHUB_CLIENT_ID}#"
+AUTH_GITHUB_CLIENT_SECRET = "#{AUTH_GITHUB_CLIENT_SECRET}#"
+JWT_SECRET = "#{JWT_SECRET}#"
