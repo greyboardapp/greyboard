@@ -1,6 +1,7 @@
-import { Board, BoardCreationSchema, BoardsUpdateSchema } from "../../../common/models/board";
+import { Board, BoardCreationSchema, BoardFlattened, BoardsUpdateSchema } from "../../../common/models/board";
 import { getSignedInUser } from "../../auth";
-import { BoardCreationFailed, BoardNotFound, Env, NotAuthenticated, ValidationError, badRequest, dbDeleteById, dbGetByProperty, dbInsert, dbUpdateByIds, getUnixTime, internalError, notFound, ok, randomString, unauthorized } from "../../utils";
+import { dbDeleteById, dbGetByProperty, dbInsert, dbUpdateByIds } from "../../db";
+import { BoardCreationFailed, BoardNotFound, Env, NotAuthenticated, ValidationError, badRequest, getUnixTime, internalError, notFound, ok, randomString, unauthorized } from "../../utils";
 
 export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => {
     try {
@@ -12,7 +13,7 @@ export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => {
         if ("error" in user)
             return unauthorized(new NotAuthenticated("User not authenticated"));
 
-        const board = await dbInsert<Board>(env.db, "boards", {
+        const board = await dbInsert<BoardFlattened>(env.db, "boards", {
             name: body.data.name,
             author: user.value.id,
             isPublic: false,

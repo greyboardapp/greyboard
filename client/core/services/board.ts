@@ -21,13 +21,17 @@ import { network } from "./network";
 import { selection } from "./selection";
 import { BoardMoveData, BoardResizeData } from "../data/boardAction";
 import logger from "../../utils/system/logger";
+import { User } from "../../../common/models/user";
+import { BoardAccess, BoardAccessType } from "../../../common/models/board";
+import { user } from "../../utils/system/auth";
 
 interface BoardState {
     id : string;
     name : string;
-    author : string;
+    author : User;
     slug : string;
     region : string;
+    accesses : BoardAccess[];
 
     // NOTE: properties in this state will change once collaboration will be implemented.
     isPublic : boolean;
@@ -202,9 +206,15 @@ export class Board extends Service<BoardState> {
         super({
             id: "",
             name: "New Board",
-            author: "",
+            author: {
+                id: "",
+                name: "",
+                email: "",
+                avatar: "",
+            },
             slug: "",
             region: "",
+            accesses: [],
             isPublic: false,
             isDeleted: false,
             lastBuildScale: 1,
@@ -255,8 +265,12 @@ export class Board extends Service<BoardState> {
         this.saveTimer = setTimeout(() => this.save(), (import.meta.env.BOARD_SAVE_DELAY ?? 10) * 1000, null);
     }
 
+    canModify() : boolean {
+        return (user()?.id === this.state.author.id || this.state.accesses.some((access) => access.type >= BoardAccessType.Editor && user()?.id === access.user.id));
+    }
+
     canSave() : boolean {
-        return this.state.modifiedSinceLastSave && this.state.isSavingEnabled;
+        return this.state.modifiedSinceLastSave && this.state.isSavingEnabled && this.canModify();
     }
 
     async loadContents(contents : Uint8Array) : Promise<void> {
@@ -277,6 +291,7 @@ export class Board extends Service<BoardState> {
             this.state.isPublic = data.isPublic;
             this.state.isDeleted = data.isDeleted;
             this.state.region = data.region;
+            this.state.accesses = data.accesses;
         });
         this.loadContents(data.contents);
     }

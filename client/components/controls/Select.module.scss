@@ -1,0 +1,19 @@
+@import "../../global";
+
+.select {
+    @include transition();
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        @include themed() {
+            background-color: color($opaque);
+        }
+    }
+}

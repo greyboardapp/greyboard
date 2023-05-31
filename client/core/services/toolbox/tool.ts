@@ -60,7 +60,9 @@ export class Tool implements ToolDescription {
     onRender(graphics : Graphics, dt : number) : void {}
 }
 
-export abstract class CreatorTool<T extends BoardItem> extends Tool {
+export abstract class ModifierTool extends Tool {}
+
+export abstract class CreatorTool<T extends BoardItem> extends ModifierTool {
     protected item! : T;
 
     constructor(description : ToolDescription) {
@@ -100,7 +102,7 @@ export enum Orientation {
     Vertical,
 }
 
-export abstract class ManipulationTool extends Tool {
+export abstract class ManipulationTool extends ModifierTool {
     public mode = ManipulationMode.None;
     public resizeDirection = ResizeDirection.None;
     protected start = new Point();

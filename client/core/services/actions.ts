@@ -1,4 +1,5 @@
 import { createService, Service } from "../../utils/system/service";
+import { board } from "./board";
 
 interface Action<T> {
     (data : T, execute ?: boolean) : void;
@@ -57,7 +58,7 @@ class ActionStack extends Service<ActionStackState> {
     }
 
     canUndo() : boolean {
-        return this.state.undoStack.length > 0;
+        return this.state.undoStack.length > 0 && board.canModify();
     }
 
     redo() : void {
@@ -69,7 +70,7 @@ class ActionStack extends Service<ActionStackState> {
     }
 
     canRedo() : boolean {
-        return this.state.redoStack.length > 0;
+        return this.state.redoStack.length > 0 && board.canModify();
     }
 }
 

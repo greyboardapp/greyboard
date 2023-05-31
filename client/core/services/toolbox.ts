@@ -1,7 +1,7 @@
 import imageCompression from "browser-image-compression";
 import Color from "../../utils/datatypes/color";
 import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
-import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
+import { CreatorTool, makeToolCategory, ManipulationTool, ModifierTool, Tool, ToolHierarchy } from "./toolbox/tool";
 import { input, KeyboardEventData, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
@@ -131,7 +131,7 @@ export class Toolbox extends Service<ToolboxState> {
 
     async pasteFromClipboard(data : DataTransfer) : Promise<void> {
         try {
-            if (data.items.length === 0)
+            if (data.items.length === 0 || !board.canModify())
                 return;
             const [item] = data.items;
             if (item.type.startsWith("text")) {
@@ -178,7 +178,7 @@ export class Toolbox extends Service<ToolboxState> {
             this.state.isToolInAction = true;
         }
 
-        if (this.state.selectedTool.onActionStart(data)) {
+        if ((!(this.state.selectedTool instanceof ModifierTool) || board.canModify()) && this.state.selectedTool.onActionStart(data)) {
             this.state.selectedTool.actionStarted = true;
             this.state.isToolInAction = true;
         }

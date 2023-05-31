@@ -63,6 +63,7 @@
         padding: 16px;
         border-bottom-right-radius: 10px;
         border-bottom-left-radius: 10px;
+        min-height: 64px;
 
         @include themed() {
             color: color($panelText);
@@ -78,7 +79,6 @@
 
     .filled {
         flex-grow: 1;
-        width: 100%;
     }
 
     .actions {

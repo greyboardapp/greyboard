@@ -1,6 +1,7 @@
 import jwt from "@tsndr/cloudflare-worker-jwt";
-import { AuthType, User } from "../common/models/user";
-import { NotAuthenticated, PromisedResult, dbGetByProperties, dbInsert, failure, getUnixTime, internalError, ok, success } from "./utils";
+import { AuthType, User, UserDetailed } from "../common/models/user";
+import { NotAuthenticated, PromisedResult, failure, getUnixTime, internalError, ok, success } from "./utils";
+import { dbGetByProperties, dbInsert } from "./db";
 
 export interface AuthUser {
     name : string;
@@ -28,12 +29,12 @@ export const signIn = async (db : D1Database, authType : AuthType, userInfoGette
         return internalError(userInfo.error);
 
     let user : User | undefined;
-    const entry = await dbGetByProperties<User>(db, "users", [["email", userInfo.value.email], ["type", authType]]);
+    const entry = await dbGetByProperties<UserDetailed>(db, "users", [["email", userInfo.value.email], ["type", authType]]);
     if ("error" in entry)
         return internalError(entry.error);
 
     if (entry.value.length === 0) {
-        const inserted = await dbInsert<User>(db, "users", { ...userInfo.value, type: authType, createdAt: getUnixTime() });
+        const inserted = await dbInsert<UserDetailed>(db, "users", { ...userInfo.value, type: authType, createdAt: getUnixTime() });
         if ("error" in inserted)
             return internalError(inserted.error);
         user = inserted.value;

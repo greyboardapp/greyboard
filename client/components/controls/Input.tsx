@@ -5,12 +5,14 @@ import { GenericProps, getGenericProps, getGenericVariants } from "../../utils/d
 import Icon, { SVGIcon } from "../data/Icon";
 
 import styles from "./Input.module.scss";
+import { getText } from "../../utils/system/intl";
 
 const InputVariants = {
     ...getGenericVariants({}),
     type: {
         text: "",
         password: "",
+        email: "",
     },
     size: {
         xs: styles.xs,
@@ -53,7 +55,7 @@ const Input : Component<InputProps> = (props) => {
                 id={props.id}
                 ref={props.ref as HTMLInputElement}
                 type={props.type ?? "text"}
-                placeholder={props.placeholder ?? ""}
+                placeholder={getText(props.placeholder) ?? ""}
                 value={props.model[0]()}
                 disabled={props.disabled ?? false}
                 onFocus={(e) => setOriginalValue((e.target as HTMLInputElement).value)}

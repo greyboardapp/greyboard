@@ -16,6 +16,7 @@ import Rect from "../data/geometry/rect";
 import { selection } from "./selection";
 import createDelegate from "../../utils/datatypes/delegate";
 import logger, { getSignalRLogLevel } from "../../utils/system/logger";
+import { BoardAccess, BoardAccessType } from "../../../common/models/board";
 
 export interface NetworkState {
     user ?: BasicUser;
@@ -32,6 +33,8 @@ export class Network extends Service<NetworkState> {
     public readonly onClientReassigned = createDelegate();
     public readonly onClientBoardClosed = createDelegate();
     public readonly onClientReloadBoard = createDelegate();
+    public readonly onClientAccessTypeChanged = createDelegate<[oldAccessType: BoardAccessType, newAccessType: BoardAccessType]>();
+    public connected = false;
 
     private connection : HubConnection | null = null;
     private boardSlug ?: string;
@@ -61,6 +64,7 @@ export class Network extends Service<NetworkState> {
         this.onClientReassigned.clear();
         this.onClientBoardClosed.clear();
         this.onClientReloadBoard.clear();
+        this.onClientAccessTypeChanged.clear();
 
         this.stopped = true;
         this.connection?.stop();
@@ -73,6 +77,9 @@ export class Network extends Service<NetworkState> {
     }
 
     async connect(slug : string, region : string) : Promise<boolean> {
+        if (this.connected)
+            return true;
+
         this.boardSlug = slug;
         this.boardRegion = region;
         try {
@@ -87,6 +94,7 @@ export class Network extends Service<NetworkState> {
             this.registerNetworkEvents();
 
             this.connection.onclose((e) => {
+                this.connected = false;
                 if (this.stopped) {
                     this.onDisconnected();
                     return;
@@ -112,6 +120,7 @@ export class Network extends Service<NetworkState> {
 
             return true;
         } catch (e) {
+            this.connected = false;
             console.error(e);
             if (!this.reconnecting)
                 this.onConnectionFailed();
@@ -124,8 +133,9 @@ export class Network extends Service<NetworkState> {
             this.stopped = true;
         await this.connection?.stop();
         this.connection = null;
+        this.connected = false;
         this.state.clients = [];
-        if (board.state.author !== this.state.user?.id)
+        if (board.state.author.id !== this.state.user?.id)
             board.state.isSavingEnabled = false;
     }
 
@@ -140,6 +150,7 @@ export class Network extends Service<NetworkState> {
         this.state.age = age;
 
         await this.performBoardActions(events, false);
+        this.connected = true;
         this.onConnected();
     }
 
@@ -169,6 +180,17 @@ export class Network extends Service<NetworkState> {
 
     onPerformBoardAction(event : BoardEvent) : void {
         this.performBoardActions([event], true);
+    }
+
+    onBoardAccessesModified(accesses : BoardAccess[]) : void {
+        const oldAccessType = board.state.accesses.find((access) => access.user.id === this.state.user?.id)?.type ?? BoardAccessType.Viewer;
+        const newAccessType = accesses.find((access) => access.user.id === this.state.user?.id)?.type ?? BoardAccessType.Viewer;
+        board.state.accesses = accesses;
+
+        if (oldAccessType !== newAccessType)
+            this.onClientAccessTypeChanged(oldAccessType, newAccessType);
+        if (newAccessType === BoardAccessType.Viewer)
+            selection.clear();
     }
 
     onBoardClosed() : void {
@@ -262,6 +284,10 @@ export class Network extends Service<NetworkState> {
 
     async boardSaved() : Promise<void> {
         await this.send("BoardSaved");
+    }
+
+    async accessesModified(accesses : BoardAccess[]) : Promise<void> {
+        await this.send("AccessesModified", accesses);
     }
 
     async closeBoard() : Promise<void> {

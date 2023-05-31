@@ -8,6 +8,7 @@ declare global {
     interface Array<T> {
         clear() : void;
         copy() : Array<T>;
+        deepCopy() : Array<T>;
         unique() : Array<T>;
 
         first() : T | undefined;
@@ -29,6 +30,10 @@ Array.prototype.clear = function<T> (this : T[]) : void {
 
 Array.prototype.copy = function<T> (this : T[]) : Array<T> {
     return [...this];
+};
+
+Array.prototype.deepCopy = function<T> (this : T[]) : Array<T> {
+    return JSON.parse(JSON.stringify(this)) as Array<T>;
 };
 
 Array.prototype.unique = function<T> (this : T[]) : Array<T> {
