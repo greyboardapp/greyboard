@@ -178,15 +178,18 @@ const SelectionBox : Component = () => {
                                         <Tooltip content={<><Text content="actions.removeLabel" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.toggleLabel.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                             <ToolbarButton icon={labelIcon} onClick={selection.toggleLabel} />
                                         </Tooltip>
-                                        <ToolbarInput model={[
-                                            () => selection.state.label() ?? "",
-                                            (v) => selection.setLabel(v),
-                                        ]}
-                                        onChange={(e, newLabel, oldLabel) => {
-                                            selection.setLabel(newLabel);
-                                            board.setLabelAction({ items: selection.state.items(), newLabel, oldLabel }, false);
-                                        }}
-                                        placeholder="placeholder.typeSomething" />
+                                        <ToolbarInput
+                                            class={styles.input}
+                                            model={[
+                                                () => selection.state.label() ?? "",
+                                                (v) => selection.setLabel(v),
+                                            ]}
+                                            onChange={(e, newLabel, oldLabel) => {
+                                                selection.setLabel(newLabel);
+                                                board.setLabelAction({ items: selection.state.items(), newLabel, oldLabel }, false);
+                                                return true;
+                                            }}
+                                            placeholder="placeholder.typeSomething" />
                                     </Show>
                                 </Show>
                             </Toolbar>

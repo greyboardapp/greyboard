@@ -54,4 +54,8 @@
         margin-top: -10px;
         pointer-events: all;
     }
+
+    .input input {
+        min-width: 100px;
+    }
 }
