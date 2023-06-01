@@ -28,7 +28,7 @@ interface GitHubAuthCallbackParams extends Record<string, string> {
     redirectUrl : string;
 }
 
-export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => signIn(env.db, AuthType.GitHub, async () => {
+export const onRequestPost : PagesFunction<Env> = async ({ request, env }) => signIn(env, AuthType.GitHub, async () => {
     try {
         const body = await request.json<GitHubAuthCallbackParams>();
 

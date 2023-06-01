@@ -1,6 +1,6 @@
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { AuthType, User, UserDetailed } from "../common/models/user";
-import { NotAuthenticated, PromisedResult, failure, getUnixTime, internalError, ok, success } from "./utils";
+import { Env, NotAuthenticated, PromisedResult, failure, getUnixTime, internalError, ok, success } from "./utils";
 import { dbGetByProperties, dbInsert } from "./db";
 
 export interface AuthUser {
@@ -13,7 +13,7 @@ export const getToken = async (user : User, secret : string) : Promise<string> =
 
 export const validateToken = async (token : string, secret : string) : Promise<boolean> => jwt.verify(token, secret, { algorithm: "HS256" });
 
-export const getSignOutResponse = () : Response => ok("ok", { "Set-Cookie": "jwtToken=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=None; secure; httpOnly" });
+export const getSignOutResponse = (env : Env) : Response => ok("ok", { "Set-Cookie": `jwtToken=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.${env.DEVELOPMENT ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly` });
 
 export const getSignedInUser = async (request : Request, secret : string) : PromisedResult<User> => {
     const token = request.headers.get("Cookie")?.match(/jwtToken=([^;]+)/);
@@ -23,18 +23,18 @@ export const getSignedInUser = async (request : Request, secret : string) : Prom
     return success(jwt.decode(token[1]).payload as User);
 };
 
-export const signIn = async (db : D1Database, authType : AuthType, userInfoGetter : () => PromisedResult<AuthUser>, secret : string) : Promise<Response> => {
+export const signIn = async (env : Env, authType : AuthType, userInfoGetter : () => PromisedResult<AuthUser>, secret : string) : Promise<Response> => {
     const userInfo = await userInfoGetter();
     if ("error" in userInfo)
         return internalError(userInfo.error);
 
     let user : User | undefined;
-    const entry = await dbGetByProperties<UserDetailed>(db, "users", [["email", userInfo.value.email], ["type", authType]]);
+    const entry = await dbGetByProperties<UserDetailed>(env.db, "users", [["email", userInfo.value.email], ["type", authType]]);
     if ("error" in entry)
         return internalError(entry.error);
 
     if (entry.value.length === 0) {
-        const inserted = await dbInsert<UserDetailed>(db, "users", { ...userInfo.value, type: authType, createdAt: getUnixTime() });
+        const inserted = await dbInsert<UserDetailed>(env.db, "users", { ...userInfo.value, type: authType, createdAt: getUnixTime() });
         if ("error" in inserted)
             return internalError(inserted.error);
         user = inserted.value;
@@ -47,6 +47,6 @@ export const signIn = async (db : D1Database, authType : AuthType, userInfoGette
     const now = new Date();
     now.setTime(now.getTime() + 10 * 365 * 24 * 60 * 60 * 1000);
     return ok<User>(user, {
-        "Set-Cookie": `jwtToken=${token}; expires=${now.toUTCString()}; path=/; SameSite=None; secure; httpOnly;`,
+        "Set-Cookie": `jwtToken=${token}; expires=${now.toUTCString()}; domain=.${env.DEVELOPMENT ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly;`,
     });
 };
