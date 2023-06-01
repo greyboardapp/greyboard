@@ -7,7 +7,7 @@ export interface Services {
 }
 
 export interface Env extends Services {
-    DEVELOPMENT : boolean;
+    DEVELOPMENT : string;
     JWT_SECRET : string;
     AUTH_GOOGLE_CLIENT_ID : string;
     AUTH_GOOGLE_CLIENT_SECRET : string;

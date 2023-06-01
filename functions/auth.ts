@@ -13,7 +13,7 @@ export const getToken = async (user : User, secret : string) : Promise<string> =
 
 export const validateToken = async (token : string, secret : string) : Promise<boolean> => jwt.verify(token, secret, { algorithm: "HS256" });
 
-export const getSignOutResponse = (env : Env) : Response => ok("ok", { "Set-Cookie": `jwtToken=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${env.DEVELOPMENT ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly` });
+export const getSignOutResponse = (env : Env) : Response => ok("ok", { "Set-Cookie": `jwtToken=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${env.DEVELOPMENT === "true" ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly` });
 
 export const getSignedInUser = async (request : Request, secret : string) : PromisedResult<User> => {
     const token = request.headers.get("Cookie")?.match(/jwtToken=([^;]+)/);
@@ -47,6 +47,6 @@ export const signIn = async (env : Env, authType : AuthType, userInfoGetter : ()
     const now = new Date();
     now.setTime(now.getTime() + 10 * 365 * 24 * 60 * 60 * 1000);
     return ok<User>(user, {
-        "Set-Cookie": `jwtToken=${token}; expires=${now.toUTCString()}; domain=${env.DEVELOPMENT ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly;`,
+        "Set-Cookie": `jwtToken=${token}; expires=${now.toUTCString()}; domain=${env.DEVELOPMENT === "true" ? "localhost" : "greyboard.app"}; path=/; SameSite=None; secure; httpOnly;`,
     });
 };
