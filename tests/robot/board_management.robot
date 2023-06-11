@@ -87,6 +87,7 @@ Bulk Make Boards Permanent From Dashboard
     ${toBeUpdatedCount}=    Get Element Count    //div[contains(@class, "card")]//input[@type='checkbox']
     Click All    //div[contains(@class, "card")]//input[@type='checkbox']
     Click    /html/body/div/div/div[1]/div/div[2]/div[2]/div[1]/div[2]/div/button
+    Sleep    1s
     ${expiringBoardCountAfterUpdate}=    Get Element Count    //span[normalize-space(.) = "Expires"]
     Should Be True    ${expiringBoardCountAfterUpdate}+${toBeUpdatedCount} == ${expiringBoardCount}
 
