@@ -7,6 +7,13 @@ on:
         type: boolean
         description: Skip Linting
         default: false
+      testOn:
+        type: choice
+        description: End-to-End test browser
+        options:
+          - "headlessfirefox"
+          - "headlesschrome"
+        default: "headlessfirefox"
 
 jobs:
   lint:
@@ -64,7 +71,10 @@ jobs:
         run: yarn install
 
       - name: Install Robot Framework
-        run: pip install robotframework robotframework-selenium2library
+        run: pip install robotframework robotframework-selenium2library webdrivermanager selenium==4.9.0
+
+      - name: Install WebDrivers
+        run: webdrivermanager firefox chrome --linkpath /usr/local/bin
 
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
