@@ -17,6 +17,7 @@ import { selection } from "./selection";
 import createDelegate from "../../utils/datatypes/delegate";
 import logger, { getSignalRLogLevel } from "../../utils/system/logger";
 import { BoardAccess, BoardAccessType } from "../../../common/models/board";
+import { TextAlignment } from "../../utils/system/text";
 
 export interface NetworkState {
     user ?: BasicUser;
@@ -282,6 +283,10 @@ export class Network extends Service<NetworkState> {
         await this.sendBoardAction({ type: BoardActionType.Weight, data: { ids, value: weight } });
     }
 
+    async setBoardItemText(id : number, text : string, alignment : TextAlignment, fontSize : number) : Promise<void> {
+        await this.sendBoardAction({ type: BoardActionType.Text, data: { id, text, alignment, fontSize } });
+    }
+
     async boardSaved() : Promise<void> {
         await this.send("BoardSaved");
     }
@@ -334,6 +339,8 @@ export class Network extends Service<NetworkState> {
                 board.setColor(board.getItemsFromIds(event.action.data.ids), event.action.data.value);
             } else if (event.action.type === BoardActionType.Weight) {
                 board.setWeight(board.getItemsFromIds(event.action.data.ids), event.action.data.value);
+            } else if (event.action.type === BoardActionType.Text) {
+                board.setText(board.getItemsFromIds([event.action.data.id])[0], event.action.data.text, event.action.data.alignment, event.action.data.fontSize);
             }
         }
         if (isSelectionUpdateNeeded)

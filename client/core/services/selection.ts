@@ -7,6 +7,7 @@ import { board } from "./board";
 import { createCommand, Shortcut } from "./commands";
 import { KeyModifiers } from "./input";
 import { viewport } from "./viewport";
+import { TextAlignment } from "../data/items/text";
 
 interface SelectionState {
     ids : number[];

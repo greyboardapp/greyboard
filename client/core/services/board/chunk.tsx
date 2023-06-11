@@ -62,16 +62,21 @@ export class Chunk {
     updateRegion(rect : Rect) : void {
         rect.inflate(45);
 
-        this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, () => {
+        rect.x = Math.floor(rect.x);
+        rect.y = Math.floor(rect.y);
+        rect.x2 = Math.ceil(rect.x2);
+        rect.y2 = Math.ceil(rect.y2);
+
+        this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, async () => {
             const items = Array.from(this.qt.get(viewport.viewportToBoardRect(rect))).sort((a, b) => a.zIndex - b.zIndex);
             for (const item of items)
-                item.render(this.graphics, false);
+                await item.render(this.graphics, false);
         });
     }
 
-    rerender() : void {
+    async rerender() : Promise<void> {
         for (const item of this.qt.getAll())
-            item.render(this.graphics, false);
+            await item.render(this.graphics, false);
     }
 
     resetGraphics() : void {

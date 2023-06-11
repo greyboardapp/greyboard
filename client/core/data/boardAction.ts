@@ -1,3 +1,4 @@
+import { TextAlignment } from "../../utils/system/text";
 import Rect from "./geometry/rect";
 import { BoardItem } from "./item";
 
@@ -13,6 +14,7 @@ export enum BoardActionType
     Label,
     Color,
     Weight,
+    Text,
 }
 
 export interface BoardMoveData {
@@ -55,6 +57,13 @@ export interface BoardStyleData {
     value : number;
 }
 
+export interface BoardTextData {
+    id : number;
+    text : string;
+    alignment : TextAlignment;
+    fontSize : number;
+}
+
 export type BoardAction = (
     { type : BoardActionType.Add; data : BoardItem[] } |
     { type : BoardActionType.Remove; data : number[] } |
@@ -64,7 +73,8 @@ export type BoardAction = (
     { type : BoardActionType.LockState; data : BoardLockStateData } |
     { type : BoardActionType.Label; data : BoardLabelData } |
     { type : BoardActionType.Color; data : BoardStyleData } |
-    { type : BoardActionType.Weight; data : BoardStyleData }
+    { type : BoardActionType.Weight; data : BoardStyleData } |
+    { type : BoardActionType.Text; data : BoardTextData }
 );
 
 export interface BoardEvent {

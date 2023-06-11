@@ -24,6 +24,8 @@ import logger from "../../utils/system/logger";
 import { User } from "../../../common/models/user";
 import { BoardAccess, BoardAccessType } from "../../../common/models/board";
 import { user } from "../../utils/system/auth";
+import Text from "../data/items/text";
+import { TextAlignment, TextState } from "../../utils/system/text";
 
 interface BoardState {
     id : string;
@@ -198,6 +200,23 @@ export class Board extends Service<BoardState> {
         },
     );
 
+    public readonly setTextAction = createAction(
+        (data : { item : Text; oldState : TextState; newState : TextState }, execute ?: boolean) => {
+            if (execute)
+                this.setText(data.item, data.newState.text, data.newState.alignment, data.newState.fontSize);
+            network.setBoardItemText(data.item.id, data.newState.text, data.newState.alignment, data.newState.fontSize);
+            selection.refresh();
+            this.queueSave();
+        },
+        (data : { item : Text; oldState : TextState; newState : TextState }, execute ?: boolean) => {
+            if (execute)
+                this.setText(data.item, data.oldState.text, data.oldState.alignment, data.oldState.fontSize);
+            network.setBoardItemText(data.item.id, data.oldState.text, data.oldState.alignment, data.oldState.fontSize);
+            selection.refresh();
+            this.queueSave();
+        },
+    );
+
     public readonly onBoardReadyToSave = createDelegate();
 
     private saveTimer : number | null = null;
@@ -266,7 +285,7 @@ export class Board extends Service<BoardState> {
     }
 
     canModify() : boolean {
-        return (user()?.id === this.state.author.id || this.state.accesses.some((access) => access.type >= BoardAccessType.Editor && user()?.id === access.user.id));
+        return (user()?.id === this.state.author.id || this.state.isPublic || this.state.accesses.some((access) => access.type >= BoardAccessType.Editor && user()?.id === access.user.id));
     }
 
     canSave() : boolean {
@@ -305,6 +324,9 @@ export class Board extends Service<BoardState> {
     async addFromObject(items : BoardItem[], sameId = false) : Promise<void> {
         const promises = Array.from(items).map(async (item) : Promise<(BoardItem | null)> => {
             let created : BoardItem | null = null;
+            if (this.items.has(item.id))
+                return null;
+
             if (item.type === BoardItemType.Path) {
                 created = new Path((item as Path).points.map((point) => new Point(point.x, point.y)), (item as Path).color, (item as Path).weight);
                 created.rect = new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y));
@@ -315,6 +337,8 @@ export class Board extends Service<BoardState> {
             } else if (item.type === BoardItemType.Image) {
                 const imageData = await loadImage((item as Image).src);
                 created = new Image(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), imageData);
+            } else if (item.type === BoardItemType.Text) {
+                created = new Text(new Rect(item.rect.x, item.rect.y, Math.abs(item.rect.x2 - item.rect.x), Math.abs(item.rect.y2 - item.rect.y)), (item as Text).fontSize, (item as Text).color, (item as Text).text, (item as Text).alignment);
             }
 
             if (created && sameId)
@@ -323,7 +347,7 @@ export class Board extends Service<BoardState> {
             return created;
         });
 
-        const itemsToAdd = await (await Promise.all(promises)).filter((item) => item !== null) as BoardItem[];
+        const itemsToAdd = (await Promise.all(promises)).filter((item) => item !== null) as BoardItem[];
 
         this.add(itemsToAdd);
     }
@@ -345,10 +369,12 @@ export class Board extends Service<BoardState> {
 
         this.removeFromChunk(items);
         for (const item of items) {
+            const oldRect = new Rect(item.rect.x, item.rect.y, item.rect.w, item.rect.h);
             item.rect.x += dx;
             item.rect.x2 += dx;
             item.rect.y += dy;
             item.rect.y2 += dy;
+            item.onMoved(oldRect);
         }
         this.addToChunk(items);
     }
@@ -359,10 +385,12 @@ export class Board extends Service<BoardState> {
         this.removeFromChunk(items);
         const bb = this.getItemsBoundingBox(items);
         for (const item of items) {
+            const oldRect = new Rect(item.rect.x, item.rect.y, item.rect.w, item.rect.h);
             item.rect.x = rect.x + ((item.rect.x - bb.x) / bb.w) * rect.w;
             item.rect.y = rect.y + ((item.rect.y - bb.y) / bb.h) * rect.h;
             item.rect.x2 = rect.x + ((item.rect.x2 - bb.x) / bb.w) * rect.w;
             item.rect.y2 = rect.y + ((item.rect.y2 - bb.y) / bb.h) * rect.h;
+            item.onResized(oldRect);
         }
         this.addToChunk(items);
     }
@@ -405,6 +433,17 @@ export class Board extends Service<BoardState> {
         this.updateItems(items.filter((item) => item instanceof BoardShapeItem));
     }
 
+    setText(item : BoardItem, text : string, alignment : TextAlignment, fontSize : number) : void {
+        if (!(item instanceof Text))
+            return;
+        this.removeFromChunk([item]);
+        item.text = text;
+        item.alignment = alignment;
+        item.fontSize = fontSize;
+        item.calculateRect();
+        this.addToChunk([item]);
+    }
+
     rebuild() : void {
         for (const chunk of this.chunks.values()) {
             chunk.resetGraphics();
@@ -418,7 +457,7 @@ export class Board extends Service<BoardState> {
             builder.cancel();
 
         this.state.temporaryScale = viewport.state.scale / this.state.lastBuildScale;
-        builder.queueBuild(Array.from(this.items.values()));
+        builder.queueBuild(Array.from(this.getAllItemsFromChucks()));
     }
 
     getItemsWithinRect(rect : Rect) : BoardItem[] {
@@ -476,6 +515,13 @@ export class Board extends Service<BoardState> {
                     const src = buffer.readString();
                     const image = await loadImage(src);
                     item = new Image(rect, image);
+                } else if (type === BoardItemType.Text) {
+                    const color = buffer.readUInt();
+                    buffer.readByte();
+                    const fontSize = buffer.readFloat();
+                    const alignment = buffer.readByte();
+                    const text = buffer.readString();
+                    item = new Text(rect, fontSize, color, text, alignment);
                 } else {
                     continue;
                 }
@@ -542,6 +588,14 @@ export class Board extends Service<BoardState> {
                 items.push(item);
         }
 
+        return items;
+    }
+
+    getAllItemsFromChucks() : BoardItem[] {
+        const items : BoardItem[] = [];
+
+        for (const chunk of this.chunks.values())
+            items.push(...chunk.qt.getAll());
         return items;
     }
 

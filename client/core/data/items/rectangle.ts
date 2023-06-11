@@ -10,7 +10,7 @@ export default class Rectangle extends BoardShapeItem {
         super(BoardItemType.Rectangle, color, weight);
     }
 
-    render(graphics : Graphics, isTemporary : boolean) : void {
+    async render(graphics : Graphics, isTemporary : boolean) : Promise<void> {
         graphics.rect(this.rect, this.color, this.weight, this.filled);
     }
 

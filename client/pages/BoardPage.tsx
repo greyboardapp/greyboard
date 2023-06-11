@@ -49,6 +49,7 @@ import { clearToasts, showToast } from "../components/feedback/Toast";
 import { getText, formattedRelativeDateTime } from "../utils/system/intl";
 import { getMidnightAfterDays } from "../utils/datatypes/date";
 import { createWindowListener } from "../utils/dom/hooks";
+import TextToolEditor from "../components/app/TextToolEditor";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -256,6 +257,7 @@ const BoardPage : Component = () => {
             <ApiSuspense query={boardDataQuery}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
+                    <TextToolEditor />
                     <div class="flex h h-spaced v-center">
                         <Toolbar class={styles.interactable} variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>

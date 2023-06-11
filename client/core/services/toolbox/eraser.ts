@@ -68,7 +68,7 @@ export class EraserTool extends ModifierTool {
         this.itemsToDelete.clear();
     }
 
-    onRender(graphics : Graphics, dt : number) : void {
+    async onRender(graphics : Graphics, dt : number) : Promise<void> {
         if (!this.actionStarted)
             return;
 

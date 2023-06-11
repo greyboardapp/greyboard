@@ -10,6 +10,7 @@ export enum BoardItemType {
     Rectangle,
     Ellipse,
     Image,
+    Text,
 }
 
 export abstract class BoardItem {
@@ -32,7 +33,11 @@ export abstract class BoardItem {
         return buffer;
     }
 
-    abstract render(graphics : Graphics, isTemporary : boolean) : void;
+    onManipulating() : void {}
+    onResized(oldRect : Rect) : void {}
+    onMoved(oldRect : Rect) : void {}
+
+    abstract render(graphics : Graphics, isTemporary : boolean) : Promise<void>;
     abstract isInLine(a : Point, b : Point) : boolean;
     abstract isInRect(rect : Rect) : boolean;
 }

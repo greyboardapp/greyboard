@@ -23,5 +23,5 @@ export abstract class RendererLayer {
 
     stop() : void {}
 
-    abstract onRender(dt : number) : void;
+    abstract onRender(dt : number) : Promise<void>;
 }
