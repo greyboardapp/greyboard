@@ -133,9 +133,9 @@ const SharePanelContent : Component<SharePanelContentProps> = (props) => {
                             </div>
                             <div class="flex h v-center">
                                 <Show when={hasRightsToModify()} fallback={<Text content={BoardAccessTypes[access.type]} faded />}>
-                                    <Select model={[() => access.type, change((v) => { access.type = v; })]} options={BoardAccessTypes.map((item, i) => ({
+                                    <Select model={[() => access.type, change((v) => { access.type = v; })]} options={BoardAccessTypes.map((item, accessIndex) => ({
                                         content: <Text content={item} />,
-                                        value: i,
+                                        value: accessIndex,
                                     }))} />
                                     <IconButton icon={DeleteIcon} variant="tertiary" size="s" marginLeft={2} onClick={() => { accessList.splice(i(), 1); setUnsavedChanges(true); }} />
                                 </Show>
