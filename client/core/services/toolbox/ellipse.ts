@@ -31,12 +31,14 @@ export class EllipseTool extends CreatorTool<Ellipse> {
     }
 
     onActionMove(data : PointerEventData) : void {
+        if (!this.item)
+            return;
         this.item.rect.x2 = data.positions[0].x;
         this.item.rect.y2 = data.positions[0].y;
     }
 
     onActionEnd(data : PointerEventData) : void {
-        if (this.item.rect.area < 1)
+        if (!this.item || this.item.rect.area < 1)
             return;
 
         this.onActionMove(data);
@@ -44,6 +46,8 @@ export class EllipseTool extends CreatorTool<Ellipse> {
     }
 
     create() : void {
+        if (!this.item)
+            return;
         this.item.rect.normalize();
         const { max } = this.item.rect;
         this.item.rect.min = viewport.screenToViewport(this.item.rect.min);

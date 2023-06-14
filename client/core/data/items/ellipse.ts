@@ -10,7 +10,7 @@ export default class Ellipse extends BoardShapeItem {
         super(BoardItemType.Ellipse, color, weight);
     }
 
-    async render(graphics : Graphics, isTemporary : boolean) : Promise<void> {
+    render(graphics : Graphics, isTemporary : boolean) : void {
         graphics.ellipse(this.rect, this.color, this.weight, this.filled);
     }
 

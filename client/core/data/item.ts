@@ -37,7 +37,7 @@ export abstract class BoardItem {
     onResized(oldRect : Rect) : void {}
     onMoved(oldRect : Rect) : void {}
 
-    abstract render(graphics : Graphics, isTemporary : boolean) : Promise<void>;
+    abstract render(graphics : Graphics, isTemporary : boolean) : void;
     abstract isInLine(a : Point, b : Point) : boolean;
     abstract isInRect(rect : Rect) : boolean;
 }

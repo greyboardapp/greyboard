@@ -5,7 +5,7 @@ import { toolbox } from "../../toolbox";
 import { viewport } from "../../viewport";
 
 export class DynamicLayer extends RendererLayer {
-    async onRender(dt : number) : Promise<void> {
+    onRender(dt : number) : void {
         this.graphics.clear();
         for (const id of selection.state.ids) {
             const item = board.items.get(id);
@@ -18,6 +18,6 @@ export class DynamicLayer extends RendererLayer {
         const tool = toolbox.state.selectedTool;
         if (!tool)
             return;
-        await tool.onRender(this.graphics, dt);
+        tool.onRender(this.graphics, dt);
     }
 }

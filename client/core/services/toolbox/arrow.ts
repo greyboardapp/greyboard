@@ -38,7 +38,7 @@ export class ArrowTool extends CreatorTool<Path> {
     }
 
     onActionMove(data : PointerEventData) : void {
-        if (this.item.points.length < 5)
+        if (!this.item || this.item.points.length < 5)
             return;
         [this.item.points[1]] = [this.item.points[4]] = data.positions;
 
@@ -55,6 +55,8 @@ export class ArrowTool extends CreatorTool<Path> {
     }
 
     create() : void {
+        if (!this.item)
+            return;
         this.item.process();
         this.item.weight = toolbox.state.selectedWeight;
         super.create();

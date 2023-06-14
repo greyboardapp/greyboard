@@ -4,7 +4,6 @@ import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 import { toDataUrl } from "../../../utils/system/image";
 import { TextAlignment } from "../../../utils/system/text";
-import { caveat } from "../../../utils/system/fonts";
 
 export default class Graphics {
     private static readonly backgroundColor = "#222222";
@@ -143,9 +142,9 @@ export default class Graphics {
         return image?.toString() ?? null;
     }
 
-    async text(rect : Rect, text : string, color : number, weight : number, size : number, alignment : TextAlignment) : Promise<void> {
-        const font = `${weight * 100} ${size}px ${caveat.family}`;
-        await document.fonts.load(font);
+    text(rect : Rect, text : string, color : number, weight : number, size : number, alignment : TextAlignment) : void {
+        const font = `${weight * 100} ${size}px Caveat`;
+
         const lines = text.split("\n");
         this.ctx.font = font;
         this.ctx.textAlign = "left";

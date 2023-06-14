@@ -5,7 +5,12 @@ import "./utils/datatypes/array";
 import "./utils/datatypes/map";
 
 import App from "./App";
+import { loadFonts } from "./utils/system/fonts";
 
-const root = document.getElementById("root");
-if (root)
-    render(() => <App />, root);
+(async () => {
+    await loadFonts();
+
+    const root = document.getElementById("root");
+    if (root)
+        render(() => <App />, root);
+})();

@@ -1,1 +1,7 @@
-export const caveat = new FontFace("Caveat", "url(https://fonts.gstatic.com/s/caveat/v17/Wnz6HAc5bAfYB2Q7azYYmg8.woff2)");
+import Caveat from "../../assets/fonts/Caveat-Regular.ttf?url";
+
+export const caveat = new FontFace("Caveat", `url(${Caveat})`);
+
+export async function loadFonts() : Promise<void> {
+    await document.fonts.load(`16px ${caveat.family}`);
+}

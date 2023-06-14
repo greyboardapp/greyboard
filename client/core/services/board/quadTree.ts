@@ -8,24 +8,27 @@ export class QuadTree {
     public static readonly maxCapacity = 10;
     public static readonly maxDepth = 10;
 
-    public items = new Set<BoardItem>();
+    public items = new Map<number, BoardItem>();
     public children : QuadTreeSubdivisions = [];
 
     constructor(public boundary : Rect, private readonly depth = 0) {}
 
-    insert(item : BoardItem) : void {
+    insert(item : BoardItem) : boolean {
         const bb = viewport.viewportToBoardRect(item.rect);
         if (!bb.intersects(this.boundary))
-            return;
+            return false;
 
         if (this.items.size < QuadTree.maxCapacity || this.depth >= QuadTree.maxDepth) {
-            this.items.add(item);
-        } else {
-            if (this.children.length === 0)
-                this.subdivide();
-            for (const child of this.children)
-                child.insert(item);
+            if (this.items.has(item.id))
+                return false;
+            this.items.set(item.id, item);
+            return true;
         }
+
+        if (this.children.length === 0)
+            this.subdivide();
+
+        return this.children.map((child) => child.insert(item)).some((inserted) => inserted);
     }
 
     delete(item : BoardItem) : void {
@@ -33,11 +36,8 @@ export class QuadTree {
         if (!bb.intersects(this.boundary))
             return;
 
-        for (const i of this.items)
-            if (item === i) {
-                this.items.delete(i);
-                return;
-            }
+        if (this.items.delete(item.id))
+            return;
 
         for (const child of this.children)
             child.delete(item);
@@ -59,7 +59,7 @@ export class QuadTree {
         for (const child of this.children)
             child.get(region, result);
 
-        for (const item of this.items) {
+        for (const item of this.items.values()) {
             const bb = viewport.viewportToBoardRect(item.rect);
             if (bb.intersects(region))
                 result.add(item);
@@ -75,7 +75,7 @@ export class QuadTree {
         for (const child of this.children)
             child.getAll(result);
 
-        for (const item of this.items)
+        for (const item of this.items.values())
             result.add(item);
 
         return result;
@@ -90,7 +90,7 @@ export class QuadTree {
         ];
 
         for (const child of this.children)
-            for (const item of this.items)
+            for (const item of this.items.values())
                 child.insert(item);
 
         this.items.clear();

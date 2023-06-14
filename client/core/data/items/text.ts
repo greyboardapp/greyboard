@@ -42,8 +42,8 @@ export default class Text extends BoardShapeItem {
         this.calculateFontSize();
     }
 
-    async render(graphics : Graphics, isTemporary : boolean) : Promise<void> {
-        await graphics.text(this.rect, this.text, this.color, this.weight, this.fontSize, this.alignment);
+    render(graphics : Graphics, isTemporary : boolean) : void {
+        graphics.text(this.rect, this.text, this.color, this.weight, this.fontSize, this.alignment);
     }
 
     isInLine(a : Point, b : Point) : boolean {

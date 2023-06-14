@@ -34,6 +34,8 @@ import Panel from "../surfaces/Panel";
 import { ColorPickerPanelContent } from "./panels/ColorpickerPanel";
 import { ManipulationMode, ManipulationTool } from "../../core/services/toolbox/tool";
 import { board } from "../../core/services/board";
+import { Shortcut as ShortcutType } from "../../core/services/commands";
+import { KeyModifiers } from "../../core/services/input";
 
 interface SelectionBoundingBox {
     x : number;
@@ -145,7 +147,7 @@ const SelectionBox : Component = () => {
                                         <ToolbarButton icon={sendBackwardIcon} onClick={selection.sendBackward} />
                                     </Tooltip>
                                 </Show>
-                                <Tooltip content={<><Text content="actions.copy" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.undo.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                <Tooltip content={<><Text content="actions.copy" size="s" uppercase bold as="span" /> <Shortcut shortcut={new ShortcutType("c", KeyModifiers.Control)} /></>} orientation="vertical" variant="panel" offset={5}>
                                     <ToolbarButton icon={copyIcon} onClick={selection.copyToClipboard} />
                                 </Tooltip>
                                 <Show

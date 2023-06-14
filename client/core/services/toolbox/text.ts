@@ -62,10 +62,13 @@ export class TextTool extends CreatorTool<Text> {
     }
 
     onDeselected() : void {
-        this.finalize(this.item.text, this.item.alignment, this.item.fontSize);
+        if (this.item)
+            this.finalize(this.item.text, this.item.alignment, this.item.fontSize);
     }
 
     finalize(text : string, alignment : TextAlignment, fontSize : number) : void {
+        if (!this.item)
+            return;
         if (this.originalText !== text || this.originalAlignment !== alignment || this.originalFontSize !== fontSize)
             board.setTextAction({
                 item: this.item,
@@ -80,15 +83,19 @@ export class TextTool extends CreatorTool<Text> {
                     fontSize,
                 },
             });
+        else if (text.trim().length > 0)
+            board.addToChunk([this.item]);
+
         if (text.trim().length === 0)
             board.remove([this.item]);
-        else
-            board.addToChunk(selection.state.items());
 
         selection.clear();
+        this.item = null;
     }
 
     create() : void {
+        if (!this.item)
+            return;
         this.item.rect.normalize();
         const { max } = this.item.rect;
         this.item.rect.min = viewport.screenToViewport(this.item.rect.min);

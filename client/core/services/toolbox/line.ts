@@ -30,7 +30,7 @@ export class LineTool extends CreatorTool<Path> {
     }
 
     onActionMove(data : PointerEventData) : void {
-        if (this.item.points.length < 2)
+        if (!this.item || this.item.points.length < 2)
             return;
         [this.item.points[1]] = data.positions;
     }
@@ -41,6 +41,8 @@ export class LineTool extends CreatorTool<Path> {
     }
 
     create() : void {
+        if (!this.item)
+            return;
         this.item.process();
         this.item.weight = toolbox.state.selectedWeight;
         super.create();

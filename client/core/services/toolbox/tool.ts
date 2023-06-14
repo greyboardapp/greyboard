@@ -57,26 +57,27 @@ export class Tool implements ToolDescription {
     onActionMove(data : PointerEventData) : void {}
     onActionEnd(data : PointerEventData) : void {}
 
-    async onRender(graphics : Graphics, dt : number) : Promise<void> {}
+    onRender(graphics : Graphics, dt : number) : void {}
 }
 
 export abstract class ModifierTool extends Tool {}
 
 export abstract class CreatorTool<T extends BoardItem> extends ModifierTool {
-    protected item! : T;
+    protected item : T | null = null;
 
     constructor(description : ToolDescription) {
         super(description);
     }
 
     create() : void {
-        board.addAction([this.item]);
+        if (this.item)
+            board.addAction([this.item]);
     }
 
-    async onRender(graphics : Graphics, dt : number) : Promise<void> {
+    onRender(graphics : Graphics, dt : number) : void {
         if (this.actionStarted)
             if (this.item)
-                await this.item.render(graphics, true);
+                this.item.render(graphics, true);
     }
 
     abstract new() : T;
@@ -270,14 +271,14 @@ export abstract class ManipulationTool extends ModifierTool {
         board.addToChunk(selection.state.items());
     }
 
-    async onRender(graphics : Graphics, dt : number) : Promise<void> {
+    onRender(graphics : Graphics, dt : number) : void {
         if (!this.actionStarted)
             return;
 
         if (this.mode === ManipulationMode.Select)
-            await this.onSelectRender(graphics, dt);
+            this.onSelectRender(graphics, dt);
         else
-            await this.onMoveRender(graphics, dt);
+            this.onMoveRender(graphics, dt);
     }
 
     private getMouseDragOrientation(dx : number, dy : number) : Orientation {
@@ -286,6 +287,6 @@ export abstract class ManipulationTool extends ModifierTool {
 
     abstract getSelectedItems() : void;
 
-    abstract onSelectRender(graphics : Graphics, dt : number) : Promise<void>;
-    abstract onMoveRender(graphics : Graphics, dt : number) : Promise<void>;
+    abstract onSelectRender(graphics : Graphics, dt : number) : void;
+    abstract onMoveRender(graphics : Graphics, dt : number) : void;
 }

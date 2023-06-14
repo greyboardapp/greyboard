@@ -26,15 +26,15 @@ export class BoxSelectTool extends ManipulationTool {
             selection.state.ids = ids;
     }
 
-    async onSelectRender(graphics : Graphics, dt : number) : Promise<void> {
+    onSelectRender(graphics : Graphics, dt : number) : void {
         graphics.rect(Rect.fromTwoPoints(this.start, this.end), 0xFFFFFF30, 0, true);
     }
 
-    async onMoveRender(graphics : Graphics, dt : number) : Promise<void> {
+    onMoveRender(graphics : Graphics, dt : number) : void {
         graphics.origin(-viewport.state.offsetX, -viewport.state.offsetY);
         graphics.zoom(viewport.state.scale);
         for (const item of selection.state.items())
-            await item.render(graphics, false);
+            item.render(graphics, false);
         graphics.reset();
     }
 }

@@ -13,7 +13,7 @@ export default class Image extends BoardItem {
         this.src = img.src;
     }
 
-    async render(graphics : Graphics, isTemporary : boolean) : Promise<void> {
+    render(graphics : Graphics, isTemporary : boolean) : void {
         graphics.image(this.rect, this.img);
     }
 

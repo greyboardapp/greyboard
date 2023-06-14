@@ -30,7 +30,7 @@ export default class Path extends BoardShapeItem {
         this.normalize();
     }
 
-    async render(graphics : Graphics, isTemporary : boolean) : Promise<void> {
+    render(graphics : Graphics, isTemporary : boolean) : void {
         if (this.points.length === 1) {
             const r = (this.points[0].pressure || 1) * this.weight;
             graphics.ellipse(new Rect(this.rect.x + this.points[0].x - r, this.rect.y + this.points[0].y - r, r * 2, r * 2), this.color, this.weight, true);
