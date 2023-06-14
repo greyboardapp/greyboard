@@ -74,7 +74,7 @@ jobs:
         run: pip install robotframework robotframework-selenium2library webdrivermanager selenium==4.9.0
 
       - name: Install WebDrivers
-        run: webdrivermanager firefox chrome --linkpath /usr/local/bin
+        run: webdrivermanager chrome --linkpath /usr/local/bin
 
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
@@ -100,7 +100,7 @@ jobs:
         id: test
         uses: ./.github/actions/test-robot
         with:
-          browser: headlessfirefox
+          browser: ${{ github.event.inputs.testOn }}
           token: ${{ secrets.RFW_TOKEN }}
           username: ${{ secrets.RFW_USERNAME }}
           password: ${{ secrets.RFW_PASSWORD }}
