@@ -1,4 +1,4 @@
-import { Tool } from "./tool";
+import { ModifierTool, Tool } from "./tool";
 
 import eraserIcon from "../../../assets/icons/eraser.svg";
 import { PointerEventData } from "../input";
@@ -10,7 +10,7 @@ import { viewport } from "../viewport";
 import { Shortcut } from "../commands";
 import Color from "../../../utils/datatypes/color";
 
-export class EraserTool extends Tool {
+export class EraserTool extends ModifierTool {
     private pointerPosition = new Point();
     private readonly tail : Point[] = [];
     private readonly itemsToDelete : BoardItem[] = [];

@@ -3,24 +3,75 @@
 .container {
     width: 100vw;
     min-height: 100vh;
+    padding: 0 20px;
 
     @include themed() {
         background-color: color($bg);
+        color: color($fg);
     }
 }
 
-.content {
+.landing {
     position: relative;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    padding: 250px 0;
+    margin: 0 auto;
 
-    @include themed() {
-        color: color($panelText);
-        background-color: color($panelBg);
+    .landingHint {
+        margin-top: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        svg {
+            width: 20px;
+            height: 20px;
+            margin-top: 20px;
+            animation: carret-up-down 2s ease-in-out infinite;
+        }
     }
+}
+
+.videoCard {
+    display: flex;
+    flex-direction: column;
+
+    .video {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 960px;
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 20px;
+
+        @include themed() {
+            background-color: color($panelBg);
+            box-shadow: 0 10px 30px color($shadow);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 10px;
+        }
+    }
+
+    &:nth-child(even) {
+        align-items: flex-end;
+    }
+}
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 50px 0 150px;
 }
 
 .providerList {
@@ -36,14 +87,22 @@
     }
 }
 
-.wave {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 100%;
-    height: 100vh;
+@keyframes carret-up-down {
+    0% {
+        opacity: 0;
+        transform: translateY(0);
+    }
 
-    @include themed() {
-        color: color($panelBg);
+    25% {
+        opacity: 1;
+    }
+
+    75% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 0;
     }
 }

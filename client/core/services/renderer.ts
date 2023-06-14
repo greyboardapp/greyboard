@@ -34,10 +34,14 @@ class Renderer extends Service {
         this.layerStack.push(new ctor());
     }
 
-    private render(t : number) : void {
+    getLayer<T extends RendererLayer>(toolType : new (...args : any[]) => T) : T | null {
+        return (this.layerStack.find((tool) => tool instanceof toolType) as T) ?? null;
+    }
+
+    private async render(t : number) : Promise<void> {
         const dt = (t - this.prevT) * 0.001;
         for (const layer of this.layerStack)
-            layer.onRender(dt);
+            await layer.onRender(dt);
 
         tweenjs.update(t);
         this.onFrameUpdate(dt);
@@ -45,7 +49,7 @@ class Renderer extends Service {
         this.prevT = t;
 
         if (this.enabled)
-            window.requestAnimationFrame((t2) => this.render(t2));
+            window.requestAnimationFrame(async (t2) => this.render(t2));
     }
 }
 

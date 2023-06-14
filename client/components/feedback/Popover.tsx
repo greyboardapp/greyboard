@@ -30,10 +30,14 @@ interface PopoverProps extends GenericProps<HTMLDivElement>, VariantProps<typeof
 
 const Popover : Component<PopoverProps> = (props) => {
     let root! : HTMLDivElement;
+    let content : HTMLDivElement | undefined;
 
     const [open, setOpen] = createSignal(false);
     createDocumentListener("click", (e) => {
-        if (!open() || root.contains(e?.target as Node))
+        if (!(e instanceof MouseEvent) || !content)
+            return;
+        const rect = content.getBoundingClientRect();
+        if (!open() || root.contains(e?.target as Node) || (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom))
             return;
         e?.preventDefault();
         setOpen(false);
@@ -52,6 +56,7 @@ const Popover : Component<PopoverProps> = (props) => {
             <Presence>
                 <Show when={open()}>
                     <Motion.div
+                        ref={content}
                         class={styles.popoverContent}
                         initial={{ scale: 0.75, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: quickEaseInTransition }}

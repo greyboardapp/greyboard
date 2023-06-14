@@ -10,6 +10,7 @@ interface ToolbarInputProps {
     placeholder ?: string;
     onChange ?: (e : Event, newValue : string, oldValue : string) => undefined | boolean | Promise<undefined | boolean>;
     class ?: string;
+    disabled ?: boolean;
 }
 
 const ToolbarInput : Component<ToolbarInputProps> = (props) => {
@@ -26,6 +27,8 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
         <div
             class={cls(styles.toolbarInput, props.class)}
             onClick={() => {
+                if (props.disabled)
+                    return;
                 setFocused(true);
                 if (input)
                     input.focus();
@@ -37,6 +40,7 @@ const ToolbarInput : Component<ToolbarInputProps> = (props) => {
                     type="text"
                     value={props.model[0]()}
                     placeholder={getText(props.placeholder)}
+                    disabled={props.disabled}
                     onInput={(e) => { props.model[1]((e.target as HTMLInputElement).value); }}
                     onKeyUp={(e) => {
                         if (e.key === "Enter")

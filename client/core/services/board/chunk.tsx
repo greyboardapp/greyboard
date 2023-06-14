@@ -45,8 +45,8 @@ export class Chunk {
     }
 
     insert(item : BoardItem) : void {
-        this.qt.insert(item);
-        item.render(this.graphics, false);
+        if (this.qt.insert(item))
+            item.render(this.graphics, false);
     }
 
     deleteMany(items : Iterable<BoardItem>) : void {
@@ -62,7 +62,12 @@ export class Chunk {
     updateRegion(rect : Rect) : void {
         rect.inflate(45);
 
-        this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, () => {
+        rect.x = Math.floor(rect.x);
+        rect.y = Math.floor(rect.y);
+        rect.x2 = Math.ceil(rect.x2);
+        rect.y2 = Math.ceil(rect.y2);
+
+        this.graphics.scissor(rect.x, rect.y, rect.w, rect.h, async () => {
             const items = Array.from(this.qt.get(viewport.viewportToBoardRect(rect))).sort((a, b) => a.zIndex - b.zIndex);
             for (const item of items)
                 item.render(this.graphics, false);

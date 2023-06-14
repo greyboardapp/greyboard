@@ -1,23 +1,22 @@
 import { Component, createMemo } from "solid-js";
 import { board } from "../../../core/services/board";
 import { viewport } from "../../../core/services/viewport";
-import Button from "../../controls/Button";
 import { List, ListItem } from "../../data/List";
 import Panel from "../../surfaces/Panel";
 import Text from "../../typography/Text";
+import styles from "./LabelPanel.module.scss";
+import { cls } from "../../../utils/dom/dom";
 
 const LabelPanelContent : Component = () => {
     const itemWithLabels = createMemo(() => Array.from(board.items.values()).filter((item) => !!item.label));
 
     return (
-        <div style={{
-            width: "250px",
-        }}>
+        <div class={styles.labelPanel}>
             <List each={itemWithLabels()} fallback={<Text content="texts.noLabels" />} flush>
                 {(item) => (
-                    <ListItem>
+                    <ListItem onClick={() => viewport.centerOnPoint(viewport.viewportToBoardRect(item.rect).center)} class={cls(styles.label, "flex h h-spaced v-center")}>
                         <Text content={item.label ?? "texts.unknown"} />
-                        <Button content="actions.jump" size="xs" onClick={() => viewport.centerOnPoint(viewport.viewportToBoardRect(item.rect).center)} />
+                        <Text class={styles.jump} content="actions.jump" size="s" uppercase bold faded />
                     </ListItem>
                 )}
             </List>

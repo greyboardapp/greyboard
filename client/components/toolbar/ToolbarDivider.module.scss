@@ -1,12 +1,20 @@
 @import "../../global";
 
 .toolbarDivider {
-    height: 2px;
-    width: 16px;
     border-radius: 2px;
-    margin-left: 12px;
 
     @include themed() {
-        background-color: color($shadow);
+        background-color: color($opaque);
+    }
+
+    &.horizontal {
+        height: 2px;
+        width: 16px;
+        margin-left: 12px;
+    }
+
+    &.vertical {
+        height: 16px;
+        width: 2px;
     }
 }

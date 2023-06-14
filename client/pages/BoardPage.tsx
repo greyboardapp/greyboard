@@ -44,11 +44,12 @@ import { showModal } from "../components/surfaces/Modal";
 import { network } from "../core/services/network";
 import ClientList from "../components/app/ClientAvatars";
 import { user } from "../utils/system/auth";
-import { BoardUpdateData, BoardUpdateSchema } from "../../common/models/board";
+import { BoardAccessTypes, BoardUpdateData, BoardUpdateSchema } from "../../common/models/board";
 import { clearToasts, showToast } from "../components/feedback/Toast";
 import { getText, formattedRelativeDateTime } from "../utils/system/intl";
 import { getMidnightAfterDays } from "../utils/datatypes/date";
 import { createWindowListener } from "../utils/dom/hooks";
+import TextToolEditor from "../components/app/TextToolEditor";
 
 interface BoardPageParams extends Params {
     slug : string;
@@ -88,13 +89,13 @@ const BoardPage : Component = () => {
                     navigate(user() === null ? "/" : "/dashboard");
                 } else {
                     board.loadFromBoardData(data.result);
-                    if (data.result.isPublic)
+                    if (data.result.isPublic || data.result.accesses.length > 0)
                         network.connect(data.result.slug, data.result.region);
 
-                    if (data.result.author === user()?.id)
+                    if (data.result.author.id === user()?.id)
                         board.state.isSavingEnabled = true;
 
-                    if (data.result.author === user()?.id && data.result.isDeleted)
+                    if (data.result.author.id === user()?.id && data.result.isDeleted)
                         showModal({
                             title: "titles.boardDeleted",
                             content: <Text content="texts.deletedBoardRevert" />,
@@ -129,7 +130,7 @@ const BoardPage : Component = () => {
                 }
             });
 
-            if (!data.result?.isPublic)
+            if (!data.result?.isPublic && data.result?.accesses.length === 0)
                 hideLoadingOverlay();
         },
         onError: (err) => {
@@ -227,6 +228,9 @@ const BoardPage : Component = () => {
 
             board.loadContents(data.result);
         });
+        network.onClientAccessTypeChanged.add((oldAccessType, newAccessType) => showToast({
+            title: `${getText("texts.accessTypeChanged")} ${getText(BoardAccessTypes[newAccessType])?.toLowerCase()}`,
+        }));
 
         clearToasts();
     });
@@ -253,6 +257,7 @@ const BoardPage : Component = () => {
             <ApiSuspense query={boardDataQuery}>
                 {(data) => <div class={styles.ui}>
                     <SelectionBox />
+                    <TextToolEditor />
                     <div class="flex h h-spaced v-center">
                         <Toolbar class={styles.interactable} variant="top">
                             <Link href="/dashboard"><ToolbarButton icon={menuIcon} /></Link>
@@ -264,7 +269,7 @@ const BoardPage : Component = () => {
                                 }
                                 saveBoardDataMutation.mutate(parsed.data);
                                 return true;
-                            }} />
+                            }} disabled={!board.canModify()} />
                             <Tooltip content={<><Text content="actions.save" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.save.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                 <ToolbarButton icon={saveIcon} onClick={app.save} disabled={!app.save.when()} />
                             </Tooltip>

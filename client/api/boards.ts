@@ -20,11 +20,6 @@ export async function getBoardData(slug : string) : Promise<ApiResponse<BoardDat
         if (board.status !== 200 || board.error || !board.result)
             return { status: board.status, error: board.error };
 
-        const loggedInUser = user();
-
-        if (!board.result.isPublic && (!loggedInUser || board.result.author !== loggedInUser.id))
-            return { status: 403, error: "errors.unauthorized" };
-
         const contentResult = await fetch(`/api/boards/${board.result.id}/contents`, { credentials: "include" });
         if (contentResult.status !== 200)
             return { status: 500, error: "errors.boardDoesNotHaveContents" };

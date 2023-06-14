@@ -3,11 +3,12 @@ import Color from "../../../utils/datatypes/color";
 import Point from "../../data/geometry/point";
 import Rect from "../../data/geometry/rect";
 import { toDataUrl } from "../../../utils/system/image";
+import { TextAlignment } from "../../../utils/system/text";
 
 export default class Graphics {
     private static readonly backgroundColor = "#222222";
-
     private readonly ctx : CanvasRenderingContext2D;
+
     constructor(private readonly canvas : HTMLCanvasElement, private readonly alpha = false) {
         const ctx = canvas.getContext("2d", { alpha });
         if (!ctx)
@@ -139,5 +140,34 @@ export default class Graphics {
 
         const image = await toDataUrl(URL.createObjectURL(compressedBlob));
         return image?.toString() ?? null;
+    }
+
+    text(rect : Rect, text : string, color : number, weight : number, size : number, alignment : TextAlignment) : void {
+        const font = `${weight * 100} ${size}px Caveat`;
+
+        const lines = text.split("\n");
+        this.ctx.font = font;
+        this.ctx.textAlign = "left";
+        this.ctx.textBaseline = "top";
+
+        this.ctx.fillStyle = Color.UIntToHex(color);
+        for (let i = 0; i < lines.length; i++)
+            if (alignment === TextAlignment.Left) {
+                this.ctx.fillText(lines[i], rect.x + 10, rect.y + (size * i) + 10 + (size * 0.09), rect.w - 20);
+            } else {
+                const width = this.measureText(rect, lines[i], weight, size);
+                if (alignment === TextAlignment.Center)
+                    this.ctx.fillText(lines[i], (rect.x + (rect.w - 20 - width) / 2) + 10, rect.y + (size * i) + 10 + (size * 0.09), rect.w - 20);
+                else
+                    this.ctx.fillText(lines[i], (rect.x + (rect.w - 20 - width)) + 10, rect.y + (size * i) + 10 + (size * 0.09), rect.w - 20);
+            }
+    }
+
+    measureText(rect : Rect, text : string, weight : number, size : number) : number {
+        this.ctx.font = `${weight * 100} ${size}px Caveat`;
+        this.ctx.textAlign = "left";
+        this.ctx.textBaseline = "top";
+
+        return this.ctx.measureText(text).width;
     }
 }

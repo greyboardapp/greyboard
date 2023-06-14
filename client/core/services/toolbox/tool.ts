@@ -60,20 +60,24 @@ export class Tool implements ToolDescription {
     onRender(graphics : Graphics, dt : number) : void {}
 }
 
-export abstract class CreatorTool<T extends BoardItem> extends Tool {
-    protected item! : T;
+export abstract class ModifierTool extends Tool {}
+
+export abstract class CreatorTool<T extends BoardItem> extends ModifierTool {
+    protected item : T | null = null;
 
     constructor(description : ToolDescription) {
         super(description);
     }
 
     create() : void {
-        board.addAction([this.item]);
+        if (this.item)
+            board.addAction([this.item]);
     }
 
     onRender(graphics : Graphics, dt : number) : void {
         if (this.actionStarted)
-            this.item.render(graphics, true);
+            if (this.item)
+                this.item.render(graphics, true);
     }
 
     abstract new() : T;
@@ -100,7 +104,7 @@ export enum Orientation {
     Vertical,
 }
 
-export abstract class ManipulationTool extends Tool {
+export abstract class ManipulationTool extends ModifierTool {
     public mode = ManipulationMode.None;
     public resizeDirection = ResizeDirection.None;
     protected start = new Point();
@@ -230,6 +234,7 @@ export abstract class ManipulationTool extends Tool {
             item.rect.y = newBb.y + ((item.rect.y - oldBb.y) / oldBb.h) * newBb.h;
             item.rect.x2 = newBb.x + ((item.rect.x2 - oldBb.x) / oldBb.w) * newBb.w;
             item.rect.y2 = newBb.y + ((item.rect.y2 - oldBb.y) / oldBb.h) * newBb.h;
+            item.onManipulating();
         }
 
         selection.state.ids = selection.state.ids.copy();

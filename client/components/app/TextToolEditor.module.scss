@@ -1,0 +1,33 @@
+@import "../../global";
+
+.selectionBox {
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+
+    .toolbar {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        translate: -50% -100% !important;
+        margin-top: -10px;
+        pointer-events: all;
+    }
+}
+
+.textArea {
+    outline: 0;
+    background-color: transparent;
+    position: fixed;
+    pointer-events: all;
+    resize: none;
+    font-family: Caveat, cursive;
+    font-size: 16px;
+    line-height: 1em;
+    overflow: hidden;
+    white-space: pre;
+
+    @include themed() {
+        border: 1px solid color($primary);
+    }
+}

@@ -29,16 +29,22 @@ export class PencilTool extends CreatorTool<Path> {
     }
 
     onActionMove(data : PointerEventData) : void {
+        if (!this.item)
+            return;
         this.item.points.push(data.positions[0]);
     }
 
     onActionEnd(data : PointerEventData) : void {
+        if (!this.item)
+            return;
         this.item.points.push(data.positions[0]);
 
         this.create();
     }
 
     create() : void {
+        if (!this.item)
+            return;
         this.item.process();
         this.item.weight = toolbox.state.selectedWeight;
         super.create();

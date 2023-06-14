@@ -3,7 +3,7 @@
 /* eslint-disable solid/reactivity */
 
 import { Component, createEffect, createSignal, Show } from "solid-js";
-import { Motion, Presence } from "@motionone/solid";
+import { Motion } from "@motionone/solid";
 import tweenjs, { Tween } from "@tweenjs/tween.js";
 import { createMutable } from "solid-js/store";
 import { untrack } from "solid-js/web";
@@ -34,6 +34,8 @@ import Panel from "../surfaces/Panel";
 import { ColorPickerPanelContent } from "./panels/ColorpickerPanel";
 import { ManipulationMode, ManipulationTool } from "../../core/services/toolbox/tool";
 import { board } from "../../core/services/board";
+import { Shortcut as ShortcutType } from "../../core/services/commands";
+import { KeyModifiers } from "../../core/services/input";
 
 interface SelectionBoundingBox {
     x : number;
@@ -94,7 +96,7 @@ const SelectionBox : Component = () => {
     });
 
     return (
-        <Show when={selection.state.ids.length > 0}>
+        <Show when={selection.state.ids.length > 0 && toolbox.state.selectedTool && toolbox.state.selectedTool instanceof ManipulationTool}>
             <div
                 class={styles.selectionBox}
                 style={{
@@ -115,28 +117,28 @@ const SelectionBox : Component = () => {
                         animate={{ y: 0, opacity: 1, transition: quickEaseInTransition }}
                     >
                         <Panel size="s" class={styles.toolbar}>
-                            <Presence>
-                                <Show when={paletteOpen()}>
-                                    <Motion.div
-                                        class="px3"
-                                        initial={{ height: "0px", opacity: 0, paddingTop: "0px", overflow: "hidden" }}
-                                        animate={{ height: "215px", opacity: 1, paddingTop: "16px" }}
-                                        exit={{ height: "0px", opacity: 0, paddingTop: "0px" }}
-                                    >
-                                        <ColorPickerPanelContent
-                                            showColorPicker={false}
-                                            activeColor={selection.state.color()}
-                                            sliderModel={[selection.state.weight, (v) => selection.setWeight(v)]}
-                                            weightPicked={(newWeight, oldWeight) => board.setWeightAction({ items: selection.state.items(), newWeight, oldWeight }, false)}
-                                            colorPicked={(color) => selection.setColor(color)}
-                                        />
-                                    </Motion.div>
-                                </Show>
-                            </Presence>
-                            <Toolbar variant="transparent">
-                                <Show
-                                    when={!selection.state.hasAllItemsLocked()}
+                            <Show when={!selection.state.hasAllItemsLocked()}>
+                                <div
+                                    classList={{
+                                        [styles.colorPalette]: true,
+                                        [styles.colorPaletteOpen]: paletteOpen(),
+                                    }}
                                 >
+                                    <div>
+                                        <div style={{ "max-width": "278px" }}>
+                                            <ColorPickerPanelContent
+                                                showColorPicker={false}
+                                                activeColor={selection.state.color()}
+                                                sliderModel={[selection.state.weight, (v) => selection.setWeight(v)]}
+                                                weightPicked={(newWeight, oldWeight) => board.setWeightAction({ items: selection.state.items(), newWeight, oldWeight }, false)}
+                                                colorPicked={(color) => selection.setColor(color)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Show>
+                            <Toolbar variant="transparent">
+                                <Show when={!selection.state.hasAllItemsLocked()}>
                                     <ToolbarButton icon={paletteIcon} onClick={() => setPaletteOpen(!paletteOpen())} />
                                     <Tooltip content={<><Text content="actions.bringForward" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.bringForward.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                         <ToolbarButton icon={bringForwardIcon} onClick={selection.bringForward} />
@@ -145,7 +147,7 @@ const SelectionBox : Component = () => {
                                         <ToolbarButton icon={sendBackwardIcon} onClick={selection.sendBackward} />
                                     </Tooltip>
                                 </Show>
-                                <Tooltip content={<><Text content="actions.copy" size="s" uppercase bold as="span" /> <Shortcut shortcut={app.undo.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
+                                <Tooltip content={<><Text content="actions.copy" size="s" uppercase bold as="span" /> <Shortcut shortcut={new ShortcutType("c", KeyModifiers.Control)} /></>} orientation="vertical" variant="panel" offset={5}>
                                     <ToolbarButton icon={copyIcon} onClick={selection.copyToClipboard} />
                                 </Tooltip>
                                 <Show
@@ -178,15 +180,18 @@ const SelectionBox : Component = () => {
                                         <Tooltip content={<><Text content="actions.removeLabel" size="s" uppercase bold as="span" /> <Shortcut shortcut={selection.toggleLabel.shortcut} /></>} orientation="vertical" variant="panel" offset={5}>
                                             <ToolbarButton icon={labelIcon} onClick={selection.toggleLabel} />
                                         </Tooltip>
-                                        <ToolbarInput model={[
-                                            () => selection.state.label() ?? "",
-                                            (v) => selection.setLabel(v),
-                                        ]}
-                                        onChange={(e, newLabel, oldLabel) => {
-                                            selection.setLabel(newLabel);
-                                            board.setLabelAction({ items: selection.state.items(), newLabel, oldLabel }, false);
-                                        }}
-                                        placeholder="placeholder.typeSomething" />
+                                        <ToolbarInput
+                                            class={styles.input}
+                                            model={[
+                                                () => selection.state.label() ?? "",
+                                                (v) => selection.setLabel(v),
+                                            ]}
+                                            onChange={(e, newLabel, oldLabel) => {
+                                                selection.setLabel(newLabel);
+                                                board.setLabelAction({ items: selection.state.items(), newLabel, oldLabel }, false);
+                                                return true;
+                                            }}
+                                            placeholder="placeholder.typeSomething" />
                                     </Show>
                                 </Show>
                             </Toolbar>

@@ -1,7 +1,7 @@
 import imageCompression from "browser-image-compression";
 import Color from "../../utils/datatypes/color";
 import { batched, createService, detached, reactive, Service } from "../../utils/system/service";
-import { makeToolCategory, Tool, ToolHierarchy } from "./toolbox/tool";
+import { makeToolCategory, ModifierTool, Tool, ToolHierarchy } from "./toolbox/tool";
 import { input, KeyboardEventData, MouseButton, PointerEventData } from "./input";
 import { PencilTool } from "./toolbox/pencil";
 import { ViewTool } from "./toolbox/view";
@@ -21,6 +21,9 @@ import { loadImage, toDataUrl } from "../../utils/system/image";
 import Image from "../data/items/image";
 import { viewport } from "./viewport";
 import Rect from "../data/geometry/rect";
+import { LineTool } from "./toolbox/line";
+import { ArrowTool } from "./toolbox/arrow";
+import { TextTool } from "./toolbox/text";
 
 export interface ToolboxState {
     toolHierarchy : ToolHierarchy;
@@ -41,9 +44,7 @@ export class Toolbox extends Service<ToolboxState> {
     constructor() {
         super({
             toolHierarchy: [
-                makeToolCategory("Selections",
-                    new BoxSelectTool()),
-                // new PencilTool(),
+                new BoxSelectTool(),
                 makeToolCategory("Writing",
                     new PencilTool(),
                     new MarkerTool()),
@@ -53,7 +54,10 @@ export class Toolbox extends Service<ToolboxState> {
                     new FilledRectangleTool(),
                     new RectangleTool(),
                     new FilledEllipseTool(),
-                    new EllipseTool()),
+                    new EllipseTool(),
+                    new LineTool(),
+                    new ArrowTool()),
+                new TextTool(),
             ],
             colorPalette: [],
             selectedColorIndex: 0,
@@ -76,6 +80,10 @@ export class Toolbox extends Service<ToolboxState> {
         }
         if (!this.state.selectedTool?.name.match(/(select|view)/i))
             selection.state.ids = [];
+        if (this.state.selectedTool && this.state.selectedTool.category)
+            for (const entry of this.state.toolHierarchy)
+                if (!(entry instanceof Tool) && entry.name === this.state.selectedTool.category.name)
+                    entry.lastUsedTool = this.state.selectedTool;
         this.state.selectedTool?.onSelected(prev);
         return this.state.selectedTool;
     }
@@ -107,8 +115,8 @@ export class Toolbox extends Service<ToolboxState> {
         ];
     }
 
-    getTool<T extends Tool>(toolType : new (...args : any[]) => T) : Tool | null {
-        return this.tools.find((tool) => tool instanceof toolType) ?? null;
+    getTool<T extends Tool>(toolType : new (...args : any[]) => T) : T | null {
+        return (this.tools.find((tool) => tool instanceof toolType) as T) ?? null;
     }
 
     getToolByName(name : string) : Tool | null {
@@ -131,9 +139,9 @@ export class Toolbox extends Service<ToolboxState> {
 
     async pasteFromClipboard(data : DataTransfer) : Promise<void> {
         try {
-            if (data.items.length === 0)
+            if (data.items.length === 0 || !board.canModify())
                 return;
-            const [item] = data.items;
+            const item = data.items[0];
             if (item.type.startsWith("text")) {
                 const buffer = ByteBuffer.decode(data.getData("text"));
                 const items = await board.deserialize(buffer, false);
@@ -178,7 +186,7 @@ export class Toolbox extends Service<ToolboxState> {
             this.state.isToolInAction = true;
         }
 
-        if (this.state.selectedTool.onActionStart(data)) {
+        if ((!(this.state.selectedTool instanceof ModifierTool) || board.canModify()) && this.state.selectedTool.onActionStart(data)) {
             this.state.selectedTool.actionStarted = true;
             this.state.isToolInAction = true;
         }

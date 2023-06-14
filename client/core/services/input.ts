@@ -123,7 +123,7 @@ export class Input extends Service<InputState> {
     }
 
     processKeyDownEvent(e : KeyboardEvent) : void {
-        if ((e.target as HTMLElement).tagName === "INPUT")
+        if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA")
             return;
         const data = this.toKeyboardEventData(e);
         data.repeatCount = e.repeat ? (this.pressedKeyboardButtons.get(data.button) ?? 0) + 1 : 1;
@@ -135,7 +135,7 @@ export class Input extends Service<InputState> {
     }
 
     processKeyUpEvent(e : KeyboardEvent) : void {
-        if ((e.target as HTMLElement).tagName === "INPUT")
+        if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA")
             return;
         if (e.key.startsWith("F") && e.key.length > 1)
             return;

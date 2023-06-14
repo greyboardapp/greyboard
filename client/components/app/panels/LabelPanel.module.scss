@@ -1,0 +1,11 @@
+.labelPanel {
+    width: 250px;
+
+    .jump {
+        opacity: 0;
+    }
+
+    .label:hover .jump {
+        opacity: 1;
+    }
+}

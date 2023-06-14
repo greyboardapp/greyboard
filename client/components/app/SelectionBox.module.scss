@@ -54,4 +54,27 @@
         margin-top: -10px;
         pointer-events: all;
     }
+
+    .input input {
+        min-width: 100px;
+    }
+}
+
+.colorPalette {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s;
+
+    > div {
+        overflow: hidden;
+        padding: 0 16px;
+    }
+
+    &.colorPaletteOpen {
+        grid-template-rows: 1fr;
+
+        > div {
+            padding-top: 16px;
+        }
+    }
 }

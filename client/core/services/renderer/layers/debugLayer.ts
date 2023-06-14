@@ -7,7 +7,7 @@ import { RendererLayer } from "../../renderer/layer";
 import { viewport } from "../../viewport";
 
 export class DebugLayer extends RendererLayer {
-    onRender(dt : number) : void {
+    async onRender(dt : number) : Promise<void> {
         this.graphics.clear();
 
         for (const chunk of board.chunks.values())

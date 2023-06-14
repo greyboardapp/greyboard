@@ -9,6 +9,7 @@ import Checkbox from "../controls/Checkbox";
 import Text from "../typography/Text";
 import LockIcon from "../../assets/icons/lock.svg";
 import DeleteIcon from "../../assets/icons/delete.svg";
+import PeopleIcon from "../../assets/icons/people.svg";
 
 import styles from "./BoardCard.module.scss";
 import ToolbarInput from "../toolbar/ToolbarInput";
@@ -19,6 +20,8 @@ import IconButton from "../controls/IconButton";
 import Tooltip from "../feedback/Tooltip";
 import { showToast } from "../feedback/Toast";
 import RelativeDateTime from "../typography/RelativeDateTime";
+import { user } from "../../utils/system/auth";
+import Icon from "./Icon";
 
 const BoardCardVariants = { ...getGenericVariants({}) };
 const boardCardStyles = cva(styles.card, {
@@ -66,13 +69,19 @@ const BoardCard : Component<BoardCardProps> = (props) => {
             </Link>
             <div class={styles.info}>
                 <div class={cls(styles.infoSide, styles.filled)}>
-                    <Checkbox model={[selected, (value) => {
-                        setSelected(value);
-                        if (value)
-                            props.onSelected();
-                        else
-                            props.onDeselected();
-                    }]} marginRight={2} />
+                    <Show when={props.board.author.id === user()?.id} fallback={
+                        <Tooltip content={<Text content="texts.sharedBoard" />} orientation="vertical">
+                            <Icon icon={PeopleIcon} class="mr2" />
+                        </Tooltip>
+                    }>
+                        <Checkbox model={[selected, (value) => {
+                            setSelected(value);
+                            if (value)
+                                props.onSelected();
+                            else
+                                props.onDeselected();
+                        }]} marginRight={2} />
+                    </Show>
                     <ToolbarInput class={styles.filled} model={[() => props.board.name, (v) => (props.board.name = v)]} onChange={async (e, name) => {
                         const parsed = BoardUpdateSchema.safeParse({ name });
                         if (!parsed.success) {
@@ -81,18 +90,20 @@ const BoardCard : Component<BoardCardProps> = (props) => {
                         }
                         saveBoardDataMutation.mutate(parsed.data);
                         return true;
-                    }} />
+                    }} disabled={props.board.author.id !== user()?.id} />
                 </div>
-                <div class={cls(styles.infoSide, styles.actions)}>
-                    <Show when={!props.board.isPermanent}>
-                        <Tooltip content={<Text content="buttons.makePermanent" />} orientation="vertical">
-                            <IconButton icon={LockIcon} variant="tertiary" size="s" onClick={() => props.onMadePermanent()} />
+                <Show when={props.board.author.id === user()?.id}>
+                    <div class={cls(styles.infoSide, styles.actions)}>
+                        <Show when={!props.board.isPermanent}>
+                            <Tooltip content={<Text content="buttons.makePermanent" />} orientation="vertical">
+                                <IconButton icon={LockIcon} variant="tertiary" size="s" onClick={() => props.onMadePermanent()} />
+                            </Tooltip>
+                        </Show>
+                        <Tooltip content={<Text content="actions.delete" />} orientation="vertical">
+                            <IconButton icon={DeleteIcon} variant="tertiary" size="s" onClick={() => props.onDeleted()} />
                         </Tooltip>
-                    </Show>
-                    <Tooltip content={<Text content="actions.delete" />} orientation="vertical">
-                        <IconButton icon={DeleteIcon} variant="tertiary" size="s" onClick={() => props.onDeleted()} />
-                    </Tooltip>
-                </div>
+                    </div>
+                </Show>
             </div>
         </div>
     );

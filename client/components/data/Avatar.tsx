@@ -35,11 +35,12 @@ const avatarStyles = cva(styles.avatar, {
 interface AvatarProps extends GenericProps<HTMLDivElement>, VariantProps<typeof avatarStyles> {
     user : BasicUser;
     showNameAsTooltip ?: boolean;
+    onClick ?: () => void;
 }
 
 const Avatar : Component<AvatarProps> = (props) => {
     const avatar = (
-        <div {...getGenericProps(props)} class={cls(avatarStyles(props), props.class)}>
+        <div {...getGenericProps(props)} class={cls(avatarStyles(props), props.class)} onClick={() => (props.onClick && props.onClick())}>
             <Text content={(props.size === "xs" ? props.user.name[0] : getInitials(props.user.name))} size={props.size} />
             <Show when={props.user.avatar} keyed>
                 {(img) => <img src={img} alt={props.user.name} onError={(e) => (e.target as HTMLImageElement).style.display = "none"} />}
