@@ -7,8 +7,6 @@ import styles from "./HomePage.module.scss";
 import Logo from "../assets/branding/logo.svg";
 import GoogleLogo from "../assets/branding/google.svg";
 import GithubLogo from "../assets/branding/github.svg";
-import MicrosoftLogo from "../assets/branding/microsoft.svg";
-import SlackLogo from "../assets/branding/slack.svg";
 import CarretIcon from "../assets/icons/carret.svg";
 import { getGoogleAuthUrl, getGithubAuthUrl, logout } from "../api/auth";
 import { setUser, user } from "../utils/system/auth";
@@ -29,8 +27,6 @@ const HomePage : Component = () => {
                 <div class={styles.providerList}>
                     <a href={getGoogleAuthUrl()}><Icon icon={GoogleLogo} /></a>
                     <a href={getGithubAuthUrl()}><Icon icon={GithubLogo} /></a>
-                    <a href={getGithubAuthUrl()}><Icon icon={MicrosoftLogo} /></a>
-                    <a href={getGithubAuthUrl()}><Icon icon={SlackLogo} /></a>
                 </div>
             </>
         )}>
